@@ -1,5 +1,7 @@
 # CarGuy
 
+![PUML diagram](https://www.plantuml.com/plantuml/png/XP5FIyD04CNlyoc6dBJGebTFXIsLeaWExJcioM8Nzq_OcI11_EvkiudnJnOloMJdxVkzcMo9PU3E6XGot7SzW7AikSSJgO3lW2iy7NOmV3ff5M0fYTvyQ6BLFHjTfzETeZhebhLtW4VD9fuTh7o9hpeeoQgf9CF7bttfYPDz6Usd6yU-ZK_X7KSPNCXujN-u1cmlA3ed5zpxqDbADsFpKRygYX4qcQ6QAS9R6yi44X6qv5tEbGonLuaCDij9WH9bolQTyFHtHIFgroJYnwg6Nr3S5hXUOt6psQoAjBQxSQMqf4WZ_oDAUMV9O9lpEKk2T64vYtSijPiq6T0a6cs7VeONL6kq8cGFM-MQpffF)
+
 ## Team: 
 
 - Paul Lohninger
