@@ -41,6 +41,16 @@ entity Forum {
  Created_at
 }
 
+entity Post_Category {
+ * Post_Category_id (PK)
+    Post_Category_Name
+}
+
+Forum_Category {
+ * Forum_Category_id (PK)
+    Forum_Category_Name
+}
+
 User "1" -- "0..*" Post : creates
 User "1" -- "0..*" Comment : creates
 Post "1" -- "0..*" Comment : has
