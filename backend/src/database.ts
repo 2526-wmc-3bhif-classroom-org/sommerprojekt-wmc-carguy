@@ -134,6 +134,20 @@ class DB {
         `);
 
         connection.exec(`
+            create table if not exists User_In_Forum (
+            UID Integer not null,
+            ForumID Integer not null,
+            constraint PK_User_In_Forum primary key (UID, ForumID),
+            constraint FK_User_In_Forum_User foreign key (UID)
+            references User (UID)
+            on delete cascade,
+            constraint FK_User_In_Forum_Forum foreign key (ForumID)
+            references Forum (ForumID)
+            on delete cascade
+        ) strict;
+        `);
+
+        connection.exec(`
         create table if not exists Post (
             PID Integer not null,
             Title Text not null,
