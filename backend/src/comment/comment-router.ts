@@ -1,9 +1,11 @@
 import express from "express";
+import {getAllComments, getAllCommentsById} from "./comment-servie";
 
 export const commentRouter = express.Router();
 
 commentRouter.get("/comment:id", (req, res) => {
 
+    const result = getAllComments();
     res.json(result);
 
 })
@@ -17,6 +19,7 @@ commentRouter.get("/comment:id", (req, res) => {
     }
     else{
 
+        const result = getAllCommentsById(id);
         res.json(result);
     }
 

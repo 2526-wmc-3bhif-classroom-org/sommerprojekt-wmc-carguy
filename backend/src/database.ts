@@ -48,7 +48,7 @@ export class Unit {
     }
 }
 
-class DB {
+export class DB {
 
     public static createDBConnection(): Database {
         const db = new BetterSqlite3(dbFileName, {
