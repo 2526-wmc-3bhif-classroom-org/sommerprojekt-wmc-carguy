@@ -1,0 +1,75 @@
+@reference "../../styles.css";
+
+/* Typography for Headers */
+.header-title {
+  @apply text-4xl font-bold mb-4 tracking-tight;
+  color: var(--cg-primary);
+}
+
+.header-description {
+  @apply text-gray-400 text-lg max-w-3xl leading-relaxed;
+}
+
+/* Stats Section (Top Cards) */
+.stats-grid {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-6 mb-12;
+}
+
+.stat-card {
+  @apply p-8 rounded-xl border border-accent flex flex-col justify-center;
+  background-color: var(--color-cg-primaryg); /* Neutral Surface */
+  min-height: 140px;
+}
+
+.stat-value {
+  @apply text-3xl font-extrabold mb-1;
+}
+
+.stat-label {
+  @apply text-gray-500 font-medium text-sm uppercase tracking-wider;
+}
+
+/* Brand Cards Grid */
+.brand-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6;
+}
+
+.brand-card {
+  @apply p-8 rounded-xl border transition-all duration-300 relative overflow-hidden;
+  background-color: #18181b;
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.brand-card:hover {
+  @apply shadow-2xl;
+  border-color: var(--cg-primary);
+  transform: translateY(-4px);
+}
+
+/* Brand Swatch (Color box) */
+.brand-swatch {
+  @apply w-12 h-12 rounded-lg mb-6 shadow-md;
+}
+
+.brand-name {
+  @apply text-xl font-bold text-white mb-2;
+}
+
+/* Metadata (models/members) */
+.brand-meta {
+  @apply flex items-center gap-2 text-sm text-gray-500 mb-6;
+}
+
+.meta-dot {
+  @apply opacity-30;
+}
+
+/* Explore Link */
+.explore-link {
+  @apply font-semibold flex items-center gap-1 transition-all;
+  color: var(--cg-accent);
+}
+
+.brand-card:hover .explore-link {
+  @apply gap-3;
+}
