@@ -1,16 +1,19 @@
 import express from "express";
-import {getAllComments, getAllCommentsById} from "./comment-servie";
+import {CommentService} from "./comment-service";
+import {CommentRepository} from "./comment-repository";
 
 export const commentRouter = express.Router();
 
-commentRouter.get("/comment:id", (req, res) => {
+const commentService = new CommentService(new CommentRepository());
 
-    const result = getAllComments();
+commentRouter.get("/comments", (req, res) => {
+
+    const result = commentService.getAllComments();
     res.json(result);
 
 })
 
-commentRouter.get("/comment:id", (req, res) => {
+commentRouter.get("/comment/:id", (req, res) => {
 
     const id = Number(req.params.id);
 
@@ -19,15 +22,17 @@ commentRouter.get("/comment:id", (req, res) => {
     }
     else{
 
-        const result = getAllCommentsById(id);
+        const result = commentService.getCommentById(id);
         res.json(result);
     }
 
 })
 
-commentRouter.get("/comment:postId", (req, res) => {
+commentRouter.get("/posts/comments/:postId", (req, res) => {
 
     const postId = Number(req.params.id);
+
+    const result = commentService.getCommentByPostId(postId);
 
     if (typeof postId !== "number") {
         return res.status(400).send("Invalid id");
@@ -39,9 +44,11 @@ commentRouter.get("/comment:postId", (req, res) => {
 
 })
 
-commentRouter.get("/comment:parentCommentId", (req, res) => {
+commentRouter.get("/comment/comments/:parentCommentId", (req, res) => {
 
     const parentCommentId = Number(req.params.id);
+
+    const result = commentService.getCommentsByParentComment(parentCommentId);
 
     if (typeof parentCommentId !== "number") {
         return res.status(400).send("Invalid id");

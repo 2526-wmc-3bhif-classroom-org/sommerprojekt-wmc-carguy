@@ -1,26 +1,49 @@
 import { DB } from "../database";
 
-export function findAllPosts() {
-    const db = DB.createDBConnection();
+export class CommentRepository{
+    public getAllComments() {
+        const db = DB.createDBConnection();
 
-    const result = db.prepare(`
+        const result = db.prepare(`
         SELECT *
-        FROM Post
-    `).all();
+        FROM Comment`).all() as Comment[];
 
-    db.close();
-    return result;
-}
+        db.close();
+        return result;
+    }
 
-export function findAllPostsById(id: number) {
-    const db = DB.createDBConnection();
+    public getCommentById(id: number) {
+        const db = DB.createDBConnection();
 
-    const result = db.prepare(`
+        const result = db.prepare(`
         SELECT *
-        FROM Post
-        WHERE PID = ?
-    `).all(id);
+        FROM Comment
+        WHERE CID = ?`).get(id) as Comment;
 
-    db.close();
-    return result;
+        db.close();
+        return result;
+    }
+
+    public getCommentsByPost(id: number):Comment[] {
+        const db = DB.createDBConnection();
+
+        const result = db.prepare(`
+        SELECT *
+        FROM Comment
+        where PID = ?`).all(id) as Comment[];
+
+        db.close();
+        return result;
+    }
+
+    public getCommentsByParentComment(pid: number) :Comment[] {
+        const db = DB.createDBConnection();
+
+        const result = db.prepare(`
+        SELECT *
+        FROM Comment
+        WHERE PARENT_CID = ?`).all(pid) as Comment[];
+
+        return result;
+    }
 }
