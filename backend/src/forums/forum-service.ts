@@ -1,13 +1,19 @@
-import {findAllForums, findForumByCategory, findForumById} from "./forum-repository";
+import { Forum } from "../../data/model";
+import { ForumRepository } from "./forum-repository";
 
-export function getAllForums(){
-    return findAllForums();
-}
+export class ForumService {
 
-export function getForumById(id:number){
-    return findForumById(id);
-}
+    constructor(private forumRepository: ForumRepository) {}
 
-export function getForumByCategory(id:number){
-    return findForumByCategory(id);
+    public getAllForums(): Forum[] {
+        return this.forumRepository.findAllForums();
+    }
+
+    public getForumById(id: number): Forum | undefined {
+        return this.forumRepository.findForumById(id);
+    }
+
+    public getForumByCategory(categoryId: number): Forum[] {
+        return this.forumRepository.findForumByCategory(categoryId);
+    }
 }
