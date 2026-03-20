@@ -47,7 +47,7 @@ commentRouter.get("/posts/comments/:postId", (req, res) => {
 
 commentRouter.get("/comment/comments/:parentCommentId", (req, res) => {
 
-    const parentCommentId = Number(req.params.id);
+    const parentCommentId = Number(req.params.parentCommentId);
 
     const result = commentService.getCommentsByParentComment(parentCommentId);
 
@@ -60,7 +60,7 @@ commentRouter.get("/comment/comments/:parentCommentId", (req, res) => {
     }
 })
 
-commentRouter.put("/comment", (req, res) => {
+commentRouter.post("/comment", (req, res) => {
     const content: string = req.body.content;
     const author: User = req.body.author;
     const post: Post = req.body.post;
@@ -79,7 +79,7 @@ commentRouter.put("/comment", (req, res) => {
     commentService.createCommentOnPost(comment);
 })
 
-commentRouter.put("/posts/comments", (req, res) => {
+commentRouter.post("/posts/comments", (req, res) => {
     const content: string = req.body.content;
     const author: User = req.body.author;
     const post: Post = req.body.post;
