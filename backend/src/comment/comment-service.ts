@@ -1,5 +1,6 @@
 import { CommentRepository } from "./comment-repository";
 import {DB} from "../database";
+import {Comment} from "../../data/model";
 
 export class CommentService{
 
@@ -20,5 +21,13 @@ export class CommentService{
 
     public getCommentsByParentComment(id: number) : Comment[]{
         return this.commentRepository.getCommentsByParentComment(id);
+    }
+
+    public createCommentOnPost(comment: Comment){
+        return this.commentRepository.createCommentOnPost(comment);
+    }
+
+    public createCommentOnComment(comment: Comment){
+        return this.commentRepository.createCommentOnComment(comment);
     }
 }
