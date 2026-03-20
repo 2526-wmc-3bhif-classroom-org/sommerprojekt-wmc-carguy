@@ -1,13 +1,13 @@
 import express from "express";
 
+import {getPostById, getPostByUser, getAllPosts, getPostByCategory, getPostByForum} from "./post-servie";
+
 export const postRouter = express.Router();
 
 postRouter.get("/posts", (req, res) => {
 
-
+    const result = getAllPosts();
     res.json(result);
-
-
 })
 
 postRouter.get("/posts:id", (req, res) => {
@@ -18,7 +18,7 @@ postRouter.get("/posts:id", (req, res) => {
         return res.status(400).send("Invalid id");
     }
     else{
-
+        const result = getPostById(id);
         res.json(result);
     }
 
@@ -33,6 +33,7 @@ postRouter.get("/posts:forum", (req, res) => {
     }
     else{
 
+        const result = getPostByForum(forumId);
         res.json(result);
     }
 })
@@ -46,6 +47,7 @@ postRouter.get("/posts/:userId", (req, res) => {
     }
     else{
 
+        const result = getPostByUser(userId);
         res.json(result);
     }
 })
@@ -59,6 +61,7 @@ postRouter.get("/posts/:category", (req, res) => {
     }
     else{
 
+        const result = getPostByCategory(categoryId);
         res.json(result);
     }
 })
