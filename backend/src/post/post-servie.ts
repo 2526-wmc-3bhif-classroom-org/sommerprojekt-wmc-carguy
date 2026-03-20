@@ -1,7 +1,5 @@
 import {findPostById, findPostByUser, findPostByForum, findAllPosts, findPostByCategory} from "./post-repository";
 
-
-
 export function getAllPosts(){
     return findAllPosts();
 }
