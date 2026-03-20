@@ -1,4 +1,5 @@
 import { DB } from "../database";
+import {Comment} from "../../data/model";
 
 export class CommentRepository{
     public getAllComments() {
@@ -45,5 +46,21 @@ export class CommentRepository{
         WHERE PARENT_CID = ?`).all(pid) as Comment[];
 
         return result;
+    }
+
+    public createCommentOnPost(comment: Comment) {
+        const db = DB.createDBConnection();
+
+        db.prepare(`INSERT INTO Comment
+        (content, uid, pid, publishedAt) values 
+        (?, ?, ?, ?)`).run(comment.content, comment.author.uid, comment.post.pid, comment.publishedAt);
+    }
+
+    public createCommentOnComment(comment: Comment) {
+        const db = DB.createDBConnection();
+
+        db.prepare(`INSERT INTO Comment
+        (content, uid, pid, parentCID, publishedAt) values 
+        (?, ?, ?, ?)`).run(comment.content, comment.author.uid, comment.post.pid, comment.parentComment.cid, comment.publishedAt);
     }
 }

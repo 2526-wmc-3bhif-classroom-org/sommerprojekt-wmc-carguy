@@ -1,7 +1,7 @@
 import BetterSqlite3 from "better-sqlite3";
 import { Database } from "better-sqlite3";
 
-const dbFileName = "carguy.db";
+const dbFileName = "../data/carguy.db";
 
 export class Unit {
 
