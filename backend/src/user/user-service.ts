@@ -1,9 +1,15 @@
-import {findAllUsers, findUserById} from "./user-repository";
+import { User } from "../../data/model";
+import { UserRepository } from "./user-repository";
 
-export function getAllUsers() {
-    return findAllUsers();
-}
+export class UserService {
 
-export function getUserById(id: number) {
-    return findUserById(id)
+    constructor(private userRepository: UserRepository) {}
+
+    public getAllUsers(): User[] {
+        return this.userRepository.findAllUsers();
+    }
+
+    public getUserById(id: number): User | undefined {
+        return this.userRepository.findUserById(id);
+    }
 }

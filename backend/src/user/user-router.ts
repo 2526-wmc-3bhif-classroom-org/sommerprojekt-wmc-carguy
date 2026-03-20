@@ -1,27 +1,28 @@
 import express from "express";
-import {getAllUsers, getUserById} from "./user-service";
-import {getAllPosts} from "../post/post-servie";
+import { UserService } from "./user-service";
+import { UserRepository } from "./user-repository";
 
 export const userRouter = express.Router();
 
-userRouter.get("/user", (req, res) => {
+const userService = new UserService(new UserRepository());
 
-    const result = getAllPosts();
+userRouter.get("/users", (req, res) => {
+    const result = userService.getAllUsers();
     res.json(result);
+});
 
-})
-
-userRouter.get("/user:id", (req, res) => {
-
+userRouter.get("/user/:id", (req, res) => {
     const id = Number(req.params.id);
 
     if (typeof id !== "number") {
         return res.status(400).send("Invalid id");
     }
-    else{
 
-        const result = getUserById(id);
-        res.json(result);
+    const result = userService.getUserById(id);
+
+    if (!result) {
+        return res.status(404).send("User not found");
     }
 
-})
+    res.json(result);
+});
