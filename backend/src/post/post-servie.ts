@@ -1,21 +1,26 @@
-import {findPostById, findPostByUser, findPostByForum, findAllPosts, findPostByCategory} from "./post-repository";
+import { Post } from "../../data/model";
+import { PostRepository } from "./post-repository";
 
-export function getAllPosts(){
-    return findAllPosts();
-}
+export class PostService {
+    constructor(private postRepository: PostRepository) {}
 
-export function getPostById(id:number){
-    return findPostById(id);
-}
+    public getAllPosts(): Post[] {
+        return this.postRepository.findAllPosts();
+    }
 
-export function getPostByForum(id:number){
-    return findPostByForum(id);
-}
+    public getPostById(id: number): Post | undefined {
+        return this.postRepository.findPostById(id);
+    }
 
-export function getPostByUser(id:number){
-    return findPostByUser(id);
-}
+    public getPostByForum(forumId: number): Post[] {
+        return this.postRepository.findPostByForum(forumId);
+    }
 
-export function getPostByCategory(id:number){
-    return findPostByCategory(id);
+    public getPostByUser(userId: number): Post[] {
+        return this.postRepository.findPostByUser(userId);
+    }
+
+    public getPostByCategory(categoryId: number): Post[] {
+        return this.postRepository.findPostByCategory(categoryId);
+    }
 }

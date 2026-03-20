@@ -1,40 +1,49 @@
 import { DB } from "../database";
+import { Post } from "../../data/model";
 
-export function findAllPosts() {
-    const db = DB.createDBConnection();
-    const result = db.prepare(`SELECT * FROM Post`).all();
-    db.close();
-    return result;
-}
+export class PostRepository {
+    public findAllPosts(): Post[] {
+        const db = DB.createDBConnection();
+        try {
+            return db.prepare("SELECT * FROM Post").all() as Post[];
+        } finally {
+            db.close();
+        }
+    }
 
-export function findPostById(id: number) {
-    const db = DB.createDBConnection();
+    public findPostById(id: number): Post | undefined {
+        const db = DB.createDBConnection();
+        try {
+            return db.prepare("SELECT * FROM Post WHERE PID = ?").get(id) as Post | undefined;
+        } finally {
+            db.close();
+        }
+    }
 
-    const result = db.prepare('SELECT * FROM Post WHERE PID = ?').get(id);
-    db.close();
-    return result;
-}
+    public findPostByForum(forumId: number): Post[] {
+        const db = DB.createDBConnection();
+        try {
+            return db.prepare("SELECT * FROM Post WHERE ForumID = ?").all(forumId) as Post[];
+        } finally {
+            db.close();
+        }
+    }
 
-export function findPostByForum(forumId: number) {
-    const db = DB.createDBConnection();
+    public findPostByUser(userId: number): Post[] {
+        const db = DB.createDBConnection();
+        try {
+            return db.prepare("SELECT * FROM Post WHERE UID = ?").all(userId) as Post[];
+        } finally {
+            db.close();
+        }
+    }
 
-    const result = db.prepare('SELECT * FROM Post WHERE ForumID = ?').all(forumId);
-    db.close();
-    return result;
-}
-
-export function findPostByUser(userId: number) {
-    const db = DB.createDBConnection();
-
-    const result = db.prepare('SELECT * FROM Post WHERE UID = ?').all(userId);
-    db.close();
-    return result;
-}
-
-export function findPostByCategory(categoryId: number) {
-    const db = DB.createDBConnection();
-
-    const result = db.prepare('SELECT * FROM Post WHERE Post_Category_id = ?').all(categoryId);
-    db.close();
-    return result;
+    public findPostByCategory(categoryId: number): Post[] {
+        const db = DB.createDBConnection();
+        try {
+            return db.prepare("SELECT * FROM Post WHERE Post_Category_id = ?").all(categoryId) as Post[];
+        } finally {
+            db.close();
+        }
+    }
 }
