@@ -1,11 +1,13 @@
 import express from "express";
 import { ForumRepository } from "./forum-repository";
 import { ForumService } from "./forum-service";
+import {Comment, Forum, Post, User} from "../../data/model";
+import {commentRouter} from "../comment/comment-router";
 
 const forumService = new ForumService(new ForumRepository());
 export const forumRouter = express.Router();
 
-forumRouter.get("/forum", (req, res) => {
+forumRouter.get("/forums", (req, res) => {
     const result = forumService.getAllForums();
     res.json(result);
 });
@@ -36,3 +38,16 @@ forumRouter.get("/forum/category/:categoryId", (req, res) => {
     const result = forumService.getForumByCategory(categoryId);
     res.json(result);
 });
+
+forumRouter.post("/forum", (req, res) => {
+    const name: string = req.body.name;
+    const createdAt: Date = new Date(Date.now());
+
+    const forum: Forum = {
+        forumId: 0,
+        name: name,
+        createdAt: createdAt
+    };
+
+    forumService.createForum(forum);
+})
