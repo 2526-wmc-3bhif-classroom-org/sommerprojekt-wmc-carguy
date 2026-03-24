@@ -29,15 +29,15 @@ export class ForumRepository {
 
         try {
             db.prepare(`
-                INSERT INTO Forum
-                (ForumID, Name, Description, ParentForumID, Forum_Category_id, CreatedAt)
-                VALUES (?, ?, ?, ?, ?, ?)
-            `).run(
+            INSERT INTO Forum
+            (ForumID, Name, Description, ParentForumID, Forum_Category_id, CreatedAt)
+            VALUES (?, ?, ?, ?, ?, ?)
+        `).run(
                 forum.forumId,
                 forum.name,
                 forum.description ?? null,
-                forum.parentForumId ?? null,
-                forum.category?.forumCategoryId ?? null,
+                forum.parentForum?.forumId ?? null,
+                null,
                 forum.createdAt
             );
         } finally {

@@ -42,7 +42,7 @@ forumRouter.get("/forum/category/:categoryId", (req, res) => {
 forumRouter.post("/forum", (req, res) => {
     const forum: Forum = req.body;
 
-    userRouter.createUser(forum);
+    forumService.createForum(forum);
 
     res.status(201).json({ message: "User created" });
 });
