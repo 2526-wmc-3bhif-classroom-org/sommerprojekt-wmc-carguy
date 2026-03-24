@@ -12,4 +12,8 @@ export class UserService {
     public getUserById(id: number): User | undefined {
         return this.userRepository.findUserById(id);
     }
+
+    public createUser(user: User){
+        this.userRepository.create(user);
+    }
 }

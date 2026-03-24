@@ -4,12 +4,16 @@ import { PostRepository } from "./post-repository";
 export class PostService {
     constructor(private postRepository: PostRepository) {}
 
-    public getAllPosts(): Post[] {
-        return this.postRepository.findAllPosts();
+    public getAllRootPosts(): Post[] {
+        return this.postRepository.findAllRootPosts();
     }
 
     public getPostById(id: number): Post | undefined {
         return this.postRepository.findPostById(id);
+    }
+
+    public getRepliesByParentId(parentId: number): Post[] {
+        return this.postRepository.findRepliesByParentId(parentId);
     }
 
     public getPostByForum(forumId: number): Post[] {
@@ -22,5 +26,13 @@ export class PostService {
 
     public getPostByCategory(categoryId: number): Post[] {
         return this.postRepository.findPostByCategory(categoryId);
+    }
+
+    public createPost(post: Post): void {
+        this.postRepository.createPost(post);
+    }
+
+    public createReply(post: Post): void {
+        this.postRepository.createReply(post);
     }
 }

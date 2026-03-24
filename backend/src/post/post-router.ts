@@ -1,12 +1,13 @@
 import express from "express";
-import {PostService} from "./post-servie";
+import { PostService } from "./post-servie";
 import { PostRepository } from "./post-repository";
+import { Post } from "../../data/model";
 
 const postService = new PostService(new PostRepository());
 export const postRouter = express.Router();
 
 postRouter.get("/posts", (req, res) => {
-    const result = postService.getAllPosts();
+    const result = postService.getAllRootPosts();
     res.json(result);
 });
 
@@ -23,6 +24,17 @@ postRouter.get("/posts/:id", (req, res) => {
         return res.status(404).send("Post not found");
     }
 
+    res.json(result);
+});
+
+postRouter.get("/posts/:id/replies", (req, res) => {
+    const id = Number(req.params.id);
+
+    if (typeof id !== "number") {
+        return res.status(400).send("Invalid id");
+    }
+
+    const result = postService.getRepliesByParentId(id);
     res.json(result);
 });
 
@@ -57,4 +69,27 @@ postRouter.get("/posts/category/:categoryId", (req, res) => {
 
     const result = postService.getPostByCategory(categoryId);
     res.json(result);
+});
+
+postRouter.post("/post", (req, res) => {
+    const post: Post = req.body;
+
+    postService.createPost(post);
+
+    res.status(201).json({ message: "Post created" });
+});
+
+postRouter.post("/posts/:id/replies", (req, res) => {
+    const id = Number(req.params.id);
+
+    if (typeof id !== "number") {
+        return res.status(400).send("Invalid id");
+    }
+
+    const post: Post = req.body;
+    post.parentPost = { pid: id } as Post;
+
+    postService.createReply(post);
+
+    res.status(201).json({ message: "Reply created" });
 });

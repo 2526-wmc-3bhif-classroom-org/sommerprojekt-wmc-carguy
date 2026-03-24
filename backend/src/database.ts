@@ -94,110 +94,91 @@ export class DB {
     private static ensureTablesCreated(connection: Database): void {
 
         connection.exec(`
-        create table if not exists User (
-            UID Integer not null,
-            Username Text not null,
-            Password Text not null,
-            PublicName Text,
-            Description Text,
-            Title Text,
-            Image Text,
-            CreatedAt Text not null,
-            constraint PK_User primary key (UID)
-        ) strict;
-        `);
+    create table if not exists User (
+        UID Integer not null,
+        Username Text not null,
+        Password Text not null,
+        PublicName Text,
+        Description Text,
+        Title Text,
+        Image Text,
+        CreatedAt Text not null,
+        constraint PK_User primary key (UID)
+    ) strict;
+    `);
 
         connection.exec(`
-        create table if not exists Forum_Category (
-            Forum_Category_id Integer not null,
-            Forum_Category_Name Text not null,
-            constraint PK_Forum_Category primary key (Forum_Category_id)
-        ) strict;
-        `);
+    create table if not exists Forum_Category (
+        Forum_Category_id Integer not null,
+        Forum_Category_Name Text not null,
+        constraint PK_Forum_Category primary key (Forum_Category_id)
+    ) strict;
+    `);
 
         connection.exec(`
-        create table if not exists Post_Category (
-            Post_Category_id Integer not null,
-            Post_Category_Name Text not null,
-            constraint PK_Post_Category primary key (Post_Category_id)
-        ) strict;
-        `);
+    create table if not exists Post_Category (
+        Post_Category_id Integer not null,
+        Post_Category_Name Text not null,
+        constraint PK_Post_Category primary key (Post_Category_id)
+    ) strict;
+    `);
 
         connection.exec(`
-        create table if not exists Forum (
-            ForumID Integer not null,
-            Name Text not null,
-            Description Text,
-            ParentForumID Integer,
-            Forum_Category_id Integer,
-            CreatedAt Text not null,
-            constraint PK_Forum primary key (ForumID),
-            constraint FK_ForumParent foreign key (ParentForumID)
-                references Forum (ForumID)
-                on delete cascade,
-            constraint FK_Forum_Category foreign key (Forum_Category_id)
-                references Forum_Category (Forum_Category_id)
-        ) strict;
-        `);
+    create table if not exists Forum (
+        ForumID Integer not null,
+        Name Text not null,
+        Description Text,
+        ParentForumID Integer,
+        Forum_Category_id Integer,
+        CreatedAt Text not null,
+        constraint PK_Forum primary key (ForumID),
+        constraint FK_ForumParent foreign key (ParentForumID)
+            references Forum (ForumID)
+            on delete cascade,
+        constraint FK_Forum_Category foreign key (Forum_Category_id)
+            references Forum_Category (Forum_Category_id)
+    ) strict;
+    `);
 
         connection.exec(`
-            create table if not exists User_In_Forum (
-            UID Integer not null,
-            ForumID Integer not null,
-            constraint PK_User_In_Forum primary key (UID, ForumID),
-            constraint FK_User_In_Forum_User foreign key (UID)
+    create table if not exists User_In_Forum (
+        UID Integer not null,
+        ForumID Integer not null,
+        constraint PK_User_In_Forum primary key (UID, ForumID),
+        constraint FK_User_In_Forum_User foreign key (UID)
             references User (UID)
             on delete cascade,
-            constraint FK_User_In_Forum_Forum foreign key (ForumID)
+        constraint FK_User_In_Forum_Forum foreign key (ForumID)
             references Forum (ForumID)
             on delete cascade
-        ) strict;
-        `);
+    ) strict;
+    `);
 
         connection.exec(`
-        create table if not exists Post (
-            PID Integer not null,
-            Title Text not null,
-            Content Text not null,
-            UID Integer not null,
-            ForumID Integer not null,
-            Post_Category_id Integer,
-            PublishedAt Text not null,
-            Likes Integer not null default 0,
-            Dislikes Integer not null default 0,
-            constraint PK_Post primary key (PID),
-            constraint FK_Post_User foreign key (UID)
-                references User (UID)
-                on delete cascade,
-            constraint FK_Post_Forum foreign key (ForumID)
-                references Forum (ForumID)
-                on delete cascade,
-            constraint FK_Post_Category foreign key (Post_Category_id)
-                references Post_Category (Post_Category_id)
-        ) strict;
-        `);
-
-        connection.exec(`
-        create table if not exists Comment (
-            CID Integer not null,
-            Content Text not null,
-            UID Integer not null,
-            PID Integer not null,
-            ParentCID Integer,
-            PublishedAt Text not null,
-            Likes Integer not null default 0,
-            Dislikes Integer not null default 0,
-            constraint PK_Comment primary key (CID),
-            constraint FK_Comment_User foreign key (UID)
-                references User (UID)
-                on delete cascade,
-            constraint FK_Comment_Post foreign key (PID)
-                references Post (PID)
-                on delete cascade,
-            constraint FK_Comment_Parent foreign key (ParentCID)
-                references Comment (CID)
-                on delete cascade
-        ) strict;
-        `);
+    create table if not exists Post (
+        PID Integer not null,
+        Title Text,
+        Content Text not null,
+        UID Integer not null,
+        ForumID Integer not null,
+        ParentPID Integer,
+        Post_Category_id Integer,
+        PublishedAt Text not null,
+        Likes Integer not null default 0,
+        Dislikes Integer not null default 0,
+        constraint PK_Post primary key (PID),
+        constraint FK_Post_User foreign key (UID)
+            references User (UID)
+            on delete cascade,
+        constraint FK_Post_Forum foreign key (ForumID)
+            references Forum (ForumID)
+            on delete cascade,
+        constraint FK_Post_Parent foreign key (ParentPID)
+            references Post (PID)
+            on delete cascade,
+        constraint FK_Post_Category foreign key (Post_Category_id)
+            references Post_Category (Post_Category_id)
+    ) strict;
+    `);
     }
 }

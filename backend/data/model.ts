@@ -8,31 +8,20 @@ export interface User {
   image?: string;
   createdAt: Date;
   posts?: Post[];
-  comments?: Comment[];
 }
 
 export interface Post {
   pid: number;
-  title: string;
+  title?: string;
   content: string;
   author: User;
-  publishedAt: Date;
   forum: Forum;
-  likes: number;
-  dislikes: number;
-  comments?: Comment[];
-}
-
-export interface Comment {
-  cid: number;
-  content: string;
-  author: User;
-  post: Post;
-  parentComment?: Comment;
-  replies?: Comment[];
+  parentPost?: Post;
+  replies?: Post[];
   publishedAt: Date;
   likes: number;
   dislikes: number;
+  category?: PostCategory;
 }
 
 export interface Forum {
@@ -43,6 +32,7 @@ export interface Forum {
   subForums?: Forum[];
   posts?: Post[];
   createdAt: Date;
+  category?: ForumCategory;
 }
 
 export interface PostCategory {
