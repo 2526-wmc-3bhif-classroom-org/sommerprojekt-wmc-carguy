@@ -23,4 +23,8 @@ export class PostService {
     public getPostByCategory(categoryId: number): Post[] {
         return this.postRepository.findPostByCategory(categoryId);
     }
+
+    public createPost(post: Post){
+        this.postRepository.create(post);
+    }
 }

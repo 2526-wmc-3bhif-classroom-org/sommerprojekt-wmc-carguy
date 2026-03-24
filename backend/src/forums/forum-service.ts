@@ -16,4 +16,8 @@ export class ForumService {
     public getForumByCategory(categoryId: number): Forum[] {
         return this.forumRepository.findForumByCategory(categoryId);
     }
+
+    public createForum(){
+
+    }
 }

@@ -1,5 +1,5 @@
 import { DB } from "../database";
-import { Post } from "../../data/model";
+import {Post, User} from "../../data/model";
 
 export class PostRepository {
     public findAllPosts(): Post[] {
@@ -42,6 +42,29 @@ export class PostRepository {
         const db = DB.createDBConnection();
         try {
             return db.prepare("SELECT * FROM Post WHERE Post_Category_id = ?").all(categoryId) as Post[];
+        } finally {
+            db.close();
+        }
+    }
+
+    public create(post: Post): void {
+        const db = DB.createDBConnection();
+
+        try {
+            db.prepare(`
+            INSERT INTO Post
+            (PID, Title, Content, UID, ForumID, PublishedAt, Likes, Dislikes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+                post.pid,
+                post.title,
+                post.content,
+                post.author.uid,
+                post.forum.forumId,
+                post.publishedAt,
+                post.likes,
+                post.dislikes
+            );
         } finally {
             db.close();
         }

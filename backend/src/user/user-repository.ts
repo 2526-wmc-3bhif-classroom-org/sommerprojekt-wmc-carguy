@@ -16,5 +16,19 @@ export class UserRepository {
         db.close();
         return result;
     }
+
+    public create(user: User): void {
+        const db = DB.createDBConnection();
+
+        db.prepare(`
+                INSERT INTO User (UID, Username, Password, CreatedAt)
+                VALUES (?, ?, ?, ?)
+            `).run(
+            user.uid,
+            user.username,
+            user.password,
+            user.createdAt
+        );
+    }
 }
 

@@ -1,6 +1,8 @@
 import express from "express";
 import {PostService} from "./post-servie";
 import { PostRepository } from "./post-repository";
+import {Post, User} from "../../data/model";
+import {userRouter} from "../user/user-router";
 
 const postService = new PostService(new PostRepository());
 export const postRouter = express.Router();
@@ -57,4 +59,12 @@ postRouter.get("/posts/category/:categoryId", (req, res) => {
 
     const result = postService.getPostByCategory(categoryId);
     res.json(result);
+});
+
+postRouter.post("/post", (req, res) => {
+    const post: Post = req.body;
+
+    postService.createPost(post);
+
+    res.status(201).json({ message: "User created" });
 });

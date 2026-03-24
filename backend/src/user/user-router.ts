@@ -1,6 +1,7 @@
 import express from "express";
 import { UserService } from "./user-service";
 import { UserRepository } from "./user-repository";
+import {User} from "../../data/model";
 
 export const userRouter = express.Router();
 
@@ -25,4 +26,12 @@ userRouter.get("/user/:id", (req, res) => {
     }
 
     res.json(result);
+});
+
+userRouter.post("/user", (req, res) => {
+    const user: User = req.body;
+
+    userService.createUser(user);
+
+    res.status(201).json({ message: "User created" });
 });

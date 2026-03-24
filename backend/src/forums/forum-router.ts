@@ -1,6 +1,8 @@
 import express from "express";
 import { ForumRepository } from "./forum-repository";
 import { ForumService } from "./forum-service";
+import {Forum, User} from "../../data/model";
+import {userRouter} from "../user/user-router";
 
 const forumService = new ForumService(new ForumRepository());
 export const forumRouter = express.Router();
@@ -35,4 +37,12 @@ forumRouter.get("/forum/category/:categoryId", (req, res) => {
 
     const result = forumService.getForumByCategory(categoryId);
     res.json(result);
+});
+
+forumRouter.post("/forum", (req, res) => {
+    const forum: Forum = req.body;
+
+    userRouter.createUser(forum);
+
+    res.status(201).json({ message: "User created" });
 });
