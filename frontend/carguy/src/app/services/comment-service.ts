@@ -1,9 +1,7 @@
 import { Comment, Post, User } from "../../model";
 
-const API_BASE_URL = "http://localhost:3000";
+const API_BASE_URL = "http://localhost:3000/api";
 
-/** * Helper to handle fetch responses and throw clear errors
- */
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const errorText = await response.text();

@@ -1,7 +1,10 @@
 import BetterSqlite3 from "better-sqlite3";
-import { Database } from "better-sqlite3";
+import Database from "better-sqlite3";
+import * as path from "node:path";
+import * as fs from "node:fs";
 
-const dbFileName = "../data/carguy.db";
+const dataDir = path.resolve(process.cwd(), "./data");
+const dbFileName = path.join(dataDir, "carguy.db");
 
 export class Unit {
 
@@ -51,13 +54,17 @@ export class Unit {
 export class DB {
 
     public static createDBConnection(): Database {
+        if (!fs.existsSync(dataDir)) {
+            console.log(`Creating directory: ${dataDir}`);
+            fs.mkdirSync(dataDir, { recursive: true });
+        }
+
         const db = new BetterSqlite3(dbFileName, {
             fileMustExist: false,
             verbose: (s: unknown) => DB.logStatement(s)
         });
 
         db.pragma("foreign_keys = ON");
-
         DB.ensureTablesCreated(db);
 
         return db;
