@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ForumService } from '../services/forum-service';
-import {Forum} from '../../model';
+import { Forum } from '../../model';
 
 @Component({
   selector: 'app-brand-directory',
@@ -11,10 +11,17 @@ import {Forum} from '../../model';
   templateUrl: './brand-directory.component.html',
   styleUrls: ['./brand-directory.component.css']
 })
-export class BrandDirectoryComponent {
+export class BrandDirectoryComponent implements OnInit {
 
-  let
+  forums: Forum[] = [];
+  private cdr = inject(ChangeDetectorRef);
 
-  ngOnInit(): void {
+  async ngOnInit() {
+    try {
+      this.forums = await ForumService.getAllForums();
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('Failed to load forums', error);
+    }
   }
 }

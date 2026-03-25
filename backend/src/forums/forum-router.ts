@@ -1,8 +1,7 @@
 import express from "express";
 import { ForumRepository } from "./forum-repository";
 import { ForumService } from "./forum-service";
-import {Comment, Forum, Post, User} from "../../data/model";
-import {commentRouter} from "../comment/comment-router";
+import {Forum} from "../../data/model";
 
 const forumService = new ForumService(new ForumRepository());
 export const forumRouter = express.Router();

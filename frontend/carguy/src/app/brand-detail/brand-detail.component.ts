@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ModelsService} from '../services/model-service';
 
 @Component({
   standalone: true,
@@ -20,7 +19,5 @@ export class BrandDetailComponent implements OnInit {
 
   ngOnInit() {
     this.brandName = <string>this.route.snapshot.paramMap.get('name');
-
-    this.curModels = ModelsService.getModels().filter(model => model.brand === this.brandName);
   }
 }

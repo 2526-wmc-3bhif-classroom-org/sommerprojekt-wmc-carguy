@@ -20,8 +20,4 @@ export class ForumService {
     public createForum(forum: Forum){
         return this.forumRepository.createForum(forum);
     }
-
-    public createForum(forum: Forum){
-        this.forumRepository.create(forum);
-    }
 }
