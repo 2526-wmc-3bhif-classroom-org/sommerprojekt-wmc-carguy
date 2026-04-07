@@ -6,10 +6,14 @@ export class UserService {
     constructor(private userRepository: UserRepository) {}
 
     public getAllUsers(): User[] {
-        return this.userRepository.findAllUsers();
+        return this.userRepository.findAllUsers() as User[];
     }
 
     public getUserById(id: number): User | undefined {
-        return this.userRepository.findUserById(id);
+        return this.userRepository.findUserById(id) as User;
+    }
+
+    public createUser(user: User){
+        this.userRepository.create(user);
     }
 }

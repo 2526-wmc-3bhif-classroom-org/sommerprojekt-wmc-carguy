@@ -1,6 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CommunityService} from '../services/community-service';
+import { ForumService } from '../services/forum-service';
+import { Forum } from '../../model';
 
 @Component({
   selector: 'app-communities',
@@ -8,18 +9,31 @@ import { CommunityService} from '../services/community-service';
   imports: [CommonModule],
   templateUrl: './communities-directory.html'
 })
-export class CommunitiesRepository {
-  private communityService = inject(CommunityService);
+export class CommunitiesRepository implements OnInit {
+  featured: Forum[] = [];
+  all: Forum[] = [];
+  categories: any[] = [];
+  trending: any[] = [];
 
-  featured = this.communityService.getFeatured();
-  all = this.communityService.getAll();
-  categories = this.communityService.getCategories();
-  trending = this.communityService.getTrending();
+  count = 0;
+  private cdr = inject(ChangeDetectorRef);
 
-  count = this.all.length;
+  async ngOnInit() {
+    try {
+      this.all = await ForumService.getAllForums();
+      this.featured = this.all;
+      this.categories = this.all;
+      this.trending = this.all;
+      this.count = this.all.length;
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('Failed to load forums', error);
+    }
+  }
 
   // Helper for the "Letter Avatar"
   getInitials(name: string): string {
+    if (!name) return '';
     return name.substring(0, 2).toUpperCase();
   }
 }
