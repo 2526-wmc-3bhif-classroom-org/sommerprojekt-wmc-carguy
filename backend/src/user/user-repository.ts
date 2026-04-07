@@ -15,6 +15,12 @@ export class UserRepository {
         return result;
     }
 
+    public findUserByUsername(username: string) {
+        const db = DB.getInstance();
+        const result = db.prepare("SELECT UID as uid, Username as username, Password as password, PublicName as publicName, Description as description, Title as title, Image as image, CreatedAt as createdAt FROM User WHERE Username = ?").get(username);
+        return result;
+    }
+
     public create(user: User): void {
         const db = DB.getInstance();
 
