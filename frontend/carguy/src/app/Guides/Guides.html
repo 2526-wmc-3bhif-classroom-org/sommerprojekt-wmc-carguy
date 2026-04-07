@@ -1,0 +1,27 @@
+<div class="guides-container">
+  <div class="header">
+    <h1 class="text-4xl font-bold mb-4">Platform Guides</h1>
+    <p class="text-lg opacity-80">Explore our comprehensive guides and tutorials to get the most out of CarGuy.</p>
+  </div>
+
+  <div class="guides-grid">
+    @for (guide of guides; track guide.id) {
+      <div class="guide-card card bg-base-100 shadow-xl border border-gray-500/20 hover:border-accent transition-all duration-300">
+        <div class="card-body">
+          <h2 class="card-title">{{ guide.title }}</h2>
+          <p class="guide-description">{{ guide.description }}</p>
+
+          <div class="card-actions justify-between items-center mt-4">
+            <span class="text-sm opacity-60 flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {{ guide.readTime }} read
+            </span>
+            <button class="btn btn-outline border-accent text-accent hover:bg-accent hover:border-accent hover:text-white btn-sm">Read Guide</button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

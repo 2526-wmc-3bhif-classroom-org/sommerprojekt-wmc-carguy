@@ -15,9 +15,10 @@ export class NavbarComponent {
 
   // Typed array of links
   public navLinks: NavLink[] = [
-    { label: 'Dashboard', path: '/dashboard' },
-    { label: 'Projects', path: '/projects' },
-    { label: 'Settings', path: '/settings' }
+    { label: 'Brands', path: '/' },
+    { label: 'Communities', path: '/communities' },
+    { label: 'Guides', path: '/guides' },
+    { label: 'Profile', path: '/profile' }
   ];
 
   public toggleMenu(): void {
