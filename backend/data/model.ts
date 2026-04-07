@@ -3,6 +3,7 @@ export interface User {
   username: string;
   password: string;
   publicName: string;
+  role: string;
   description?: string;
   title?: string;
   image?: string;
