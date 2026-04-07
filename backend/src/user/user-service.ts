@@ -13,6 +13,10 @@ export class UserService {
         return this.userRepository.findUserById(id) as User;
     }
 
+    public getUserByUsername(userName: string): User | undefined {
+        return this.userRepository.findUserByUsername(userName) as User;
+    }
+
     public createUser(user: User){
         this.userRepository.create(user);
     }
