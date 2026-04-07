@@ -25,13 +25,14 @@ export class UserRepository {
         const db = DB.getInstance();
 
         db.prepare(`
-                INSERT INTO User (UID, Username, Password, CreatedAt)
+                INSERT INTO User (UID, Username, Password, CreatedAt, Role)
                 VALUES (?, ?, ?, ?)
             `).run(
             user.uid,
             user.username,
             user.password,
-            user.createdAt
+            user.createdAt,
+            user.role
         );
     }
 }
