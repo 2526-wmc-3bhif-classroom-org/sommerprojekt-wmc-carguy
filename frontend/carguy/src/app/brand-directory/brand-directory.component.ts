@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ForumService } from '../services/forum-service';
@@ -11,15 +11,13 @@ import { Forum } from '../../model';
   templateUrl: './brand-directory.component.html',
   styleUrls: ['./brand-directory.component.css']
 })
-export class BrandDirectoryComponent implements OnInit {
+export class BrandDirectoryComponent {
 
   forums: Forum[] = [];
-  private cdr = inject(ChangeDetectorRef);
 
-  async ngOnInit() {
+  async gOnInit() {
     try {
       this.forums = await ForumService.getAllForums();
-      this.cdr.detectChanges();
     } catch (error) {
       console.error('Failed to load forums', error);
     }
