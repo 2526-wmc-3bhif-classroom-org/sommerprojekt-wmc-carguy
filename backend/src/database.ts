@@ -112,7 +112,7 @@ export class DB {
                                                 Password Text not null,
                                                 PublicName Text,
                                                 Description Text,
-                                                Role Text,
+                                                Role Text not null,
                                                 Title Text,
                                                 Image Text,
                                                 CreatedAt Text not null,
