@@ -55,7 +55,7 @@ userRouter.post("/user/login", (req, res) => {
     }
 
     const userClaims = {
-        email: user.email,
+        userName: user.username,
         role: user.role,
     };
 
