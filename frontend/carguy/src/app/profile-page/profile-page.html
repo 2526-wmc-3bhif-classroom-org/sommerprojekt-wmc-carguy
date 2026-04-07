@@ -1,0 +1,9 @@
+@if(!loggedIn){
+  <app-login-page></app-login-page>
+} @else {
+  <h1 class="m-20 text-cg-primary">{{ currentUser?.publicName }}</h1>
+  <img class="rounded-4xl card" src="{{ currentUser?.image }}" alt="Profile Picture"/>
+
+  
+
+}
