@@ -1,6 +1,29 @@
+import {JwtPayload} from "jsonwebtoken";
+
+export interface AuthRequest extends Request {
+  payload: JwtPayload
+}
+
+export interface UserLogin {
+  userName: string,
+  password: string,
+  role: string
+}
+
+export interface UserClaims {
+  email: string,
+  role: string
+}
+
+export interface UserInput {
+  email: string,
+  password: string
+}
+
 export interface User {
   uid: number;
   username: string;
+  email: string;
   password: string;
   publicName: string;
   role: string;
