@@ -1,0 +1,45 @@
+@reference "../../styles.css";
+
+/* Ambient glow — uses primary color from theme */
+.ambient-glow {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, oklch(from var(--color-primary) l c h / 0.12) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: pulse-glow 6s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+  50%      { opacity: 1;   transform: translate(-50%, -50%) scale(1.15); }
+}
+
+/* Tab indicator sliding animation */
+.tab-indicator {
+  z-index: 1;
+}
+
+/* Error banner slide-in */
+.error-slide-in {
+  animation: slide-down 0.25s ease;
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Form fade-in on tab switch */
+.form-fade-in {
+  animation: fade-in 0.2s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
