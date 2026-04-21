@@ -20,27 +20,38 @@ export class UserService {
         UserRepository.createNewUser(user);
     }
 
-    public static checkUserCredentials(user: UserInput): UserClaims | undefined {
-        try {
-            const users: User[] | undefined = UserRepository.findAllUsers();
-            if(users === undefined) throw new Error("No user found");
-            const findUserByEmail: User | undefined = users.find((userSearch) => userSearch.email === user.email);
-            if(findUserByEmail === undefined) throw new Error("No user found");
-            if(!bcrypt.compareSync(user.password, findUserByEmail.password)) throw new Error("Wrong password");
-            return {
-                email: findUserByEmail.email,
-                role: findUserByEmail.role,
-            }
-        }catch(err) {
-            if(err instanceof Error) {
-                throw new Error(err.message);
-            }
-        }
+    public static checkUserCredentials(input: UserInput): UserClaims | undefined {
+        const user: User | undefined = UserRepository.findUserByUsername(input.username) as User | undefined;
+        if (user === undefined) throw new Error("User not found");
+        if (!bcrypt.compareSync(input.password, user.password)) throw new Error("Wrong password");
+        return {
+            username: user.username,
+            role: user.role,
+        };
     }
 
-    public static createNewUser(user: User) {
-        console.log(user);
-        if(user.email === undefined || user.email === null) throw new Error("User credentials are required");
+    public static createNewUser(input: UserInput) {
+        if (!input.username || !input.password) {
+            throw new Error("Username and password are required");
+        }
+
+        // Check if username already exists
+        const existing = UserRepository.findUserByUsername(input.username);
+        if (existing) {
+            throw new Error("Username already taken");
+        }
+
+        const hashedPassword = bcrypt.hashSync(input.password, 10);
+
+        const user: User = {
+            uid: Date.now(), // Simple unique ID generation
+            username: input.username,
+            password: hashedPassword,
+            publicName: input.username,
+            role: "user",
+            createdAt: new Date(),
+        };
+
         UserRepository.createNewUser(user);
     }
 }

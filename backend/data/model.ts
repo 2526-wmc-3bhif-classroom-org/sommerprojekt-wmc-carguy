@@ -11,19 +11,18 @@ export interface UserLogin {
 }
 
 export interface UserClaims {
-  email: string,
+  username: string,
   role: string
 }
 
 export interface UserInput {
-  email: string,
+  username: string,
   password: string
 }
 
 export interface User {
   uid: number;
   username: string;
-  email: string;
   password: string;
   publicName: string;
   role: string;

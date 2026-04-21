@@ -5,7 +5,7 @@ export class UserRepository {
     public static findAllUsers(): User[] {
         const db = DB.getInstance();
         const result = db.prepare("SELECT UID as uid, Username as username, Password as password, PublicName as publicName, Description as description, Title as title, Image as image, CreatedAt as createdAt FROM User").all();
-        return result;
+        return result as unknown as User[];
     }
 
     public static findUserById(id: number) {
@@ -25,12 +25,12 @@ export class UserRepository {
 
         db.prepare(`
                 INSERT INTO User (UID, Username, Password, CreatedAt, Role)
-                VALUES (?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?)
             `).run(
             user.uid,
             user.username,
             user.password,
-            user.createdAt,
+            user.createdAt instanceof Date ? user.createdAt.toISOString() : user.createdAt,
             user.role
         );
     }

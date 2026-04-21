@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { UserService } from '../services/user-service';
 
 @Component({
   selector: 'app-login-page',
@@ -27,19 +28,11 @@ export class LoginPage {
     this.isLoading = true;
     this.errorMessage = '';
 
-    // TODO: Replace with actual backend auth call
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-
-      // Placeholder: accept any non-empty credentials
-      if (this.username && this.password) {
-        this.router.navigate(['/profile']);
-      } else {
-        this.errorMessage = 'Please enter both username and password.';
-      }
+      await UserService.login(this.username, this.password);
+      this.router.navigate(['/profile']);
     } catch (e) {
-      this.errorMessage = 'Login failed. Please try again.';
+      this.errorMessage = e instanceof Error ? e.message : 'Login failed. Please try again.';
     } finally {
       this.isLoading = false;
     }
@@ -55,17 +48,13 @@ export class LoginPage {
       return;
     }
 
-    // TODO: Replace with actual backend register call
     try {
-      await new Promise(resolve => setTimeout(resolve, 800));
-
-      if (this.username && this.password) {
-        this.router.navigate(['/profile']);
-      } else {
-        this.errorMessage = 'Please fill in all fields.';
-      }
+      await UserService.register(this.username, this.password);
+      // Auto-login after successful registration
+      await UserService.login(this.username, this.password);
+      this.router.navigate(['/profile']);
     } catch (e) {
-      this.errorMessage = 'Registration failed. Please try again.';
+      this.errorMessage = e instanceof Error ? e.message : 'Registration failed. Please try again.';
     } finally {
       this.isLoading = false;
     }

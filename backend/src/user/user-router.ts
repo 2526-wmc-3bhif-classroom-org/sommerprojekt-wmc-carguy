@@ -28,7 +28,9 @@ userRouter.get("/user/:id", (req, res) => {
     res.json(result);
 });
 
-userRouter.post("/user", (req, res) => {
+import { requireAuth } from "../auth-middleware";
+
+userRouter.post("/user", requireAuth, (req, res) => {
     const user: User = req.body;
 
     UserService.createUser(user);
@@ -38,7 +40,7 @@ userRouter.post("/user", (req, res) => {
 
 userRouter.post("/login", async (req: Request, res: Response) => {
     const user: UserInput = req.body;
-    if(!user || user.email === undefined || user.password === undefined) {
+    if(!user || user.username === undefined || user.password === undefined) {
         return res.status(StatusCodes.BAD_REQUEST).send("Body not in correct format");
     }
     try {

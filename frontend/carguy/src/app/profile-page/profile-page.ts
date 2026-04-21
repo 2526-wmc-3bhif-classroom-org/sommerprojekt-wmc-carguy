@@ -19,8 +19,8 @@ export class ProfilePage {
   public currentUser: User | null = {
     uid: 1,
     username: 'carguy123',
-    password: '',
     publicName: 'Julian H.',
+    role: 'user',
     description: 'Enthusiast of classic sports cars and JDM legends. Always looking for the next project car.',
     title: 'Gearhead',
     createdAt: new Date('2023-01-15T10:00:00'),
