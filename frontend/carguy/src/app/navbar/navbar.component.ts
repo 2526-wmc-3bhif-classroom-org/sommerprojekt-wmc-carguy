@@ -12,6 +12,7 @@ import {RouterLink} from '@angular/router';
 })
 export class NavbarComponent {
   public isMenuOpen: boolean = false;
+  public isLoggedIn: boolean = false;
 
   // Typed array of links
   public navLinks: NavLink[] = [
