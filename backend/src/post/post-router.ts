@@ -1,5 +1,5 @@
 import express from "express";
-import { PostService } from "./post-servie";
+import { PostService } from "./post-service";
 import { PostRepository } from "./post-repository";
 import { Post } from "../../data/model";
 
