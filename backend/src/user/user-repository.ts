@@ -16,7 +16,8 @@ export class UserRepository {
 
     public static findUserByUsername(username: string) {
         const db = DB.getInstance();
-        const result = db.prepare("SELECT UID as uid, Username as username, Password as password, PublicName as publicName, Description as description, Title as title, Image as image, CreatedAt as createdAt FROM User WHERE Username = ?").get(username);
+        const result = db.prepare("SELECT UID as uid, Username as username, Password as password, PublicName as publicname, Description as description, Title as title, Image as image, CreatedAt as createdAt FROM User WHERE Username = ?").get(username);
+        console.log(result);
         return result;
     }
 
@@ -24,10 +25,11 @@ export class UserRepository {
         const db = DB.getInstance();
 
         db.prepare(`
-                INSERT INTO User (UID, Username, Password, CreatedAt, Role)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO User (UID, PublicName, Username, Password, CreatedAt, Role)
+                VALUES (?, ?, ?, ?, ?, ?)
             `).run(
             user.uid,
+            user.publicname,
             user.username,
             user.password,
             user.createdAt instanceof Date ? user.createdAt.toISOString() : user.createdAt,

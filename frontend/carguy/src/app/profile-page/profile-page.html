@@ -12,12 +12,12 @@
       <div
         class="w-32 h-32 rounded-full bg-cg-primary flex items-center justify-center text-4xl font-bold text-cg-primary shadow-2xl overflow-hidden">
         <img *ngIf="currentUser?.image" [src]="currentUser?.image" class="w-full h-full object-cover">
-        <span *ngIf="!currentUser?.image">{{ currentUser?.publicName?.charAt(0) || 'U' }}</span>
+        <span *ngIf="!currentUser?.image">{{ currentUser?.publicname?.charAt(0) || 'U' }}</span>
       </div>
     </div>
 
     <div class="z-10 flex-1 text-center md:text-left">
-      <h1 class="text-4xl font-bold text-cg-primary mb-2">{{currentUser?.publicName }}</h1>
+      <h1 class="text-4xl font-bold text-cg-primary mb-2">{{currentUser?.publicname }}</h1>
       <p class="text-cg-accent font-medium mb-4">{{ currentUser?.username }} <span class="mx-2">•</span> {{
         currentUser?.title || 'Member' }}</p>
       <p class="text-gray-400 max-w-2xl">{{ currentUser?.description || 'No description provided.' }}</p>

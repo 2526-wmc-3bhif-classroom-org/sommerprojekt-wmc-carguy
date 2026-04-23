@@ -22,6 +22,8 @@ const API_BASE_URL = "http://localhost:3000/api";
   }
 }*/
 
+let curUser: User | null;
+
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     let errorMessage: string;
@@ -41,6 +43,7 @@ export interface LoginResponse {
   userClaims: { username: string; role: string };
   expiresAt: string;
   accessToken: string;
+  user: User;
 }
 
 export const UserService = {
@@ -60,17 +63,21 @@ export const UserService = {
     localStorage.setItem("expiresAt", data.expiresAt);
     localStorage.setItem("userName", data.userClaims.username);
 
+    curUser = data.user;
+
     return data;
   },
 
-  async register(username: string, password: string): Promise<void> {
+  async register(publicname: string, username: string, password: string): Promise<void> {
     const response = await fetch(`${API_BASE_URL}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({publicname, username, password }),
     });
 
-    await handleResponse<{ message: string }>(response);
+    const data : LoginResponse = await handleResponse<LoginResponse>(response);
+
+    curUser = data.user;
   },
 
   getToken(): string | null {
@@ -92,10 +99,9 @@ export const UserService = {
     return this.getToken() !== null;
   },
 
-  getCurrentUser(): { username: string; role: string } | null {
+  getCurrentUser(): User | null {
     if (!this.isLoggedIn()) return null;
-    const claims = localStorage.getItem("userClaims");
-    return claims ? JSON.parse(claims) : null;
+    return curUser
   },
 
   logout(): void {

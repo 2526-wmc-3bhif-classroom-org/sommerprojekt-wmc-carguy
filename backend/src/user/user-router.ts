@@ -58,6 +58,7 @@ userRouter.post("/login", async (req: Request, res: Response) => {
         return res.status(StatusCodes.OK).send({userClaims: claims,
             expiresAt: expiresAt,
             accessToken: token,
+            user: UserService.getUserByUsername(user.username)
         });
     }catch(err) {
         if(err instanceof Error) {
@@ -68,9 +69,13 @@ userRouter.post("/login", async (req: Request, res: Response) => {
 
 userRouter.post("/register", (req: Request, res: Response) => {
     try {
+        console.log(req.body);
         const body: UserInput = req.body as UserInput;
-        UserService.createNewUser(body);
-        return res.status(StatusCodes.CREATED).send({message: "User created successfully"});
+        let user = UserService.createNewUser(body);
+        return res.status(StatusCodes.CREATED).send({
+            message: "User created successfully",
+            user: UserService.getUserByUsername(user.username)
+        });
     }catch(err) {
         if(err instanceof Error) {
             res.status(StatusCodes.BAD_REQUEST).send({message: err.message});

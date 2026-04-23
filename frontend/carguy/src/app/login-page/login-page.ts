@@ -16,6 +16,7 @@ export class LoginPage {
   public confirmPassword = '';
   public isLoading = false;
   public errorMessage = '';
+  protected publicname = '';
 
   constructor(private router: Router) {}
 
@@ -49,7 +50,7 @@ export class LoginPage {
     }
 
     try {
-      await UserService.register(this.username, this.password);
+      await UserService.register(this.publicname, this.username, this.password);
       // Auto-login after successful registration
       await UserService.login(this.username, this.password);
       this.router.navigate(['/profile']);

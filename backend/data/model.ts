@@ -16,6 +16,7 @@ export interface UserClaims {
 }
 
 export interface UserInput {
+  publicname?: string,
   username: string,
   password: string
 }
@@ -24,7 +25,7 @@ export interface User {
   uid: number;
   username: string;
   password: string;
-  publicName: string;
+  publicname: string;
   role: string;
   description?: string;
   title?: string;

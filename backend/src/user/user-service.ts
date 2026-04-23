@@ -30,7 +30,10 @@ export class UserService {
         };
     }
 
-    public static createNewUser(input: UserInput) {
+    public static createNewUser(input: UserInput) : User {
+
+        console.log(input);
+
         if (!input.username || !input.password) {
             throw new Error("Username and password are required");
         }
@@ -47,11 +50,12 @@ export class UserService {
             uid: Date.now(), // Simple unique ID generation
             username: input.username,
             password: hashedPassword,
-            publicName: input.username,
+            publicname: input.publicname ? input.publicname : input.username,
             role: "user",
             createdAt: new Date(),
         };
 
         UserRepository.createNewUser(user);
+        return user;
     }
 }

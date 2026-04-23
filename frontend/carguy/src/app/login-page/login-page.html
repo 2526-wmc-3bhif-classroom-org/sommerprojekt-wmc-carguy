@@ -99,7 +99,22 @@
 
     <!-- Register Form -->
     @if (activeTab === 'register') {
+
+
     <form (ngSubmit)="register()" #registerForm="ngForm" class="flex flex-col gap-5 form-fade-in">
+      <div class="flex flex-col gap-1.5">
+        <label for="reg-publicname" class="text-xs font-medium text-base-content/70 pl-0.5">Public Name</label>
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/30 pointer-events-none" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          <input id="reg-publicname" type="text" [(ngModel)]="publicname" name="publicname"
+                 class="input w-full bg-white/5 border-white/10 pl-11 focus:border-primary text-base-content placeholder:text-base-content/25"
+                 placeholder="Choose a public name" required autocomplete="publicname" />
+        </div>
+      </div>
       <div class="flex flex-col gap-1.5">
         <label for="reg-username" class="text-xs font-medium text-base-content/70 pl-0.5">Username</label>
         <div class="relative">
