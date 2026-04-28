@@ -5,7 +5,6 @@ export interface Guide {
   id: number;
   title: string;
   description: string;
-  readTime: string;
   content: string[];
 }
 
@@ -23,7 +22,6 @@ export class GuidesComponent implements OnDestroy {
       id: 1,
       title: 'Setting Up Your Profile',
       description: 'Learn how to perfectly set up your profile and fill your virtual garage with your favorite cars.',
-      readTime: '5 min',
       content: [
         'First, navigate to your profile page by clicking your avatar in the top right corner.',
         'Click on "Edit Profile" to add a personal bio, social links, and upload a profile picture that represents you.',
@@ -35,7 +33,6 @@ export class GuidesComponent implements OnDestroy {
       id: 2,
       title: 'Finding the Right Community',
       description: 'Discover how to find, join, and participate in the best car communities for your interests.',
-      readTime: '8 min',
       content: [
         'Navigate to the "Communities" tab using the main navigation bar.',
         'You can browse through curated categories (like JDM, Muscle, or Euro) or use the search bar to find niche groups.',
@@ -47,7 +44,6 @@ export class GuidesComponent implements OnDestroy {
       id: 3,
       title: 'Exploring Brands & Models',
       description: 'A guide to efficiently using our brand directory to learn everything about your dream cars.',
-      readTime: '6 min',
       content: [
         'Click on "Brands" in the top navigation to view our comprehensive list of car manufacturers.',
         'You can search for specific brands or sort them by popularity and region.',
@@ -59,7 +55,6 @@ export class GuidesComponent implements OnDestroy {
       id: 4,
       title: 'Crafting the Perfect Post',
       description: 'Tips & tricks on how to create engaging posts in communities and start discussions.',
-      readTime: '7 min',
       content: [
         'Go to a community you have joined and click the "Create Post" button.',
         'Start with a catchy, descriptive title so people know exactly what you are talking about.',
@@ -71,7 +66,6 @@ export class GuidesComponent implements OnDestroy {
       id: 5,
       title: 'Connecting with Others',
       description: 'How to use our platform to exchange ideas and connect with other car enthusiasts.',
-      readTime: '4 min',
       content: [
         'The best way to connect is by being active in the comment sections of posts you find interesting.',
         'Share your automotive knowledge, offer help to those asking questions, and be respectful to everyone.',
@@ -83,7 +77,6 @@ export class GuidesComponent implements OnDestroy {
       id: 6,
       title: 'Advanced Search Tips',
       description: 'Master the search function to quickly and precisely find exactly the content, models, or members you are looking for.',
-      readTime: '9 min',
       content: [
         'Use the global search bar in the top navigation to look for specific topics.',
         'You can filter your results to only show "Communities", "Brands", or specific "Posts".',

@@ -15,12 +15,6 @@
           <p class="guide-description">{{ guide.description }}</p>
 
           <div class="card-actions justify-between items-center mt-4">
-            <span class="text-sm opacity-60 flex items-center gap-1">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              {{ guide.readTime }} read
-            </span>
             <button
               (click)="openGuide(guide)"
               class="btn btn-outline border-accent text-accent hover:bg-accent hover:border-accent hover:text-white btn-sm">
@@ -46,14 +40,7 @@
 
         <div class="mt-2 mb-6">
           <h2 class="text-3xl font-bold text-accent mb-2">{{ selectedGuide.title }}</h2>
-          <div class="flex items-center gap-4 text-sm opacity-70 mb-6 pb-4 border-b border-white/10">
-            <span class="flex items-center gap-1">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              {{ selectedGuide.readTime }} read
-            </span>
-          </div>
+          <div class="flex items-center gap-4 text-sm opacity-70 mb-6 pb-4 border-b border-white/10"></div>
 
           <p class="text-lg opacity-90 mb-8 italic border-l-4 border-accent pl-4">
             {{ selectedGuide.description }}
