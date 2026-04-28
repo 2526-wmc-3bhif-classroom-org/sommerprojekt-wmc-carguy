@@ -15,11 +15,15 @@ import {UserService} from '../services/user-service';
   styleUrl: './profile-page.css',
 })
 export class ProfilePage {
-  public loggedIn = true;
+  get loggedIn(): boolean {
+    return UserService.isLoggedIn();
+  }
 
-  public currentUser: User | null;
+  get currentUser(): User | null {
+    return UserService.getCurrentUser();
+  }
 
-  constructor() {
-    this.currentUser = UserService.getCurrentUser();
+  public logout(): void {
+    UserService.logout();
   }
 }

@@ -62,6 +62,7 @@ export const UserService = {
     localStorage.setItem("userClaims", JSON.stringify(data.userClaims));
     localStorage.setItem("expiresAt", data.expiresAt);
     localStorage.setItem("userName", data.userClaims.username);
+    localStorage.setItem("currentUser", JSON.stringify(data.user));
 
     curUser = data.user;
 
@@ -101,7 +102,15 @@ export const UserService = {
 
   getCurrentUser(): User | null {
     if (!this.isLoggedIn()) return null;
-    return curUser
+    if (!curUser) {
+      const stored = localStorage.getItem("currentUser");
+      if (stored) {
+        try {
+          curUser = JSON.parse(stored);
+        } catch (e) {}
+      }
+    }
+    return curUser || null;
   },
 
   logout(): void {
@@ -109,5 +118,7 @@ export const UserService = {
     localStorage.removeItem("userClaims");
     localStorage.removeItem("expiresAt");
     localStorage.removeItem("userName");
+    localStorage.removeItem("currentUser");
+    curUser = null;
   },
 };

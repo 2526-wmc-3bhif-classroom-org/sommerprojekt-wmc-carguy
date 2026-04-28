@@ -69,12 +69,11 @@ userRouter.post("/login", async (req: Request, res: Response) => {
 
 userRouter.post("/register", (req: Request, res: Response) => {
     try {
-        console.log(req.body);
         const body: UserInput = req.body as UserInput;
         let user = UserService.createNewUser(body);
         return res.status(StatusCodes.CREATED).send({
             message: "User created successfully",
-            user: UserService.getUserByUsername(user.username)
+            user: user
         });
     }catch(err) {
         if(err instanceof Error) {
