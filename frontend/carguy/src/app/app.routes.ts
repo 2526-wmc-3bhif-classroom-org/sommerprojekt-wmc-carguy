@@ -3,6 +3,7 @@ import {BrandDirectoryComponent} from './brand-directory/brand-directory.compone
 import {BrandDetailComponent} from './brand-detail/brand-detail.component';
 import {CommunitiesRepository} from './communities-directory/communities-directory';
 import {ProfilePage} from './profile-page/profile-page';
+import {LoginPage} from './login-page/login-page';
 import {GuidesComponent} from './Guides/Guides';
 
 export const routes: Routes = [
@@ -10,5 +11,6 @@ export const routes: Routes = [
   { path: 'brand/:name', component: BrandDetailComponent },
   { path: 'communities', component: CommunitiesRepository },
   { path: 'profile', component: ProfilePage },
+  { path: 'login', component: LoginPage },
   { path: 'guides', component: GuidesComponent },
 ];
