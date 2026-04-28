@@ -1,12 +1,13 @@
 import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { ForumService } from '../services/forum-service';
 import { Forum } from '../../model';
 
 @Component({
   selector: 'app-communities',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './communities-directory.html'
 })
 export class CommunitiesRepository implements OnInit {

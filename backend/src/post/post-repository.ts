@@ -1,5 +1,5 @@
 import { DB } from "../database";
-import { Post } from "../../data/model";
+import { Post, User } from "../../data/model";
 
 export class PostRepository {
 
@@ -33,10 +33,30 @@ export class PostRepository {
     public findPostByForum(forumId: number): Post[] {
         const db = DB.getInstance();
 
-        return db.prepare(`
-            SELECT PID as pid, Title as title, Content as content, UID as author, ForumID as forum, ParentPID as parentPost, Post_Category_id as category, PublishedAt as publishedAt, Likes as likes, Dislikes as dislikes FROM Post
-            WHERE ForumID = ?
-        `).all(forumId) as Post[];
+        const rows = db.prepare(`
+            SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.Likes as likes, p.Dislikes as dislikes,
+                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname
+            FROM Post p
+            LEFT JOIN User u ON p.UID = u.UID
+            WHERE p.ForumID = ?
+        `).all(forumId) as any[];
+
+        return rows.map(row => ({
+            pid: row.pid,
+            title: row.title,
+            content: row.content,
+            forum: row.forum,
+            parentPost: row.parentPost,
+            category: row.category,
+            publishedAt: row.publishedAt,
+            likes: row.likes,
+            dislikes: row.dislikes,
+            author: {
+                uid: row.authorUid,
+                username: row.authorUsername,
+                publicname: row.authorPublicname
+            } as User
+        })) as Post[];
     }
 
     public findPostByUser(userId: number): Post[] {
