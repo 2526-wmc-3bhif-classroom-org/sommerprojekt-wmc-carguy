@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { NavLink } from './nav-link.model';
 import {RouterLink} from '@angular/router';
+import {UserService} from '../services/user-service';
 
 @Component({
   selector: 'app-navbar',
@@ -12,7 +13,10 @@ import {RouterLink} from '@angular/router';
 })
 export class NavbarComponent {
   public isMenuOpen: boolean = false;
-  public isLoggedIn: boolean = false;
+  
+  get isLoggedIn(): boolean {
+    return this.UserService.isLoggedIn();
+  }
 
   // Typed array of links
   public navLinks: NavLink[] = [
@@ -29,4 +33,6 @@ export class NavbarComponent {
   public closeMenu(): void {
     this.isMenuOpen = false;
   }
+
+  protected readonly UserService = UserService;
 }
