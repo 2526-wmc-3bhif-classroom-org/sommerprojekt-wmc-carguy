@@ -1,0 +1,135 @@
+<div class="mx-auto max-w-[1400px] px-8 py-12 bg-cg-neutral min-h-screen">
+  
+  @if (isLoading) {
+    <div class="flex justify-center py-20">
+      <span class="loading loading-spinner loading-lg text-cg-primary"></span>
+    </div>
+  }
+
+  @if (!isLoading && community) {
+    <div>
+      <!-- Hero Header -->
+      <header class="mb-12 mt-12 flex flex-col md:flex-row items-center md:items-start gap-8 bg-cg-primary p-8 rounded-2xl border border-cg-accent/5 shadow-xl relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-cg-primary/10 to-transparent"></div>
+
+        <div class="z-10 bg-cg-primary/20 backdrop-blur-md rounded-full p-2">
+          <div class="w-32 h-32 rounded-full bg-white/5 flex items-center justify-center text-4xl font-bold text-cg-primary shadow-2xl overflow-hidden border border-cg-primary/20">
+            {{ getInitials(community.name) }}
+          </div>
+        </div>
+
+        <div class="z-10 flex-1 text-center md:text-left">
+          <h1 class="text-4xl font-bold text-cg-primary mb-2">{{ community.name }}</h1>
+          <p class="text-gray-400 max-w-2xl mb-6">{{ community.description || 'A community for CarGuy enthusiasts.' }}</p>
+
+          <div class="flex items-center gap-6 text-sm text-gray-500 mb-6 justify-center md:justify-start">
+            <span><b class="text-cg-primary">1.2k</b> members</span>
+            <span><b class="text-cg-primary">{{ community.posts?.length || 0 }}</b> posts</span>
+            <span>Created on <b class="text-cg-primary">{{ community.createdAt | date:'mediumDate' }}</b></span>
+          </div>
+
+          <div class="flex flex-wrap gap-4 justify-center md:justify-start">
+            <button class="btn btn-outline border-cg-accent/20 hover:border-cg-accent hover:bg-transparent hover:text-cg-accent">Join Community</button>
+            <button class="btn bg-cg-primary text-cg-primary border-none hover:bg-opacity-90">Create Post</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Area -->
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        
+        <!-- Main Feed -->
+        <main class="lg:col-span-3 space-y-6">
+          <div class="flex items-center justify-between border-b border-white/5 pb-4">
+            <h2 class="text-2xl font-semibold text-white">Recent Posts</h2>
+            <div class="flex gap-2">
+              <button class="text-sm px-3 py-1 bg-white/10 rounded-md hover:bg-white/20 transition-colors">New</button>
+              <button class="text-sm px-3 py-1 hover:bg-white/5 rounded-md transition-colors text-gray-400">Top</button>
+            </div>
+          </div>
+
+          @for (post of community.posts; track post.pid) {
+            <div class="card bg-cg-primary border border-cg-accent/5 hover:border-accent/50 transition-colors p-6 cursor-pointer">
+              <div class="flex gap-4">
+                <!-- Votes (Placeholder) -->
+                <div class="flex flex-col items-center gap-1 text-gray-400">
+                  <button class="hover:text-cg-primary transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+                  </button>
+                  <span class="font-medium text-white">{{ post.likes - post.dislikes || 0 }}</span>
+                  <button class="hover:text-error transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                  </button>
+                </div>
+                
+                <div class="flex-1">
+                  <div class="text-xs text-gray-500 mb-2 flex items-center gap-2">
+                    <span class="font-medium text-gray-300">Posted by u/{{ post.author.username || 'unknown' }}</span>
+                    <span>•</span>
+                    <span>{{ post.publishedAt | date:'short' }}</span>
+                  </div>
+                  <h3 class="text-xl font-semibold mb-2 text-white">{{ post.title }}</h3>
+                  <p class="text-gray-400 mb-4 line-clamp-3">{{ post.content }}</p>
+                  <div class="flex items-center gap-4 text-sm text-gray-500">
+                    <div class="flex items-center gap-1 hover:text-white transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                      <span>{{ post.comments?.length || 0 }} Comments</span>
+                    </div>
+                    <div class="flex items-center gap-1 hover:text-white transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                      <span>Share</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          } @empty {
+            <div class="card bg-cg-primary border border-cg-accent/5 p-12 text-center">
+              <div class="text-6xl mb-4 opacity-50">📝</div>
+              <h3 class="text-xl font-medium mb-2">No posts yet</h3>
+              <p class="text-gray-500 mb-6">Be the first to start a discussion in this community!</p>
+              <button class="btn bg-accent text-white border-none hover:bg-accent/80">Create the first post</button>
+            </div>
+          }
+        </main>
+
+        <!-- Sidebar -->
+        <aside class="space-y-6">
+          <div class="card bg-cg-primary border border-cg-accent/5 p-6 rounded-xl">
+            <h3 class="text-lg font-semibold mb-4 text-white">About Community</h3>
+            <p class="text-gray-400 text-sm mb-4">{{ community.description || 'Welcome to our community! Share your thoughts, ask questions, and connect with other members.' }}</p>
+            <div class="border-t border-white/5 pt-4 mt-4">
+              <div class="flex justify-between items-center text-sm mb-2">
+                <span class="text-gray-500">Created</span>
+                <span class="text-white">{{ community.createdAt | date:'mediumDate' }}</span>
+              </div>
+              <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-500">Type</span>
+                <span class="text-white">Public</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card bg-cg-primary border border-cg-accent/5 p-6 rounded-xl">
+            <h3 class="text-lg font-semibold mb-4 text-white">Rules</h3>
+            <ol class="list-decimal list-inside text-sm text-gray-400 space-y-3">
+              <li>Be respectful to other members.</li>
+              <li>No spam or self-promotion.</li>
+              <li>Keep discussions on-topic.</li>
+              <li>Follow the CarGuy Terms of Service.</li>
+            </ol>
+          </div>
+        </aside>
+      </div>
+    </div>
+  }
+
+  @if (!isLoading && !community) {
+    <div class="flex flex-col items-center justify-center py-20 text-center">
+      <div class="text-6xl mb-4">🔍</div>
+      <h2 class="text-2xl font-bold mb-2">Community not found</h2>
+      <p class="text-gray-500 mb-6">The community you're looking for doesn't exist or has been removed.</p>
+      <a routerLink="/communities" class="btn bg-accent text-white border-none hover:bg-accent/80">Back to Directory</a>
+    </div>
+  }
+</div>
