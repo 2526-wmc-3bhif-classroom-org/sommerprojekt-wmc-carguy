@@ -44,6 +44,7 @@ export interface Forum {
   parentForum?: Forum;
   subForums?: Forum[];
   posts?: Post[];
+  postCount?: number;
   createdAt: Date;
 }
 

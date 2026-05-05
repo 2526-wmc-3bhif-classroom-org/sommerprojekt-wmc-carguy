@@ -24,7 +24,7 @@
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
       @for (community of featured; track community.forumId) {
-        <div class="group relative overflow-hidden rounded-md border border-gray-500/20 hover:border-accent transition-all duration-300 p-6">
+        <div [routerLink]="['/community', community.forumId]" class="group relative overflow-hidden rounded-md border border-gray-500/20 hover:border-accent transition-all duration-300 p-6 cursor-pointer">
           <div class="flex items-start gap-4">
             <div class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-md text-2xl font-semibold text-white"
                  [style.backgroundColor]="">
@@ -42,7 +42,7 @@
                   <b class="text-cg-primary">{{ 30 | number }}</b> members
                 </span>
                 <span class="text-sm text-gray-500">
-                  <b class="text-cg-primary">{{ community.posts?.length | number }}</b> posts
+                  <b class="text-cg-primary">{{ community.postCount || 0 | number }}</b> posts
                 </span>
               </div>
             </div>
@@ -66,7 +66,10 @@
               <h3 class="font-semibold group-hover:text-cg-primary">{{ a.name }}</h3>
             </div>
           </div>
-          <button class="btn px-4 m-2 py-2 border border-gray-500/10 rounded hover:bg-accent transition-all duration-300 text-m">Join</button>
+          <div class="flex gap-2 m-4 justify-end">
+            <a [routerLink]="['/community', a.forumId]" class="btn px-4 py-2 border border-accent text-accent rounded hover:bg-accent hover:text-white transition-all duration-300 text-sm">View</a>
+            <button class="btn px-4 py-2 border border-gray-500/10 rounded hover:bg-white/10 transition-all duration-300 text-sm">Join</button>
+          </div>
         </div>
       }
     </div>

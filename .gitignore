@@ -1,6 +1,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/node,webstorm,intellij
 # Edit at https://www.toptal.com/developers/gitignore?templates=node,webstorm,intellij
 
+# Antigravity
+.antigravity/
+
 /backend/data/carguy.db
 
 ### Intellij ###
