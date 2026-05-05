@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import {BrandDirectoryComponent} from './brand-directory/brand-directory.component';
-import {BrandDetailComponent} from './brand-detail/brand-detail.component';
 import {CommunitiesRepository} from './communities-directory/communities-directory';
 import {CommunityDetailComponent} from './community-detail/community-detail';
 import {ProfilePage} from './profile-page/profile-page';
@@ -9,7 +8,6 @@ import {GuidesComponent} from './Guides/Guides';
 
 export const routes: Routes = [
   { path: '', component: BrandDirectoryComponent },
-  { path: 'brand/:name', component: BrandDetailComponent },
   { path: 'communities', component: CommunitiesRepository },
   { path: 'community/:id', component: CommunityDetailComponent },
   { path: 'profile', component: ProfilePage },
