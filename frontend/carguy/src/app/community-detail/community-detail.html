@@ -36,19 +36,19 @@
       <!-- Create Post Modal -->
       @if (showCreatePost) {
         <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div class="rounded-md border border-gray-500/20 bg-cg-neutral p-8 w-full max-w-lg mx-4 shadow-2xl">
+          <div class="rounded-md border border-white/5 bg-base-200 p-8 w-full max-w-lg mx-4 shadow-2xl">
             <h2 class="text-xl font-semibold text-cg-accent mb-6">Create a Post</h2>
             <div class="space-y-4">
               <input
                 [(ngModel)]="newPostTitle"
                 type="text"
                 placeholder="Title"
-                class="input w-full bg-white/5 border border-gray-500/20 text-white placeholder-gray-500 focus:border-accent focus:outline-none rounded-md"
+                class="input w-full bg-white/5 border border-gray-500/20 text-black placeholder-gray-500 focus:border-accent focus:outline-none rounded-md"
               />
               <textarea
                 [(ngModel)]="newPostContent"
                 placeholder="What do you want to share?"
-                class="textarea w-full bg-white/5 border border-gray-500/20 text-white placeholder-gray-500 focus:border-accent focus:outline-none resize-none rounded-md"
+                class="textarea w-full bg-white/5 border border-gray-500/20 text-black placeholder-gray-500 focus:border-accent focus:outline-none resize-none rounded-md"
                 rows="5"
               ></textarea>
               @if (postError) {
