@@ -35,10 +35,13 @@ export class PostRepository {
 
         const rows = db.prepare(`
             SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.Likes as likes, p.Dislikes as dislikes,
-                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname
+                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname,
+                   COUNT(c.CID) as commentCount
             FROM Post p
             LEFT JOIN User u ON p.UID = u.UID
+            LEFT JOIN Comment c ON c.PID = p.PID AND c.ParentCID IS NULL
             WHERE p.ForumID = ?
+            GROUP BY p.PID
         `).all(forumId) as any[];
 
         return rows.map(row => ({
@@ -51,6 +54,7 @@ export class PostRepository {
             publishedAt: row.publishedAt,
             likes: row.likes,
             dislikes: row.dislikes,
+            commentCount: row.commentCount,
             author: {
                 uid: row.authorUid,
                 username: row.authorUsername,
@@ -102,9 +106,19 @@ export class PostRepository {
         db.prepare(`UPDATE Post SET Likes = Likes + 1 WHERE PID = ?`).run(id);
     }
 
+    public unlikePost(id: number): void {
+        const db = DB.getInstance();
+        db.prepare(`UPDATE Post SET Likes = MAX(0, Likes - 1) WHERE PID = ?`).run(id);
+    }
+
     public dislikePost(id: number): void {
         const db = DB.getInstance();
         db.prepare(`UPDATE Post SET Dislikes = Dislikes + 1 WHERE PID = ?`).run(id);
+    }
+
+    public undislikePost(id: number): void {
+        const db = DB.getInstance();
+        db.prepare(`UPDATE Post SET Dislikes = MAX(0, Dislikes - 1) WHERE PID = ?`).run(id);
     }
 
     public createReply(post: Post): void {

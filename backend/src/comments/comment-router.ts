@@ -44,7 +44,7 @@ commentRouter.post("/comment", (req, res) => {
         content,
         author,
         post,
-        publishedAt: new Date(),
+        publishedAt: new Date().toISOString() as any,
         likes: 0,
         dislikes: 0
     };
@@ -60,7 +60,7 @@ commentRouter.post("/posts/comments", (req, res) => {
         author,
         post,
         parentComment,
-        publishedAt: new Date(),
+        publishedAt: new Date().toISOString() as any,
         likes: 0,
         dislikes: 0
     };

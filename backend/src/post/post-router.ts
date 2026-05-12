@@ -66,11 +66,25 @@ postRouter.patch("/posts/:id/like", (req, res) => {
     res.status(200).json({ message: "Liked" });
 });
 
+postRouter.patch("/posts/:id/unlike", (req, res) => {
+    const id = Number(req.params.id);
+    if (isNaN(id)) return res.status(400).send("Invalid id");
+    postService.unlikePost(id);
+    res.status(200).json({ message: "Unliked" });
+});
+
 postRouter.patch("/posts/:id/dislike", (req, res) => {
     const id = Number(req.params.id);
     if (isNaN(id)) return res.status(400).send("Invalid id");
     postService.dislikePost(id);
     res.status(200).json({ message: "Disliked" });
+});
+
+postRouter.patch("/posts/:id/undislike", (req, res) => {
+    const id = Number(req.params.id);
+    if (isNaN(id)) return res.status(400).send("Invalid id");
+    postService.undislikePost(id);
+    res.status(200).json({ message: "Undisliked" });
 });
 
 postRouter.post("/posts/:id/replies", (req, res) => {

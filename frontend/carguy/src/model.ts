@@ -23,6 +23,7 @@ export interface Post {
   likes: number;
   dislikes: number;
   comments?: Comment[];
+  commentCount?: number;
 }
 
 export interface Comment {

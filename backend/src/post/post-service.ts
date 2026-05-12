@@ -40,7 +40,15 @@ export class PostService {
         this.postRepository.likePost(id);
     }
 
+    public unlikePost(id: number): void {
+        this.postRepository.unlikePost(id);
+    }
+
     public dislikePost(id: number): void {
         this.postRepository.dislikePost(id);
+    }
+
+    public undislikePost(id: number): void {
+        this.postRepository.undislikePost(id);
     }
 }

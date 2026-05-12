@@ -44,8 +44,18 @@ export const PostService = {
     return handleResponse<void>(res);
   },
 
+  async unlikePost(id: number): Promise<void> {
+    const res = await fetch(`${API_BASE_URL}/posts/${id}/unlike`, { method: "PATCH" });
+    return handleResponse<void>(res);
+  },
+
   async dislikePost(id: number): Promise<void> {
     const res = await fetch(`${API_BASE_URL}/posts/${id}/dislike`, { method: "PATCH" });
+    return handleResponse<void>(res);
+  },
+
+  async undislikePost(id: number): Promise<void> {
+    const res = await fetch(`${API_BASE_URL}/posts/${id}/undislike`, { method: "PATCH" });
     return handleResponse<void>(res);
   },
 };

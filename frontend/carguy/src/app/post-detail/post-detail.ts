@@ -20,7 +20,22 @@ export class PostDetailComponent implements OnInit {
   newCommentContent = '';
   isSubmitting = false;
   errorMessage = '';
+  voteState: 'like' | 'dislike' | null = null;
   private cdr = inject(ChangeDetectorRef);
+
+  private get voteKey(): string {
+    const user = UserService.getCurrentUser();
+    return `vote_post_${this.post?.pid}_user_${user?.uid}`;
+  }
+
+  private loadVoteState() {
+    this.voteState = (localStorage.getItem(this.voteKey) as 'like' | 'dislike' | null) ?? null;
+  }
+
+  private saveVoteState() {
+    if (this.voteState === null) localStorage.removeItem(this.voteKey);
+    else localStorage.setItem(this.voteKey, this.voteState);
+  }
 
   constructor(private route: ActivatedRoute) {}
 
@@ -38,6 +53,7 @@ export class PostDetailComponent implements OnInit {
       const id = Number(idParam);
       this.post = await PostService.getPostById(id);
       this.comments = await CommentService.getCommentsByPostId(id);
+      this.loadVoteState();
     } catch (error) {
       console.error('Failed to load post', error);
     } finally {
@@ -66,16 +82,40 @@ export class PostDetailComponent implements OnInit {
   }
 
   async likePost() {
-    if (!this.post) return;
-    await PostService.likePost(this.post.pid);
-    this.post.likes++;
+    if (!this.post || !UserService.isLoggedIn()) return;
+    if (this.voteState === 'like') {
+      await PostService.unlikePost(this.post.pid);
+      this.post.likes--;
+      this.voteState = null;
+    } else {
+      if (this.voteState === 'dislike') {
+        await PostService.undislikePost(this.post.pid);
+        this.post.dislikes--;
+      }
+      await PostService.likePost(this.post.pid);
+      this.post.likes++;
+      this.voteState = 'like';
+    }
+    this.saveVoteState();
     this.cdr.detectChanges();
   }
 
   async dislikePost() {
-    if (!this.post) return;
-    await PostService.dislikePost(this.post.pid);
-    this.post.dislikes++;
+    if (!this.post || !UserService.isLoggedIn()) return;
+    if (this.voteState === 'dislike') {
+      await PostService.undislikePost(this.post.pid);
+      this.post.dislikes--;
+      this.voteState = null;
+    } else {
+      if (this.voteState === 'like') {
+        await PostService.unlikePost(this.post.pid);
+        this.post.likes--;
+      }
+      await PostService.dislikePost(this.post.pid);
+      this.post.dislikes++;
+      this.voteState = 'dislike';
+    }
+    this.saveVoteState();
     this.cdr.detectChanges();
   }
 }
