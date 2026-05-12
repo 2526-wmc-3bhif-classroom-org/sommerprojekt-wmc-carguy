@@ -35,4 +35,12 @@ export class PostService {
     public createReply(post: Post): void {
         this.postRepository.createReply(post);
     }
+
+    public likePost(id: number): void {
+        this.postRepository.likePost(id);
+    }
+
+    public dislikePost(id: number): void {
+        this.postRepository.dislikePost(id);
+    }
 }

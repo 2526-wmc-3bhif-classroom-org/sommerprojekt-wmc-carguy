@@ -82,10 +82,9 @@ export class PostRepository {
 
         db.prepare(`
             INSERT INTO Post
-            (PID, Title, Content, UID, ForumID, ParentPID, Post_Category_id, PublishedAt, Likes, Dislikes)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (Title, Content, UID, ForumID, ParentPID, Post_Category_id, PublishedAt, Likes, Dislikes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
-            post.pid,
             post.title ?? null,
             post.content,
             post.author.uid,
@@ -93,9 +92,19 @@ export class PostRepository {
             null,
             post.category?.postCategoryId ?? null,
             post.publishedAt,
-            post.likes,
-            post.dislikes
+            0,
+            0
         );
+    }
+
+    public likePost(id: number): void {
+        const db = DB.getInstance();
+        db.prepare(`UPDATE Post SET Likes = Likes + 1 WHERE PID = ?`).run(id);
+    }
+
+    public dislikePost(id: number): void {
+        const db = DB.getInstance();
+        db.prepare(`UPDATE Post SET Dislikes = Dislikes + 1 WHERE PID = ?`).run(id);
     }
 
     public createReply(post: Post): void {
@@ -103,10 +112,9 @@ export class PostRepository {
 
         db.prepare(`
             INSERT INTO Post
-            (PID, Title, Content, UID, ForumID, ParentPID, Post_Category_id, PublishedAt, Likes, Dislikes)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (Title, Content, UID, ForumID, ParentPID, Post_Category_id, PublishedAt, Likes, Dislikes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
-            post.pid,
             null,
             post.content,
             post.author.uid,
@@ -114,8 +122,8 @@ export class PostRepository {
             post.parentPost?.pid ?? null,
             post.category?.postCategoryId ?? null,
             post.publishedAt,
-            post.likes,
-            post.dislikes
+            0,
+            0
         );
     }
 }

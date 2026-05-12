@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git pull *)",
+      "Bash(git checkout *)",
+      "Bash(git push *)",
+      "Read(//mnt/c/3WMC/CarGuy/**)",
+      "Bash(npx tsc *)",
+      "Bash(npx ts-node *)",
+      "PowerShell(Get-Process *)",
+      "PowerShell(Receive-Job *)",
+      "PowerShell(Get-Job *)",
+      "PowerShell(Invoke-RestMethod -Uri \"http://localhost:3000/api/users\" -Method GET -ErrorAction SilentlyContinue | Select-Object -First 3)",
+      "PowerShell($body = '{\"username\": \"max_mustermann\", \"password\": \"password123\"}'; $response = Invoke-RestMethod -Uri \"http://localhost:3000/api/login\" -Method POST -ContentType \"application/json\" -Body $body -ErrorAction Stop; Write-Output \"accessToken: $\\($response.accessToken.Substring\\(0,30\\)\\)...\"; Write-Output \"expiresAt: $\\($response.expiresAt\\)\"; Write-Output \"user: $\\($response.user.username\\)\")",
+      "PowerShell($ts = [DateTimeOffset]::UtcNow.ToString\\(\"o\"\\); Write-Output \"Current UTC: $ts\"; $expires = [DateTimeOffset]::Parse\\(\"2026-05-12T06:47:57.957Z\"\\); $diff = $expires - [DateTimeOffset]::UtcNow; Write-Output \"Token läuft ab in: $\\([math]::Round\\($diff.TotalMinutes\\)\\) Minuten\")",
+      "PowerShell(netstat *)",
+      "PowerShell(Start-Sleep 5; try { Invoke-RestMethod -Uri \"http://localhost:3000/api/users\" -Method GET -TimeoutSec 3 | Select-Object -First 1 } catch { Write-Output \"Server nicht erreichbar: $_\" })",
+      "PowerShell($body = '{\"username\": \"max_mustermann\", \"password\": \"password123\"}'; $r = Invoke-RestMethod -Uri \"http://localhost:3000/api/login\" -Method POST -ContentType \"application/json\" -Body $body; $expires = [DateTimeOffset]::Parse\\($r.expiresAt\\); $diff = $expires - [DateTimeOffset]::UtcNow; Write-Output \"Token laeuft ab in: $\\([math]::Round\\($diff.TotalHours, 1\\)\\) Stunden\"; Write-Output \"User: $\\($r.user.username\\)\")",
+      "PowerShell($ts = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds\\(\\); $body = \"{`\"publicname`\": `\"TestUser`\", `\"username`\": `\"testuser_$ts`\", `\"password`\": `\"test1234`\"}\"; $r = Invoke-RestMethod -Uri \"http://localhost:3000/api/register\" -Method POST -ContentType \"application/json\" -Body $body; Write-Output \"accessToken: $\\(if \\($r.accessToken\\) { $r.accessToken.Substring\\(0,30\\) + '...' } else { 'FEHLT!' }\\)\"; $expires = [DateTimeOffset]::Parse\\($r.expiresAt\\); $diff = $expires - [DateTimeOffset]::UtcNow; Write-Output \"Token laeuft ab in: $\\([math]::Round\\($diff.TotalHours, 1\\)\\) Stunden\"; Write-Output \"User: $\\($r.user.username\\)\")"
+    ]
+  }
+}

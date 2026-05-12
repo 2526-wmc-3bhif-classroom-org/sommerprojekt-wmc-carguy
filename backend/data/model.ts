@@ -59,6 +59,18 @@ export interface Forum {
   category?: ForumCategory;
 }
 
+export interface Comment {
+  cid: number;
+  content: string;
+  author: User;
+  post: Post;
+  parentComment?: Comment;
+  replies?: Comment[];
+  publishedAt: Date;
+  likes: number;
+  dislikes: number;
+}
+
 export interface PostCategory {
   postCategoryId: number;
   postCategoryName: string;
@@ -67,4 +79,9 @@ export interface PostCategory {
 export interface ForumCategory {
   forumCategoryId: number;
   forumCategoryName: string;
+}
+
+export interface UserInForum {
+  uid: number;
+  forumId: number;
 }

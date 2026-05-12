@@ -76,7 +76,13 @@ export const UserService = {
       body: JSON.stringify({publicname, username, password }),
     });
 
-    const data : LoginResponse = await handleResponse<LoginResponse>(response);
+    const data: LoginResponse = await handleResponse<LoginResponse>(response);
+
+    localStorage.setItem("accessToken", data.accessToken);
+    localStorage.setItem("userClaims", JSON.stringify(data.userClaims));
+    localStorage.setItem("expiresAt", data.expiresAt);
+    localStorage.setItem("userName", data.userClaims.username);
+    localStorage.setItem("currentUser", JSON.stringify(data.user));
 
     curUser = data.user;
   },

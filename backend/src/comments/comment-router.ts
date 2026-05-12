@@ -11,16 +11,6 @@ commentRouter.get("/comments", (req, res) => {
     res.json(result);
 });
 
-commentRouter.get("/comment/:id", (req, res) => {
-    const id = Number(req.params.id);
-    if (isNaN(id)) return res.status(400).send("Invalid id");
-
-    const result = commentService.getCommentById(id);
-    if (!result) return res.status(404).send("Comment not found");
-
-    res.json(result);
-});
-
 commentRouter.get("/posts/comments/:postId", (req, res) => {
     const postId = Number(req.params.postId);
     if (isNaN(postId)) return res.status(400).send("Invalid postId");
@@ -37,8 +27,27 @@ commentRouter.get("/comment/comments/:parentCommentId", (req, res) => {
     res.json(result);
 });
 
+commentRouter.get("/comment/:id", (req, res) => {
+    const id = Number(req.params.id);
+    if (isNaN(id)) return res.status(400).send("Invalid id");
+
+    const result = commentService.getCommentById(id);
+    if (!result) return res.status(404).send("Comment not found");
+
+    res.json(result);
+});
+
 commentRouter.post("/comment", (req, res) => {
-    const comment: Comment = req.body;
+    const { content, author, post } = req.body;
+    const comment: Comment = {
+        cid: 0,
+        content,
+        author,
+        post,
+        publishedAt: new Date(),
+        likes: 0,
+        dislikes: 0
+    };
     commentService.createComment(comment);
     res.status(201).json({ message: "Comment created" });
 });

@@ -38,34 +38,32 @@ export class CommentRepository {
     public createComment(comment: Comment): void {
         const db = DB.getInstance();
         db.prepare(`
-            INSERT INTO Comment (CID, Content, UID, PID, ParentCID, PublishedAt, Likes, Dislikes)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO Comment (Content, UID, PID, ParentCID, PublishedAt, Likes, Dislikes)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         `).run(
-            comment.cid,
             comment.content,
             comment.author.uid,
             comment.post.pid,
             null,
             comment.publishedAt,
-            comment.likes,
-            comment.dislikes
+            0,
+            0
         );
     }
 
     public createReply(comment: Comment): void {
         const db = DB.getInstance();
         db.prepare(`
-            INSERT INTO Comment (CID, Content, UID, PID, ParentCID, PublishedAt, Likes, Dislikes)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO Comment (Content, UID, PID, ParentCID, PublishedAt, Likes, Dislikes)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         `).run(
-            comment.cid,
             comment.content,
             comment.author.uid,
             comment.post.pid,
             comment.parentComment?.cid ?? null,
             comment.publishedAt,
-            comment.likes,
-            comment.dislikes
+            0,
+            0
         );
     }
 }
