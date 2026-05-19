@@ -49,4 +49,5 @@ forumRouter.post("/forum", (req, res) => {
     };
 
     forumService.createForum(forum);
+    res.status(201).json({ message: "Forum created" });
 })
