@@ -15,10 +15,32 @@ export class PostRepository {
     public findPostById(id: number): Post | undefined {
         const db = DB.getInstance();
 
-        return db.prepare(`
-            SELECT PID as pid, Title as title, Content as content, UID as author, ForumID as forum, ParentPID as parentPost, Post_Category_id as category, PublishedAt as publishedAt, Likes as likes, Dislikes as dislikes FROM Post
-            WHERE PID = ?
-        `).get(id) as Post | undefined;
+        const row = db.prepare(`
+            SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.Likes as likes, p.Dislikes as dislikes,
+                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname
+            FROM Post p
+            LEFT JOIN User u ON p.UID = u.UID
+            WHERE p.PID = ?
+        `).get(id) as any;
+
+        if (!row) return undefined;
+
+        return {
+            pid: row.pid,
+            title: row.title,
+            content: row.content,
+            forum: { forumId: row.forum } as any,
+            parentPost: row.parentPost ? { pid: row.parentPost } as any : undefined,
+            category: row.category ? { postCategoryId: row.category } as any : undefined,
+            publishedAt: row.publishedAt,
+            likes: row.likes,
+            dislikes: row.dislikes,
+            author: {
+                uid: row.authorUid,
+                username: row.authorUsername,
+                publicname: row.authorPublicname
+            } as User
+        } as Post;
     }
 
     public findRepliesByParentId(parentId: number): Post[] {

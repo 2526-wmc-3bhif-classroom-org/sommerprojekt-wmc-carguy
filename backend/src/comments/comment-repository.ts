@@ -1,38 +1,111 @@
 import { DB } from "../database";
-import { Comment } from "../../data/model";
+import { Comment, User } from "../../data/model";
 
 export class CommentRepository {
 
     public findAllComments(): Comment[] {
         const db = DB.getInstance();
-        return db.prepare(`
-            SELECT CID as cid, Content as content, UID as author, PID as post, ParentCID as parentComment, PublishedAt as publishedAt, Likes as likes, Dislikes as dislikes
-            FROM Comment
-        `).all() as Comment[];
+        const rows = db.prepare(`
+            SELECT c.CID as cid, c.Content as content, c.PID as post, c.ParentCID as parentComment, c.PublishedAt as publishedAt, c.Likes as likes, c.Dislikes as dislikes,
+                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname
+            FROM Comment c
+            LEFT JOIN User u ON c.UID = u.UID
+        `).all() as any[];
+
+        return rows.map(row => ({
+            cid: row.cid,
+            content: row.content,
+            post: { pid: row.post } as any,
+            parentComment: row.parentComment ? { cid: row.parentComment } as any : undefined,
+            publishedAt: row.publishedAt,
+            likes: row.likes,
+            dislikes: row.dislikes,
+            author: {
+                uid: row.authorUid,
+                username: row.authorUsername,
+                publicname: row.authorPublicname
+            } as User
+        })) as Comment[];
     }
 
     public findCommentById(id: number): Comment | undefined {
         const db = DB.getInstance();
-        return db.prepare(`
-            SELECT CID as cid, Content as content, UID as author, PID as post, ParentCID as parentComment, PublishedAt as publishedAt, Likes as likes, Dislikes as dislikes
-            FROM Comment WHERE CID = ?
-        `).get(id) as Comment | undefined;
+        const row = db.prepare(`
+            SELECT c.CID as cid, c.Content as content, c.PID as post, c.ParentCID as parentComment, c.PublishedAt as publishedAt, c.Likes as likes, c.Dislikes as dislikes,
+                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname
+            FROM Comment c
+            LEFT JOIN User u ON c.UID = u.UID
+            WHERE c.CID = ?
+        `).get(id) as any;
+
+        if (!row) return undefined;
+
+        return {
+            cid: row.cid,
+            content: row.content,
+            post: { pid: row.post } as any,
+            parentComment: row.parentComment ? { cid: row.parentComment } as any : undefined,
+            publishedAt: row.publishedAt,
+            likes: row.likes,
+            dislikes: row.dislikes,
+            author: {
+                uid: row.authorUid,
+                username: row.authorUsername,
+                publicname: row.authorPublicname
+            } as User
+        } as Comment;
     }
 
     public findCommentsByPostId(postId: number): Comment[] {
         const db = DB.getInstance();
-        return db.prepare(`
-            SELECT CID as cid, Content as content, UID as author, PID as post, ParentCID as parentComment, PublishedAt as publishedAt, Likes as likes, Dislikes as dislikes
-            FROM Comment WHERE PID = ? AND ParentCID IS NULL
-        `).all(postId) as Comment[];
+        const rows = db.prepare(`
+            SELECT c.CID as cid, c.Content as content, c.PID as post, c.ParentCID as parentComment, c.PublishedAt as publishedAt, c.Likes as likes, c.Dislikes as dislikes,
+                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname
+            FROM Comment c
+            LEFT JOIN User u ON c.UID = u.UID
+            WHERE c.PID = ? AND c.ParentCID IS NULL
+        `).all(postId) as any[];
+
+        return rows.map(row => ({
+            cid: row.cid,
+            content: row.content,
+            post: { pid: row.post } as any,
+            parentComment: row.parentComment ? { cid: row.parentComment } as any : undefined,
+            publishedAt: row.publishedAt,
+            likes: row.likes,
+            dislikes: row.dislikes,
+            author: {
+                uid: row.authorUid,
+                username: row.authorUsername,
+                publicname: row.authorPublicname
+            } as User
+        })) as Comment[];
     }
 
     public findRepliesByParentCommentId(parentCommentId: number): Comment[] {
         const db = DB.getInstance();
-        return db.prepare(`
-            SELECT CID as cid, Content as content, UID as author, PID as post, ParentCID as parentComment, PublishedAt as publishedAt, Likes as likes, Dislikes as dislikes
-            FROM Comment WHERE ParentCID = ?
-        `).all(parentCommentId) as Comment[];
+        const rows = db.prepare(`
+            SELECT c.CID as cid, c.Content as content, c.PID as post, c.ParentCID as parentComment, c.PublishedAt as publishedAt, c.Likes as likes, c.Dislikes as dislikes,
+                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname
+            FROM Comment c
+            LEFT JOIN User u ON c.UID = u.UID
+            WHERE c.ParentCID = ?
+        `).all(parentCommentId) as any[];
+
+        return rows.map(row => ({
+            cid: row.cid,
+            content: row.content,
+            post: { pid: row.post } as any,
+            parentComment: row.parentComment ? { cid: row.parentComment } as any : undefined,
+            publishedAt: row.publishedAt,
+            likes: row.likes,
+            dislikes: row.dislikes,
+            author: {
+                uid: row.authorUid,
+                username: row.authorUsername,
+                publicname: row.authorPublicname
+            } as User
+        })) as Comment[];
     }
 
     public createComment(comment: Comment): void {
