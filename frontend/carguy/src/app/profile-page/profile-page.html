@@ -33,16 +33,16 @@
   <!-- Stats Section -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
     <div class="stat-card">
-      <div class="text-3xl font-extrabold text-primary">{{ currentUser?.posts?.length || 0 }}</div>
+      <div class="text-3xl font-extrabold text-primary">{{ currentUser?.totalPosts || 0 }}</div>
       <div class="text-base-content/60 font-medium text-sm uppercase tracking-wider">Posts Published</div>
     </div>
     <div class="stat-card">
-      <div class="text-3xl font-extrabold text-primary">{{ currentUser?.comments?.length || 0 }}</div>
+      <div class="text-3xl font-extrabold text-primary">{{ currentUser?.totalComments || 0 }}</div>
       <div class="text-base-content/60 font-medium text-sm uppercase tracking-wider">Comments Made</div>
     </div>
     <div class="stat-card">
-      <div class="text-xl font-bold text-primary">{{ currentUser?.createdAt | date:'mediumDate' }}</div>
-      <div class="text-base-content/60 font-medium text-sm uppercase tracking-wider">Joined Date</div>
+      <div class="text-3xl font-extrabold text-primary">{{ currentUser?.totalAura || 0 }}</div>
+      <div class="text-base-content/60 font-medium text-sm uppercase tracking-wider">Total Aura</div>
     </div>
   </div>
 

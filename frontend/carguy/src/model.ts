@@ -11,6 +11,9 @@ export interface User {
   createdAt: Date;
   posts?: Post[];
   comments?: Comment[];
+  totalPosts?: number;
+  totalComments?: number;
+  totalAura?: number;
 }
 
 export interface Post {

@@ -32,6 +32,9 @@ export interface User {
   image?: string;
   createdAt: Date;
   posts?: Post[];
+  totalPosts?: number;
+  totalComments?: number;
+  totalAura?: number;
 }
 
 export interface Post {

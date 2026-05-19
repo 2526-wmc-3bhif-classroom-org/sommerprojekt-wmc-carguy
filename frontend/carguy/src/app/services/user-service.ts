@@ -119,6 +119,11 @@ export const UserService = {
     return curUser || null;
   },
 
+  async getUserById(id: number): Promise<User> {
+    const response = await fetch(`${API_BASE_URL}/user/${id}`);
+    return handleResponse<User>(response);
+  },
+
   logout(): void {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("userClaims");
