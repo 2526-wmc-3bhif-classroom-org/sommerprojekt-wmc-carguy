@@ -75,3 +75,31 @@ commentRouter.post("/posts/comments", (req, res) => {
     commentService.createReply(reply);
     res.status(201).json({ message: "Reply created" });
 });
+
+commentRouter.patch("/comments/:id/like", (req, res) => {
+    const id = Number(req.params.id);
+    if (isNaN(id)) return res.status(400).send("Invalid comment ID");
+    commentService.likeComment(id);
+    res.json({ message: "Comment liked" });
+});
+
+commentRouter.patch("/comments/:id/unlike", (req, res) => {
+    const id = Number(req.params.id);
+    if (isNaN(id)) return res.status(400).send("Invalid comment ID");
+    commentService.unlikeComment(id);
+    res.json({ message: "Comment unliked" });
+});
+
+commentRouter.patch("/comments/:id/dislike", (req, res) => {
+    const id = Number(req.params.id);
+    if (isNaN(id)) return res.status(400).send("Invalid comment ID");
+    commentService.dislikeComment(id);
+    res.json({ message: "Comment disliked" });
+});
+
+commentRouter.patch("/comments/:id/undislike", (req, res) => {
+    const id = Number(req.params.id);
+    if (isNaN(id)) return res.status(400).send("Invalid comment ID");
+    commentService.undislikeComment(id);
+    res.json({ message: "Comment undisliked" });
+});

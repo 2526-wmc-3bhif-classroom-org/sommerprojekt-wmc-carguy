@@ -21,6 +21,7 @@ export class PostDetailComponent implements OnInit {
   isSubmitting = false;
   errorMessage = '';
   voteState: 'like' | 'dislike' | null = null;
+  commentVoteStates: Record<number, 'like' | 'dislike' | null> = {};
   private cdr = inject(ChangeDetectorRef);
 
   private get voteKey(): string {
@@ -30,11 +31,25 @@ export class PostDetailComponent implements OnInit {
 
   private loadVoteState() {
     this.voteState = (localStorage.getItem(this.voteKey) as 'like' | 'dislike' | null) ?? null;
+    for (const comment of this.comments) {
+      this.commentVoteStates[comment.cid] = (localStorage.getItem(this.getCommentVoteKey(comment.cid)) as 'like' | 'dislike' | null) ?? null;
+    }
   }
 
   private saveVoteState() {
     if (this.voteState === null) localStorage.removeItem(this.voteKey);
     else localStorage.setItem(this.voteKey, this.voteState);
+  }
+
+  private getCommentVoteKey(cid: number): string {
+    const user = UserService.getCurrentUser();
+    return `vote_comment_${cid}_user_${user?.uid}`;
+  }
+
+  private saveCommentVoteState(cid: number) {
+    const state = this.commentVoteStates[cid];
+    if (state === null) localStorage.removeItem(this.getCommentVoteKey(cid));
+    else localStorage.setItem(this.getCommentVoteKey(cid), state);
   }
 
   constructor(private route: ActivatedRoute) {}
@@ -83,39 +98,95 @@ export class PostDetailComponent implements OnInit {
 
   async likePost() {
     if (!this.post || !UserService.isLoggedIn()) return;
-    if (this.voteState === 'like') {
-      await PostService.unlikePost(this.post.pid);
-      this.post.likes--;
-      this.voteState = null;
-    } else {
-      if (this.voteState === 'dislike') {
-        await PostService.undislikePost(this.post.pid);
-        this.post.dislikes--;
+    try {
+      if (this.voteState === 'like') {
+        await PostService.unlikePost(this.post.pid);
+        this.post.likes--;
+        this.voteState = null;
+      } else {
+        if (this.voteState === 'dislike') {
+          await PostService.undislikePost(this.post.pid);
+          this.post.dislikes--;
+        }
+        await PostService.likePost(this.post.pid);
+        this.post.likes++;
+        this.voteState = 'like';
       }
-      await PostService.likePost(this.post.pid);
-      this.post.likes++;
-      this.voteState = 'like';
+      this.saveVoteState();
+    } catch (e) {
+      console.error('Failed to like post', e);
     }
-    this.saveVoteState();
     this.cdr.detectChanges();
   }
 
   async dislikePost() {
     if (!this.post || !UserService.isLoggedIn()) return;
-    if (this.voteState === 'dislike') {
-      await PostService.undislikePost(this.post.pid);
-      this.post.dislikes--;
-      this.voteState = null;
-    } else {
-      if (this.voteState === 'like') {
-        await PostService.unlikePost(this.post.pid);
-        this.post.likes--;
+    try {
+      if (this.voteState === 'dislike') {
+        await PostService.undislikePost(this.post.pid);
+        this.post.dislikes--;
+        this.voteState = null;
+      } else {
+        if (this.voteState === 'like') {
+          await PostService.unlikePost(this.post.pid);
+          this.post.likes--;
+        }
+        await PostService.dislikePost(this.post.pid);
+        this.post.dislikes++;
+        this.voteState = 'dislike';
       }
-      await PostService.dislikePost(this.post.pid);
-      this.post.dislikes++;
-      this.voteState = 'dislike';
+      this.saveVoteState();
+    } catch (e) {
+      console.error('Failed to dislike post', e);
     }
-    this.saveVoteState();
+    this.cdr.detectChanges();
+  }
+
+  async likeComment(comment: Comment) {
+    if (!UserService.isLoggedIn()) return;
+    const currentState = this.commentVoteStates[comment.cid];
+    try {
+      if (currentState === 'like') {
+        await CommentService.unlikeComment(comment.cid);
+        comment.likes--;
+        this.commentVoteStates[comment.cid] = null;
+      } else {
+        if (currentState === 'dislike') {
+          await CommentService.undislikeComment(comment.cid);
+          comment.dislikes--;
+        }
+        await CommentService.likeComment(comment.cid);
+        comment.likes++;
+        this.commentVoteStates[comment.cid] = 'like';
+      }
+      this.saveCommentVoteState(comment.cid);
+    } catch (e) {
+      console.error('Failed to like comment', e);
+    }
+    this.cdr.detectChanges();
+  }
+
+  async dislikeComment(comment: Comment) {
+    if (!UserService.isLoggedIn()) return;
+    const currentState = this.commentVoteStates[comment.cid];
+    try {
+      if (currentState === 'dislike') {
+        await CommentService.undislikeComment(comment.cid);
+        comment.dislikes--;
+        this.commentVoteStates[comment.cid] = null;
+      } else {
+        if (currentState === 'like') {
+          await CommentService.unlikeComment(comment.cid);
+          comment.likes--;
+        }
+        await CommentService.dislikeComment(comment.cid);
+        comment.dislikes++;
+        this.commentVoteStates[comment.cid] = 'dislike';
+      }
+      this.saveCommentVoteState(comment.cid);
+    } catch (e) {
+      console.error('Failed to dislike comment', e);
+    }
     this.cdr.detectChanges();
   }
 }
