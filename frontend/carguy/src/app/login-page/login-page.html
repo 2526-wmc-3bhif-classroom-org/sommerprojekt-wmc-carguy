@@ -2,7 +2,7 @@
   <!-- Ambient glow -->
   <div class="ambient-glow"></div>
 
-  <div class="relative z-10 w-full max-w-md bg-base-200 border border-white/5 rounded-2xl p-8 shadow-xl">
+  <div class="relative z-10 w-full max-w-md bg-base-200 border border-base-content/10 rounded-2xl p-8 shadow-xl">
     <!-- Logo / Branding -->
     <div class="text-center mb-8">
       <div class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-accent mb-4">
@@ -24,12 +24,12 @@
     <!-- Tab Switcher -->
     <div class="tab-switcher relative flex bg-base-300 rounded-lg p-1 mb-6">
       <button class="tab-btn flex-1 py-2.5 text-sm font-semibold rounded-md relative z-10 transition-colors duration-200"
-        [class]="activeTab === 'login' ? 'text-white' : 'text-base-content/50'"
+        [class]="activeTab === 'login' ? 'text-base-content' : 'text-base-content/50'"
         (click)="switchTab('login')">
         Log In
       </button>
       <button class="tab-btn flex-1 py-2.5 text-sm font-semibold rounded-md relative z-10 transition-colors duration-200"
-        [class]="activeTab === 'register' ? 'text-white' : 'text-base-content/50'"
+        [class]="activeTab === 'register' ? 'text-base-content' : 'text-base-content/50'"
         (click)="switchTab('register')">
         Register
       </button>
@@ -81,7 +81,7 @@
         </div>
       </div>
 
-      <button type="submit" class="btn bg-accent text-white border-none hover:bg-accent/80 w-full mt-2 gap-2" [disabled]="!loginForm.valid || isLoading">
+      <button type="submit" class="btn bg-accent text-base-content border-none hover:bg-accent/80 w-full mt-2 gap-2" [disabled]="!loginForm.valid || isLoading">
         @if (isLoading) {
         <span class="loading loading-spinner loading-sm"></span>
         <span>Logging in...</span>
@@ -156,7 +156,7 @@
         </div>
       </div>
 
-      <button type="submit" class="btn bg-accent text-white border-none hover:bg-primary/80 w-full mt-2 gap-2" [disabled]="!registerForm.valid || isLoading">
+      <button type="submit" class="btn bg-accent text-base-content border-none hover:bg-primary/80 w-full mt-2 gap-2" [disabled]="!registerForm.valid || isLoading">
         @if (isLoading) {
         <span class="loading loading-spinner loading-sm"></span>
         <span>Creating account...</span>
