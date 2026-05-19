@@ -11,6 +11,14 @@ postRouter.get("/posts", (req, res) => {
     res.json(result);
 });
 
+postRouter.get("/posts/trending", (req, res) => {
+    const limit = req.query.limit ? Number(req.query.limit) : 10;
+    if (isNaN(limit)) return res.status(400).send("Invalid limit");
+
+    const result = postService.getTrendingPosts(limit);
+    res.json(result);
+});
+
 postRouter.get("/posts/forum/:forumId", (req, res) => {
     const forumId = Number(req.params.forumId);
     if (isNaN(forumId)) return res.status(400).send("Invalid forumId");

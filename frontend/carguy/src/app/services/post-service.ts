@@ -17,9 +17,19 @@ export const PostService = {
     return handleResponse<Post[]>(res);
   },
 
+  async getTrendingPosts(limit: number = 10): Promise<Post[]> {
+    const res = await fetch(`${API_BASE_URL}/posts/trending?limit=${limit}`);
+    return handleResponse<Post[]>(res);
+  },
+
   async getPostById(id: number): Promise<Post> {
     const res = await fetch(`${API_BASE_URL}/posts/${id}`);
     return handleResponse<Post>(res);
+  },
+
+  async getPostsByUser(userId: number): Promise<Post[]> {
+    const res = await fetch(`${API_BASE_URL}/posts/user/${userId}`);
+    return handleResponse<Post[]>(res);
   },
 
   async createPost(title: string, content: string, author: User, forum: Forum): Promise<void> {

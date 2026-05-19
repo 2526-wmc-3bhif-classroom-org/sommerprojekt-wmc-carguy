@@ -11,6 +11,14 @@ forumRouter.get("/forums", (req, res) => {
     res.json(result);
 });
 
+forumRouter.get("/forums/trending", (req, res) => {
+    const limit = req.query.limit ? Number(req.query.limit) : 5;
+    if (isNaN(limit)) return res.status(400).send("Invalid limit");
+
+    const result = forumService.getTrendingForums(limit);
+    res.json(result);
+});
+
 forumRouter.get("/forum/:id", (req, res) => {
     const id = Number(req.params.id);
 

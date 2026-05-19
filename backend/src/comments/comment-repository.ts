@@ -108,6 +108,32 @@ export class CommentRepository {
         })) as Comment[];
     }
 
+    public findCommentsByUser(userId: number): Comment[] {
+        const db = DB.getInstance();
+        const rows = db.prepare(`
+            SELECT c.CID as cid, c.Content as content, c.PID as post, c.ParentCID as parentComment, c.PublishedAt as publishedAt, c.Likes as likes, c.Dislikes as dislikes,
+                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname
+            FROM Comment c
+            LEFT JOIN User u ON c.UID = u.UID
+            WHERE c.UID = ?
+        `).all(userId) as any[];
+
+        return rows.map(row => ({
+            cid: row.cid,
+            content: row.content,
+            post: { pid: row.post } as any,
+            parentComment: row.parentComment ? { cid: row.parentComment } as any : undefined,
+            publishedAt: row.publishedAt,
+            likes: row.likes,
+            dislikes: row.dislikes,
+            author: {
+                uid: row.authorUid,
+                username: row.authorUsername,
+                publicname: row.authorPublicname
+            } as User
+        })) as Comment[];
+    }
+
     public createComment(comment: Comment): void {
         const db = DB.getInstance();
         db.prepare(`
@@ -138,5 +164,25 @@ export class CommentRepository {
             0,
             0
         );
+    }
+
+    public likeComment(id: number): void {
+        const db = DB.getInstance();
+        db.prepare('UPDATE Comment SET Likes = Likes + 1 WHERE CID = ?').run(id);
+    }
+
+    public unlikeComment(id: number): void {
+        const db = DB.getInstance();
+        db.prepare('UPDATE Comment SET Likes = Likes - 1 WHERE CID = ?').run(id);
+    }
+
+    public dislikeComment(id: number): void {
+        const db = DB.getInstance();
+        db.prepare('UPDATE Comment SET Dislikes = Dislikes + 1 WHERE CID = ?').run(id);
+    }
+
+    public undislikeComment(id: number): void {
+        const db = DB.getInstance();
+        db.prepare('UPDATE Comment SET Dislikes = Dislikes - 1 WHERE CID = ?').run(id);
     }
 }

@@ -20,6 +20,12 @@ export const CommentService = {
     return handleResponse<Comment[]>(res);
   },
 
+  /** Get comments for a user */
+  async getCommentsByUser(userId: number): Promise<Comment[]> {
+    const res = await fetch(`${API_BASE_URL}/comments/user/${userId}`);
+    return handleResponse<Comment[]>(res);
+  },
+
   /** Get a single comment */
   async getCommentById(id: number): Promise<Comment> {
     const res = await fetch(`${API_BASE_URL}/comment/${id}`);

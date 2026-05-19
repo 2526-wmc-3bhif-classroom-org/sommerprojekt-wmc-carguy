@@ -13,6 +13,7 @@ export const routes: Routes = [
   { path: 'community/:id', component: CommunityDetailComponent },
   { path: 'post/:id', component: PostDetailComponent },
   { path: 'profile', component: ProfilePage },
+  { path: 'profile/:id', component: ProfilePage },
   { path: 'login', component: LoginPage },
   { path: 'guides', component: GuidesComponent },
 ];

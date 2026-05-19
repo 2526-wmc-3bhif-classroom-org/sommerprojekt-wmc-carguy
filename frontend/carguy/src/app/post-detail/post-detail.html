@@ -33,7 +33,13 @@
 
           <div class="flex-1">
             <div class="text-xs text-base-content/60 mb-3 flex items-center gap-2">
-              <span class="font-medium text-base-content/80">u/{{ post.author?.username || 'unknown' }}</span>
+              @if (post.author) {
+                <a [routerLink]="['/profile', post.author.uid]" class="font-medium text-base-content/80 hover:text-accent transition-colors cursor-pointer">
+                  u/{{ post.author.username }}
+                </a>
+              } @else {
+                <span class="font-medium text-base-content/80">u/unknown</span>
+              }
               <span>•</span>
               <span>{{ post.publishedAt | date:'medium' }}</span>
             </div>
@@ -85,7 +91,13 @@
         @for (comment of comments; track comment.cid) {
           <div class="p-6 rounded-xl border border-base-content/10 bg-base-200 mb-4 shadow-sm hover:border-primary transition-all duration-300 group">
             <div class="text-xs text-base-content/60 mb-2 flex items-center gap-2">
-              <span class="font-medium text-base-content/80">u/{{ comment.author?.username || 'unknown' }}</span>
+              @if (comment.author) {
+                <a [routerLink]="['/profile', comment.author.uid]" class="font-medium text-base-content/80 hover:text-accent transition-colors cursor-pointer">
+                  u/{{ comment.author.username }}
+                </a>
+              } @else {
+                <span class="font-medium text-base-content/80">u/unknown</span>
+              }
               <span>•</span>
               <span>{{ comment.publishedAt | date:'short' }}</span>
             </div>

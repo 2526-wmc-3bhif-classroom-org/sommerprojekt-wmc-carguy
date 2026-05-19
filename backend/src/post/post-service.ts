@@ -8,6 +8,10 @@ export class PostService {
         return this.postRepository.findAllRootPosts();
     }
 
+    public getTrendingPosts(limit: number = 10): Post[] {
+        return this.postRepository.findTrendingPosts(limit);
+    }
+
     public getPostById(id: number): Post | undefined {
         return this.postRepository.findPostById(id);
     }

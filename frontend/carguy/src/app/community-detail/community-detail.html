@@ -100,7 +100,13 @@
 
                 <div class="flex-1">
                   <div class="text-xs text-base-content/60 mb-2 flex items-center gap-2">
-                    <span class="font-medium text-base-content/80">Posted by u/{{ post.author?.username || 'unknown' }}</span>
+                    @if (post.author) {
+                      <a [routerLink]="['/profile', post.author.uid]" (click)="$event.stopPropagation()" class="font-medium text-base-content/80 hover:text-accent transition-colors cursor-pointer">
+                        Posted by u/{{ post.author.username }}
+                      </a>
+                    } @else {
+                      <span class="font-medium text-base-content/80">Posted by u/unknown</span>
+                    }
                     <span>•</span>
                     <span>{{ post.publishedAt | date:'short' }}</span>
                   </div>

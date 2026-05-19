@@ -88,10 +88,34 @@ export class PostRepository {
     public findPostByUser(userId: number): Post[] {
         const db = DB.getInstance();
 
-        return db.prepare(`
-            SELECT PID as pid, Title as title, Content as content, UID as author, ForumID as forum, ParentPID as parentPost, Post_Category_id as category, PublishedAt as publishedAt, Likes as likes, Dislikes as dislikes FROM Post
-            WHERE UID = ?
-        `).all(userId) as Post[];
+        const rows = db.prepare(`
+            SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.Likes as likes, p.Dislikes as dislikes,
+                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname,
+                   COUNT(c.CID) as commentCount
+            FROM Post p
+            LEFT JOIN User u ON p.UID = u.UID
+            LEFT JOIN Comment c ON c.PID = p.PID AND c.ParentCID IS NULL
+            WHERE p.UID = ?
+            GROUP BY p.PID
+        `).all(userId) as any[];
+
+        return rows.map(row => ({
+            pid: row.pid,
+            title: row.title,
+            content: row.content,
+            forum: row.forum,
+            parentPost: row.parentPost,
+            category: row.category,
+            publishedAt: row.publishedAt,
+            likes: row.likes,
+            dislikes: row.dislikes,
+            commentCount: row.commentCount,
+            author: {
+                uid: row.authorUid,
+                username: row.authorUsername,
+                publicname: row.authorPublicname
+            } as User
+        })) as Post[];
     }
 
     public findPostByCategory(categoryId: number): Post[] {
@@ -161,5 +185,42 @@ export class PostRepository {
             0,
             0
         );
+    }
+
+    public findTrendingPosts(limit: number = 10): Post[] {
+        const db = DB.getInstance();
+
+        const rows = db.prepare(`
+            SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.Likes as likes, p.Dislikes as dislikes,
+                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname,
+                   COUNT(c.CID) as commentCount,
+                   (p.Likes - p.Dislikes + COALESCE(COUNT(c.CID), 0) * 2) as TrendScore
+            FROM Post p
+            LEFT JOIN User u ON p.UID = u.UID
+            LEFT JOIN Comment c ON p.PID = c.PID
+            WHERE p.ParentPID IS NULL
+              AND p.PublishedAt >= datetime('now', '-7 days')
+            GROUP BY p.PID
+            ORDER BY TrendScore DESC
+            LIMIT ?
+        `).all(limit) as any[];
+
+        return rows.map(row => ({
+            pid: row.pid,
+            title: row.title,
+            content: row.content,
+            forum: { forumId: row.forum } as any,
+            parentPost: row.parentPost ? { pid: row.parentPost } as any : undefined,
+            category: row.category ? { postCategoryId: row.category } as any : undefined,
+            publishedAt: row.publishedAt,
+            likes: row.likes,
+            dislikes: row.dislikes,
+            commentCount: row.commentCount,
+            author: {
+                uid: row.authorUid,
+                username: row.authorUsername,
+                publicname: row.authorPublicname
+            } as User
+        })) as Post[];
     }
 }

@@ -20,6 +20,12 @@ export const ForumService = {
     return handleResponse<Forum[]>(res);
   },
 
+  /** Get trending forums */
+  async getTrendingForums(limit: number = 5): Promise<Forum[]> {
+    const res = await fetch(`${API_BASE_URL}/forums/trending?limit=${limit}`);
+    return handleResponse<Forum[]>(res);
+  },
+
   /** Get a single forum */
   async getForumById(id: number): Promise<Forum> {
     const res = await fetch(`${API_BASE_URL}/forum/${id}`);

@@ -27,6 +27,14 @@ commentRouter.get("/comment/comments/:parentCommentId", (req, res) => {
     res.json(result);
 });
 
+commentRouter.get("/comments/user/:userId", (req, res) => {
+    const userId = Number(req.params.userId);
+    if (isNaN(userId)) return res.status(400).send("Invalid userId");
+
+    const result = commentService.getCommentsByUser(userId);
+    res.json(result);
+});
+
 commentRouter.get("/comment/:id", (req, res) => {
     const id = Number(req.params.id);
     if (isNaN(id)) return res.status(400).send("Invalid id");
