@@ -110,4 +110,27 @@ export const UserService = {
     localStorage.removeItem("expiresAt");
     localStorage.removeItem("userName");
   },
+
+  async editUserInfo(oldUser: User, newUser: User): Promise<User> {
+    const token = this.getToken();
+    if (!token) throw new Error("Not authenticated");
+
+    const response = await fetch(`${API_BASE_URL}/update`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        username: oldUser.username,
+        newUsername: newUser.username,
+        newPublicName: newUser.publicname,
+        newDescription: newUser.description
+      })
+    });
+
+    const data = await handleResponse<{user: User}>(response);
+    curUser = data.user;
+    return data.user;
+  }
 };

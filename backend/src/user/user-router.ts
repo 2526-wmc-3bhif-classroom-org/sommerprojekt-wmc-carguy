@@ -82,3 +82,26 @@ userRouter.post("/register", (req: Request, res: Response) => {
         }
     }
 })
+
+userRouter.post("/update", (req: Request, res: Response) => {
+    try {
+        console.log(req.body);
+        const realUserName: string = req.body.username;
+
+        const newUserName: string = req.body.newUsername;
+        const newPublicName: string = req.body.newPublicName;
+        const newDescription: string = req.body.newDescription;
+
+        let user = UserService.updateUserInfo(realUserName, {username: newUserName, publicname: newPublicName, description: newDescription} as User);
+
+        return res.status(StatusCodes.OK).send({
+            message: "User updated successfully",
+            user: UserService.getUserByUsername(user.username)
+        });
+    } catch (err) {
+        if (err instanceof Error) {
+            return res.status(StatusCodes.BAD_REQUEST).send({ message: err.message });
+        }
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "An unexpected error occurred" });
+    }
+})

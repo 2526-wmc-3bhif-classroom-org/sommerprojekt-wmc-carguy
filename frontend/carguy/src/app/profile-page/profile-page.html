@@ -17,15 +17,41 @@
     </div>
 
     <div class="z-10 flex-1 text-center md:text-left">
-      <h1 class="text-4xl font-bold text-cg-primary mb-2">{{currentUser?.publicname }}</h1>
-      <p class="text-cg-accent font-medium mb-4">{{ currentUser?.username }} <span class="mx-2">•</span> {{
-        currentUser?.title || 'Member' }}</p>
-      <p class="text-gray-400 max-w-2xl">{{ currentUser?.description || 'No description provided.' }}</p>
+      <div *ngIf="!isEditing">
+        <h1 class="text-4xl font-bold text-cg-primary mb-2">{{currentUser?.publicname }}</h1>
+        <p class="text-cg-accent font-medium mb-4">{{ currentUser?.username }} <span class="mx-2">•</span> {{
+          currentUser?.title || 'Member' }}</p>
+        <p class="text-gray-400 max-w-2xl">{{ currentUser?.description || 'No description provided.' }}</p>
+      </div>
+
+      <div *ngIf="isEditing" class="flex flex-col gap-2">
+        <input [(ngModel)]="editPublicName" class="input input-bordered w-full max-w-xs bg-cg-primary text-cg-primary text-4xl font-bold h-auto py-1 mb-2" />
+        <div class="flex items-center gap-2 mb-2">
+          <input [(ngModel)]="editUsername" class="input input-bordered bg-cg-primary text-cg-accent font-medium py-1 h-auto" />
+          <span class="text-cg-accent mx-2">•</span>
+          <span class="text-cg-accent">{{ currentUser?.title || 'Member' }}</span>
+        </div>
+        <textarea [(ngModel)]="editDescription" class="textarea textarea-bordered w-full max-w-2xl bg-cg-primary text-gray-400" placeholder="Description"></textarea>
+      </div>
 
       <div class="mt-6 flex flex-wrap gap-4 justify-center md:justify-start">
-        <button class="btn bg-cg-primary text-cg-primary border-none hover:bg-opacity-90">Edit Profile</button>
-        <button
-          class="btn btn-outline border-cg-accent/10 hover:border-cg-accent hover:bg-transparent hover:text-cg-accent">Settings</button>
+        <div *ngIf="!isEditing" class="flex gap-4">
+          <button (click)="toggleEdit()" class="btn bg-cg-primary text-cg-primary border-none hover:bg-opacity-90">Edit Profile</button>
+          <button
+            class="btn btn-outline border-cg-accent/10 hover:border-cg-accent hover:bg-transparent hover:text-cg-accent">Settings</button>
+        </div>
+        <div *ngIf="isEditing" class="flex gap-4">
+          <button
+            (click)="saveProfile()"
+            [disabled]="isSaving"
+            class="btn bg-cg-primary text-cg-primary border-none hover:bg-opacity-90"> {{ isSaving ? 'Saving...' : 'Save'}}
+          </button>
+          <button
+            (click)="abortEdit()"
+            [disabled]="isSaving"
+            class="btn btn-outline border-cg-accent/10 hover:border-cg-accent hover:bg-transparent hover:text-cg-accent">Abort
+          </button>
+        </div>
       </div>
     </div>
   </header>
