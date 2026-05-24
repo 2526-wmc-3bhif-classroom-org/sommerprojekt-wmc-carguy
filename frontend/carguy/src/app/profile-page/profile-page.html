@@ -1,87 +1,180 @@
 @if(!loggedIn){
 <app-login-page></app-login-page>
 } @else {
-<div class="mx-auto max-w-[1400px] px-8 py-12 bg-cg-neutral min-h-screen">
+<div class="mx-auto max-w-[1400px] px-8 py-12 bg-base-100 min-h-screen">
 
   <!-- Hero Section -->
   <header
-    class="mb-12 mt-12 flex flex-col md:flex-row items-center md:items-start gap-8 bg-cg-primary p-8 rounded-2xl border border-cg-accent/5 shadow-xl relative overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-r from-cg-primary/10 to-transparent"></div>
+    class="mb-12 mt-12 flex flex-col md:flex-row items-center md:items-start gap-8 bg-base-200 p-8 rounded-2xl border border-base-content/10 shadow-xl relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent"></div>
 
-    <div class="z-10 bg-cg-primary/20 backdrop-blur-md rounded-full p-2">
-      <div
-        class="w-32 h-32 rounded-full bg-cg-primary flex items-center justify-center text-4xl font-bold text-cg-primary shadow-2xl overflow-hidden">
-        <img *ngIf="currentUser?.image" [src]="currentUser?.image" class="w-full h-full object-cover">
+    <div class="z-10 bg-base-200/20 backdrop-blur-md rounded-full p-2">
+      <div class="w-32 h-32 rounded-full bg-base-300 flex items-center justify-center text-4xl font-bold text-primary border border-base-content/10 overflow-hidden">        <img *ngIf="currentUser?.image" [src]="currentUser?.image" class="w-full h-full object-cover">
         <span *ngIf="!currentUser?.image">{{ currentUser?.publicname?.charAt(0) || 'U' }}</span>
       </div>
     </div>
 
-    <div class="z-10 flex-1 text-center md:text-left">
-      <div *ngIf="!isEditing">
-        <h1 class="text-4xl font-bold text-cg-primary mb-2">{{currentUser?.publicname }}</h1>
-        <p class="text-cg-accent font-medium mb-4">{{ currentUser?.username }} <span class="mx-2">•</span> {{
-          currentUser?.title || 'Member' }}</p>
-        <p class="text-gray-400 max-w-2xl">{{ currentUser?.description || 'No description provided.' }}</p>
-      </div>
+    @if (isOwnProfile) {
+      <div class="z-10 flex-1 text-center md:text-left">
+        <div *ngIf="!isEditing">
+          <h1 class="text-4xl font-bold text-primary mb-2">{{currentUser?.publicname }}</h1>
+          <p class="text-base-content/70 font-medium mb-4">{{ currentUser?.username }} <span class="mx-2">•</span> {{
+            currentUser?.title || 'Member' }}</p>
+          <p class="text-base-content/70 max-w-2xl">{{ currentUser?.description || 'No description provided.' }}</p>
+        </div>
 
-      <div *ngIf="isEditing" class="flex flex-col gap-2">
-        <input [(ngModel)]="editPublicName" class="input input-bordered w-full max-w-xs bg-cg-primary text-cg-primary text-4xl font-bold h-auto py-1 mb-2" />
-        <div class="flex items-center gap-2 mb-2">
-          <input [(ngModel)]="editUsername" class="input input-bordered bg-cg-primary text-cg-accent font-medium py-1 h-auto" />
-          <span class="text-cg-accent mx-2">•</span>
-          <span class="text-cg-accent">{{ currentUser?.title || 'Member' }}</span>
+        <div *ngIf="isEditing" class="flex flex-col gap-2">
+          <input [(ngModel)]="editPublicName" class="input input-bordered w-full max-w-xs bg-base-200 text-primary text-4xl font-bold h-auto py-1 mb-2" />
+          <div class="flex items-center gap-2 mb-2">
+            <input [(ngModel)]="editUsername" class="input input-bordered bg-base-200 text-base-content/70 font-medium py-1 h-auto" />
+            <span class="text-base-content/70 mx-2">•</span>
+            <span class="text-base-content/70">{{ currentUser?.title || 'Member' }}</span>
+          </div>
+          <textarea [(ngModel)]="editDescription" class="textarea textarea-bordered w-full max-w-2xl bg-base-200 text-base-content/70" placeholder="Description"></textarea>
         </div>
-        <textarea [(ngModel)]="editDescription" class="textarea textarea-bordered w-full max-w-2xl bg-cg-primary text-gray-400" placeholder="Description"></textarea>
-      </div>
 
-      <div class="mt-6 flex flex-wrap gap-4 justify-center md:justify-start">
-        <div *ngIf="!isEditing" class="flex gap-4">
-          <button (click)="toggleEdit()" class="btn bg-cg-primary text-cg-primary border-none hover:bg-opacity-90">Edit Profile</button>
-          <button
-            class="btn btn-outline border-cg-accent/10 hover:border-cg-accent hover:bg-transparent hover:text-cg-accent">Settings</button>
-        </div>
-        <div *ngIf="isEditing" class="flex gap-4">
-          <button
-            (click)="saveProfile()"
-            [disabled]="isSaving"
-            class="btn bg-cg-primary text-cg-primary border-none hover:bg-opacity-90"> {{ isSaving ? 'Saving...' : 'Save'}}
-          </button>
-          <button
-            (click)="abortEdit()"
-            [disabled]="isSaving"
-            class="btn btn-outline border-cg-accent/10 hover:border-cg-accent hover:bg-transparent hover:text-cg-accent">Abort
-          </button>
+        <div class="mt-6 flex flex-wrap gap-4 justify-center md:justify-start">
+          <div *ngIf="!isEditing" class="flex gap-4">
+            <button (click)="toggleEdit()" class="btn btn-primary">Edit Profile</button>
+            <button
+              class="btn btn-outline border-accent/10 hover:border-accent hover:bg-transparent hover:text-accent">Settings</button>
+            <button
+              class="btn btn-outline border-error/50 text-error hover:bg-error hover:border-error hover:text-base-content"
+              (click)="logout()">Logout</button>
+          </div>
+          <div *ngIf="isEditing" class="flex gap-4">
+            <button
+              (click)="saveProfile()"
+              [disabled]="isSaving"
+              class="btn btn-primary"> {{ isSaving ? 'Saving...' : 'Save'}}
+            </button>
+            <button
+              (click)="abortEdit()"
+              [disabled]="isSaving"
+              class="btn btn-outline border-accent/10 hover:border-accent hover:bg-transparent hover:text-accent">Abort
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    }
   </header>
 
   <!-- Stats Section -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-    <div
-      class="stat-card bg-cg-primary border border-cg-accent/5 p-6 rounded-xl min-h-[200px] flex items-center justify-center">
-      <div class="text-3xl font-extrabold text-cg-primary">{{ currentUser?.posts?.length || 0 }}</div>
-      <div class="text-gray-500 font-medium">Posts Published</div>
+    <div class="stat-card">
+      <div class="text-3xl font-extrabold text-primary">{{ currentUser?.totalPosts || 0 }}</div>
+      <div class="text-base-content/60 font-medium text-sm uppercase tracking-wider">Posts Published</div>
     </div>
-    <div
-      class="stat-card bg-cg-primary border border-cg-accent/5 p-6 rounded-xl min-h-[200px] flex items-center justify-center ">
-      <div class="text-3xl font-extrabold text-cg-primary">{{ currentUser?.comments?.length || 0 }}</div>
-      <div class="text-gray-500 font-medium">Comments Made</div>
+    <div class="stat-card">
+      <div class="text-3xl font-extrabold text-primary">{{ currentUser?.totalComments || 0 }}</div>
+      <div class="text-base-content/60 font-medium text-sm uppercase tracking-wider">Comments Made</div>
     </div>
-    <div
-      class="stat-card bg-cg-primary border border-cg-accent/5 p-6 rounded-xl min-h-[200px] flex items-center justify-center ">
-      <div class="text-xl font-bold text-cg-primary">{{ currentUser?.createdAt | date:'mediumDate' }}</div>
-      <div class="text-gray-500 font-medium">Joined Date</div>
+    <div class="stat-card">
+      <div class="text-3xl font-extrabold text-primary">{{ currentUser?.totalAura || 0 }}</div>
+      <div class="text-base-content/60 font-medium text-sm uppercase tracking-wider">Total Aura</div>
     </div>
   </div>
 
   <!-- Recent Activity -->
   <section>
-    <h2 class="text-2xl font-semibold mb-6 text-cg-primary">Recent Activity</h2>
-    <div
-      class="card bg-cg-primary border border-cg-accent/5 p-6 rounded-xl min-h-[200px] flex items-center justify-center">
-      <p class="text-gray-500 text-center">No recent activity found. Join some communities and start posting!</p>
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-2xl font-semibold text-primary">Recent Activity</h2>
+      <div role="tablist" class="tabs tabs-boxed bg-base-200">
+        <a role="tab" class="tab" [class.tab-active]="activeTab === 'posts'" (click)="activeTab = 'posts'">Posts</a>
+        <a role="tab" class="tab" [class.tab-active]="activeTab === 'comments'" (click)="activeTab = 'comments'">Comments</a>
+      </div>
     </div>
+    
+    @if (isLoadingPosts) {
+      <div class="flex justify-center py-10">
+        <span class="loading loading-spinner loading-md text-primary"></span>
+      </div>
+    } @else {
+      @if (activeTab === 'posts') {
+        <div class="space-y-4">
+          @for (post of recentPosts; track post.pid) {
+            <a [routerLink]="['/post', post.pid]" class="p-8 rounded-xl border border-base-content/10 bg-base-200 hover:border-primary hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 relative overflow-hidden group cursor-pointer block">
+              <div class="flex gap-4">
+                <div class="flex flex-col items-center gap-3 text-base-content/70 min-w-[48px]">
+                  <div class="flex flex-col items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></svg>
+                    <span class="font-medium text-primary text-sm">{{ post.likes }}</span>
+                  </div>
+                  <div class="flex flex-col items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/></svg>
+                    <span class="font-medium text-red-400 text-sm">{{ post.dislikes }}</span>
+                  </div>
+                </div>
+
+                <div class="flex-1">
+                  <div class="text-xs text-base-content/60 mb-2 flex items-center gap-2">
+                    @if (post.author) {
+                      <a [routerLink]="['/post', post.author.uid]" (click)="$event.stopPropagation()" class="font-medium text-base-content/80 hover:text-accent transition-colors cursor-pointer">
+                        Posted by u/{{ post.author.username }}
+                      </a>
+                    } @else {
+                      <span class="font-medium text-base-content/80">Posted by u/{{ currentUser?.username || 'unknown' }}</span>
+                    }
+                    <span>•</span>
+                    <span>{{ post.publishedAt | date:'short' }}</span>
+                  </div>
+                  <h3 class="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">{{ post.title }}</h3>
+                  <p class="text-base-content/70 mb-4 line-clamp-3">{{ post.content }}</p>
+                  <div class="flex items-center gap-4 text-sm text-base-content/60 border-t border-base-content/10 pt-4">
+                    <div class="flex items-center gap-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                      <span>{{ post.commentCount || 0 }} Comment{{ post.commentCount !== 1 ? 's' : '' }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+          } @empty {
+            <div class="card bg-base-200 border border-base-content/10 p-6 rounded-xl min-h-[200px] flex items-center justify-center shadow-sm">
+              <p class="text-base-content/60 text-center">No recent posts found.</p>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="space-y-4">
+          @for (comment of recentComments; track comment.cid) {
+            <a [routerLink]="['/post', comment.post.pid]" class="p-8 rounded-xl border border-base-content/10 bg-base-200 hover:border-primary hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 relative overflow-hidden group cursor-pointer block">
+              <div class="flex gap-4">
+                <div class="flex flex-col items-center gap-3 text-base-content/70 min-w-[48px]">
+                  <div class="flex flex-col items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></svg>
+                    <span class="font-medium text-primary text-sm">{{ comment.likes }}</span>
+                  </div>
+                  <div class="flex flex-col items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/></svg>
+                    <span class="font-medium text-red-400 text-sm">{{ comment.dislikes }}</span>
+                  </div>
+                </div>
+
+                <div class="flex-1">
+                  <div class="text-xs text-base-content/60 mb-2 flex items-center gap-2">
+                    @if (comment.author) {
+                      <a [routerLink]="['/post', comment.post.pid]" (click)="$event.stopPropagation()" class="font-medium text-base-content/80 hover:text-accent transition-colors cursor-pointer">
+                        Commented by u/{{ comment.author.username }}
+                      </a>
+                    } @else {
+                      <span class="font-medium text-base-content/80">Commented by u/{{ currentUser?.username || 'unknown' }}</span>
+                    }
+                    <span>•</span>
+                    <span>{{ comment.publishedAt | date:'short' }}</span>
+                  </div>
+                  <p class="text-base-content/70 mb-4 line-clamp-3">{{ comment.content }}</p>
+                </div>
+              </div>
+            </a>
+          } @empty {
+            <div class="card bg-base-200 border border-base-content/10 p-6 rounded-xl min-h-[200px] flex items-center justify-center shadow-sm">
+              <p class="text-base-content/60 text-center">No recent comments found.</p>
+            </div>
+          }
+        </div>
+      }
+    }
   </section>
 
 </div>

@@ -1,10 +1,12 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit, inject } from '@angular/core';
 import { LoginPage } from '../login-page/login-page';
-import { User } from '../../model';
+import { User, Post, Comment } from '../../model';
 import { DatePipe, NgIf } from '@angular/common';
 import { UserService } from '../services/user-service';
+import { PostService } from '../services/post-service';
+import { CommentService } from '../services/comment-service';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-profile-page',
@@ -12,39 +14,94 @@ import { Router } from '@angular/router';
     LoginPage,
     DatePipe,
     NgIf,
-    FormsModule
+    FormsModule,
+    RouterModule
   ],
   templateUrl: './profile-page.html',
   styleUrl: './profile-page.css'
 })
 
-export class ProfilePage {
-  public loggedIn = false;
+export class ProfilePage implements OnInit {
   public isEditing = false;
 
-  public currentUser: User | null;
+
   public editPublicName: string = '';
   public editUsername: string = '';
   public editDescription: string = '';
 
+  loadedUser: User | null = null;
+
+  recentComments: Comment[] = [];
+  recentPosts: Post[] = [];
+  activeTab: 'posts' | 'comments' = 'posts';
+  isLoadingPosts: boolean = false;
+
+  private cdr = inject(ChangeDetectorRef);
+  private route = inject(ActivatedRoute);
 
   public isSaving = false;
 
-  constructor(private cdr: ChangeDetectorRef) {
-    this.loggedIn = UserService.isLoggedIn();
-    this.currentUser = UserService.getCurrentUser();
-    if (this.currentUser) {
-      this.editPublicName = this.currentUser.publicname;
-      this.editUsername = this.currentUser.username;
-      this.editDescription = this.currentUser.description || '';
+  get loggedIn(): boolean {
+    return UserService.isLoggedIn();
+  }
+
+  get currentUser(): User | null {
+    return this.loadedUser || UserService.getCurrentUser();
+  }
+
+  get isOwnProfile(): boolean {
+      const loggedInUser = UserService.getCurrentUser();
+      return loggedInUser !== null && this.currentUser !== null && loggedInUser.uid === this.currentUser.uid;
+  }
+
+
+
+  async ngOnInit() {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    let userId: number | null = null;
+
+    if (idParam) {
+      userId = Number(idParam);
+    } else {
+      const user = UserService.getCurrentUser();
+      if (user) {
+        userId = user.uid;
+      }
+    }
+
+    if (userId) {
+      try {
+        this.loadedUser = await UserService.getUserById(userId);
+        this.isLoadingPosts = true;
+
+        const [posts, comments] = await Promise.all([
+          PostService.getPostsByUser(userId),
+          CommentService.getCommentsByUser(userId)
+        ]);
+
+        this.recentPosts = posts;
+        this.recentComments = comments;
+
+        this.isLoadingPosts = false;
+        this.cdr.detectChanges();
+      } catch (error) {
+        console.error('Failed to load user profile stats or posts/comments:', error);
+        this.isLoadingPosts = false;
+        this.cdr.detectChanges();
+      }
     }
   }
 
+  public logout(): void {
+    UserService.logout();
+  }
+
   toggleEdit() {
-    if (this.currentUser) {
-      this.editPublicName = this.currentUser.publicname;
-      this.editUsername = this.currentUser.username;
-      this.editDescription = this.currentUser.description || '';
+    const loggedInUser = UserService.getCurrentUser();
+    if (loggedInUser) {
+      this.editPublicName = loggedInUser.publicname;
+      this.editUsername = loggedInUser.username;
+      this.editDescription = loggedInUser.description || '';
     }
     this.isEditing = true;
   }
@@ -79,11 +136,14 @@ export class ProfilePage {
   }
 
   abortEdit() {
-    if (this.currentUser) {
-      this.editPublicName = this.currentUser.publicname;
-      this.editUsername = this.currentUser.username;
-      this.editDescription = this.currentUser.description || '';
+    const loggedInUser = UserService.getCurrentUser();
+    if (loggedInUser) {
+      this.editPublicName = loggedInUser.publicname;
+      this.editUsername = loggedInUser.username;
+      this.editDescription = loggedInUser.description || '';
     }
     this.isEditing = false;
   }
+
+
 }
