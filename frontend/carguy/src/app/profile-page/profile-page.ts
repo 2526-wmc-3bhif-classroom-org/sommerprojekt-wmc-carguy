@@ -24,7 +24,6 @@ import { RouterModule, ActivatedRoute } from '@angular/router';
 export class ProfilePage implements OnInit {
   public isEditing = false;
 
-
   public editPublicName: string = '';
   public editUsername: string = '';
   public editDescription: string = '';
@@ -53,8 +52,6 @@ export class ProfilePage implements OnInit {
       const loggedInUser = UserService.getCurrentUser();
       return loggedInUser !== null && this.currentUser !== null && loggedInUser.uid === this.currentUser.uid;
   }
-
-
 
   async ngOnInit() {
     const idParam = this.route.snapshot.paramMap.get('id');

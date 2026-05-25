@@ -6,10 +6,11 @@
   <!-- Hero Section -->
   <header
     class="mb-12 mt-12 flex flex-col md:flex-row items-center md:items-start gap-8 bg-base-200 p-8 rounded-2xl border border-base-content/10 shadow-xl relative overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent"></div>
+    <div class="absolute inset-0 bg-linear-to-r from-primary/10 to-transparent"></div>
 
     <div class="z-10 bg-base-200/20 backdrop-blur-md rounded-full p-2">
-      <div class="w-32 h-32 rounded-full bg-base-300 flex items-center justify-center text-4xl font-bold text-primary border border-base-content/10 overflow-hidden">        <img *ngIf="currentUser?.image" [src]="currentUser?.image" class="w-full h-full object-cover">
+      <div class="w-32 h-32 rounded-full bg-base-300 flex items-center justify-center text-4xl font-bold text-primary border border-base-content/10 overflow-hidden">
+        <img *ngIf="currentUser?.image" [src]="currentUser?.image" class="w-full h-full object-cover">
         <span *ngIf="!currentUser?.image">{{ currentUser?.publicname?.charAt(0) || 'U' }}</span>
       </div>
     </div>
@@ -42,7 +43,7 @@
               class="btn btn-outline border-error/50 text-error hover:bg-error hover:border-error hover:text-base-content"
               (click)="logout()">Logout</button>
           </div>
-          <div *ngIf="isEditing" class="flex gap-4">
+          @if (isEditing) {
             <button
               (click)="saveProfile()"
               [disabled]="isSaving"
@@ -53,7 +54,7 @@
               [disabled]="isSaving"
               class="btn btn-outline border-accent/10 hover:border-accent hover:bg-transparent hover:text-accent">Abort
             </button>
-          </div>
+          }
         </div>
       </div>
     }
