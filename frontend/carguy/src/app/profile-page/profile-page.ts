@@ -121,7 +121,7 @@ export class ProfilePage implements OnInit {
 
       try {
         console.log("calling editUser with: ", this.currentUser, updatedUser);
-        this.currentUser = await UserService.editUserInfo(this.currentUser, updatedUser);
+        this.loadedUser = await UserService.editUserInfo(this.currentUser, updatedUser);
         console.log("updated user info: ", this.currentUser);
         this.isEditing = false;
       } catch (err) {
