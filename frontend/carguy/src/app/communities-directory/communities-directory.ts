@@ -1,12 +1,13 @@
 import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { ForumService } from '../services/forum-service';
 import { Forum } from '../../model';
 
 @Component({
   selector: 'app-communities',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './communities-directory.html'
 })
 export class CommunitiesRepository implements OnInit {
@@ -21,9 +22,9 @@ export class CommunitiesRepository implements OnInit {
   async ngOnInit() {
     try {
       this.all = await ForumService.getAllForums();
-      this.featured = this.all;
-      this.categories = this.all;
-      this.trending = this.all;
+      this.featured = this.all.slice(0, 4); // Just show a few for featured
+      this.categories = this.all; // Maybe mock categories or leave as is
+      this.trending = await ForumService.getTrendingForums(5);
       this.count = this.all.length;
       this.cdr.detectChanges();
     } catch (error) {

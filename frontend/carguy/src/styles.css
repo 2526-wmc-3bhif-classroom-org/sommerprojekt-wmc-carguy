@@ -6,7 +6,7 @@
 
 @plugin "daisyui/theme" {
   name: "light";
-  default: false;
+  default: true;
   prefersdark: false;
   color-scheme: "light";
   --color-base-100: oklch(100% 0 0);
@@ -76,7 +76,7 @@
 
 /* Custom CarGuy Spacing and Card Styling */
 .stat-card {
-  @apply p-8 rounded-xl border border-accent/5 flex flex-col justify-center;
+  @apply p-6 rounded-xl border border-accent/10 flex flex-col justify-center items-center text-center bg-base-100;
   min-height: 140px;
 }
 

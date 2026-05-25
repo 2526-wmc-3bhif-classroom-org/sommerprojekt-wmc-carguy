@@ -62,6 +62,7 @@ export const UserService = {
     localStorage.setItem("userClaims", JSON.stringify(data.userClaims));
     localStorage.setItem("expiresAt", data.expiresAt);
     localStorage.setItem("userName", data.userClaims.username);
+    localStorage.setItem("currentUser", JSON.stringify(data.user));
 
     curUser = data.user;
 
@@ -75,7 +76,13 @@ export const UserService = {
       body: JSON.stringify({publicname, username, password }),
     });
 
-    const data : LoginResponse = await handleResponse<LoginResponse>(response);
+    const data: LoginResponse = await handleResponse<LoginResponse>(response);
+
+    localStorage.setItem("accessToken", data.accessToken);
+    localStorage.setItem("userClaims", JSON.stringify(data.userClaims));
+    localStorage.setItem("expiresAt", data.expiresAt);
+    localStorage.setItem("userName", data.userClaims.username);
+    localStorage.setItem("currentUser", JSON.stringify(data.user));
 
     curUser = data.user;
   },
@@ -101,7 +108,20 @@ export const UserService = {
 
   getCurrentUser(): User | null {
     if (!this.isLoggedIn()) return null;
-    return curUser
+    if (!curUser) {
+      const stored = localStorage.getItem("currentUser");
+      if (stored) {
+        try {
+          curUser = JSON.parse(stored);
+        } catch (e) {}
+      }
+    }
+    return curUser || null;
+  },
+
+  async getUserById(id: number): Promise<User> {
+    const response = await fetch(`${API_BASE_URL}/user/${id}`);
+    return handleResponse<User>(response);
   },
 
   logout(): void {
@@ -109,6 +129,8 @@ export const UserService = {
     localStorage.removeItem("userClaims");
     localStorage.removeItem("expiresAt");
     localStorage.removeItem("userName");
+    localStorage.removeItem("currentUser");
+    curUser = null;
   },
 
   async editUserInfo(oldUser: User, newUser: User): Promise<User> {

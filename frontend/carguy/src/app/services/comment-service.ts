@@ -20,6 +20,12 @@ export const CommentService = {
     return handleResponse<Comment[]>(res);
   },
 
+  /** Get comments for a user */
+  async getCommentsByUser(userId: number): Promise<Comment[]> {
+    const res = await fetch(`${API_BASE_URL}/comments/user/${userId}`);
+    return handleResponse<Comment[]>(res);
+  },
+
   /** Get a single comment */
   async getCommentById(id: number): Promise<Comment> {
     const res = await fetch(`${API_BASE_URL}/comment/${id}`);
@@ -63,6 +69,30 @@ export const CommentService = {
         comment: parentComment
       }),
     });
+    return handleResponse<void>(res);
+  },
+
+  /** Like a comment */
+  async likeComment(id: number): Promise<void> {
+    const res = await fetch(`${API_BASE_URL}/comments/${id}/like`, { method: "PATCH" });
+    return handleResponse<void>(res);
+  },
+
+  /** Unlike a comment */
+  async unlikeComment(id: number): Promise<void> {
+    const res = await fetch(`${API_BASE_URL}/comments/${id}/unlike`, { method: "PATCH" });
+    return handleResponse<void>(res);
+  },
+
+  /** Dislike a comment */
+  async dislikeComment(id: number): Promise<void> {
+    const res = await fetch(`${API_BASE_URL}/comments/${id}/dislike`, { method: "PATCH" });
+    return handleResponse<void>(res);
+  },
+
+  /** Undislike a comment */
+  async undislikeComment(id: number): Promise<void> {
+    const res = await fetch(`${API_BASE_URL}/comments/${id}/undislike`, { method: "PATCH" });
     return handleResponse<void>(res);
   }
 };

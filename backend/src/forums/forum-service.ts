@@ -9,6 +9,10 @@ export class ForumService {
         return this.forumRepository.findAllForums();
     }
 
+    public getTrendingForums(limit: number = 5): Forum[] {
+        return this.forumRepository.findTrendingForums(limit);
+    }
+
     public getForumById(id: number): Forum | undefined {
         return this.forumRepository.findForumById(id);
     }

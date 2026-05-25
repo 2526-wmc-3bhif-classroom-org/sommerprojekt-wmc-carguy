@@ -46,7 +46,7 @@ userRouter.post("/login", async (req: Request, res: Response) => {
     try {
         const claims: UserClaims | undefined=UserService.checkUserCredentials(user);
         if(claims === undefined) throw new Error("User credentials not found");
-        const minutes = 15;
+        const minutes = 60 * 24;
         const expiresAt = new Date(Date.now() + minutes * 60000);
         const token = jwt.sign(
             {
@@ -69,12 +69,20 @@ userRouter.post("/login", async (req: Request, res: Response) => {
 
 userRouter.post("/register", (req: Request, res: Response) => {
     try {
-        console.log(req.body);
         const body: UserInput = req.body as UserInput;
         let user = UserService.createNewUser(body);
+        const claims: UserClaims = { username: user.username, role: user.role };
+        const minutes = 60 * 24;
+        const expiresAt = new Date(Date.now() + minutes * 60000);
+        const token = jwt.sign(
+            { user: claims, exp: expiresAt.getTime() / 1000 },
+            process.env.SECRET_KEY || "12345",
+        );
         return res.status(StatusCodes.CREATED).send({
-            message: "User created successfully",
-            user: UserService.getUserByUsername(user.username)
+            userClaims: claims,
+            expiresAt: expiresAt,
+            accessToken: token,
+            user: user
         });
     }catch(err) {
         if(err instanceof Error) {

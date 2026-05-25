@@ -1,4 +1,4 @@
-@if(!loggedIn){
+@if(!loggedIn && !loadedUser){
 <app-login-page></app-login-page>
 } @else {
 <div class="mx-auto max-w-[1400px] px-8 py-12 bg-base-100 min-h-screen">
@@ -57,6 +57,31 @@
         </div>
       </div>
     }
+    class="mb-12 mt-12 flex flex-col md:flex-row items-center md:items-start gap-8 bg-base-200 p-8 rounded-2xl border border-base-content/10 shadow-sm">
+
+    <div
+      class="w-32 h-32 shrink-0 rounded-full bg-base-300 flex items-center justify-center text-4xl font-bold text-primary border border-base-content/10 overflow-hidden">
+      <img *ngIf="currentUser?.image" [src]="currentUser?.image" class="w-full h-full object-cover">
+      <span *ngIf="!currentUser?.image">{{ currentUser?.publicname?.charAt(0) || 'U' }}</span>
+    </div>
+
+    <div class="flex-1 text-center md:text-left">
+      <h1 class="text-4xl font-bold text-primary mb-2">{{currentUser?.publicname }}</h1>
+      <p class="text-base-content/70 font-medium mb-4">{{ currentUser?.username }} <span class="mx-2">•</span> {{
+        currentUser?.title || 'Member' }}</p>
+      <p class="text-base-content/70 max-w-2xl">{{ currentUser?.description || 'No description provided.' }}</p>
+
+      @if (isOwnProfile) {
+        <div class="mt-6 flex flex-wrap gap-4 justify-center md:justify-start">
+          <button class="btn btn-primary">Edit Profile</button>
+          <button
+            class="btn btn-outline border-accent/10 hover:border-accent hover:bg-transparent hover:text-accent">Settings</button>
+          <button
+            class="btn btn-outline border-error/50 text-error hover:bg-error hover:border-error hover:text-base-content"
+            (click)="logout()">Logout</button>
+        </div>
+      }
+    </div>
   </header>
 
   <!-- Stats Section -->
@@ -109,7 +134,7 @@
                 <div class="flex-1">
                   <div class="text-xs text-base-content/60 mb-2 flex items-center gap-2">
                     @if (post.author) {
-                      <a [routerLink]="['/post', post.author.uid]" (click)="$event.stopPropagation()" class="font-medium text-base-content/80 hover:text-accent transition-colors cursor-pointer">
+                      <a [routerLink]="['/profile', post.author.uid]" (click)="$event.stopPropagation()" class="font-medium text-base-content/80 hover:text-accent transition-colors cursor-pointer">
                         Posted by u/{{ post.author.username }}
                       </a>
                     } @else {
@@ -154,7 +179,7 @@
                 <div class="flex-1">
                   <div class="text-xs text-base-content/60 mb-2 flex items-center gap-2">
                     @if (comment.author) {
-                      <a [routerLink]="['/post', comment.post.pid]" (click)="$event.stopPropagation()" class="font-medium text-base-content/80 hover:text-accent transition-colors cursor-pointer">
+                      <a [routerLink]="['/profile', comment.author.uid]" (click)="$event.stopPropagation()" class="font-medium text-base-content/80 hover:text-accent transition-colors cursor-pointer">
                         Commented by u/{{ comment.author.username }}
                       </a>
                     } @else {

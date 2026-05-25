@@ -193,5 +193,28 @@ export class DB {
                 references Post_Category (Post_Category_id)
                 ) strict;
         `);
+
+        connection.exec(`
+            create table if not exists Comment (
+                CID Integer not null,
+                Content Text not null,
+                UID Integer not null,
+                PID Integer not null,
+                ParentCID Integer,
+                PublishedAt Text not null,
+                Likes Integer not null default 0,
+                Dislikes Integer not null default 0,
+                constraint PK_Comment primary key (CID),
+                constraint FK_Comment_User foreign key (UID)
+                references User (UID)
+                on delete cascade,
+                constraint FK_Comment_Post foreign key (PID)
+                references Post (PID)
+                on delete cascade,
+                constraint FK_Comment_Parent foreign key (ParentCID)
+                references Comment (CID)
+                on delete cascade
+            ) strict;
+        `);
     }
 }

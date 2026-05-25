@@ -1,19 +1,19 @@
-<div class="mx-auto max-w-[1400px] px-8 py-12 bg-cg-neutral min-h-screen">
+<div class="mx-auto max-w-[1400px] px-8 py-12 bg-base-100 min-h-screen">
 
   <header class="mb-12 mt-12 flex items-start justify-between">
     <div>
-      <h1 class="mb-2 text-4xl font-semibold text-cg-accent">Communities</h1>
-      <p class="text-cg-accent">Join user-created groups focused on specific interests, topics, and activities</p>
+      <h1 class="mb-2 text-4xl font-semibold text-accent">Communities</h1>
+      <p class="text-accent">Join user-created groups focused on specific interests, topics, and activities</p>
     </div>
-    <button class="rounded-md bg-cg-primary px-6 py-3 font-medium  hover:bg-opacity-90 transition-all flex items-center gap-2">
+    <button class="rounded-md bg-primary px-6 py-3 font-medium  hover:bg-opacity-90 transition-all flex items-center gap-2">
       <span class="text-xl">+</span> Create Community
     </button>
   </header>
 
-  <div class="mb-12 grid grid-cols-1 gap-6 sm:grid-cols-4">
-    <div class="card border border-accent p-6 rounded-lg">
-      <div class="text-3xl font-semibold text-cg-primary">{{ count }}</div>
-      <div class="mt-1 text-sm text-gray-500">Active Communities</div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+    <div class="stat-card">
+      <div class="text-3xl font-extrabold text-primary">{{ count }}</div>
+      <div class="text-base-content/60 font-medium text-sm uppercase tracking-wider">Active Communities</div>
     </div>
   </div>
 
@@ -24,25 +24,25 @@
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
       @for (community of featured; track community.forumId) {
-        <div class="group relative overflow-hidden rounded-md border border-gray-500/20 hover:border-accent transition-all duration-300 p-6">
+        <div [routerLink]="['/community', community.forumId]" class="p-8 rounded-xl border border-base-content/10 bg-base-200 hover:border-primary hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 relative overflow-hidden group cursor-pointer">
           <div class="flex items-start gap-4">
-            <div class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-md text-2xl font-semibold text-white"
+            <div class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-md text-2xl font-semibold text-base-content"
                  [style.backgroundColor]="">
               {{ getInitials(community.name) }}
             </div>
 
             <div class="flex-1">
               <div class="mb-1 flex items-center gap-2">
-                <h3 class="text-xl font-semibold group-hover:text-cg-primary transition-colors">{{ community.name }}</h3>
+                <h3 class="text-xl font-semibold group-hover:text-primary transition-colors">{{ community.name }}</h3>
               </div>
-              <p class="text-sm text-gray-400 mb-4">{{ community.description }}</p>
+              <p class="text-sm text-base-content/70 mb-4">{{ community.description }}</p>
 
-              <div class="flex items-center gap-6 border-t border-white/5 pt-4">
-                <span class="text-sm text-gray-500">
-                  <b class="text-cg-primary">{{ 30 | number }}</b> members
+              <div class="flex items-center gap-6 border-t border-base-content/10 pt-4">
+                <span class="text-sm text-base-content/60">
+                  <b class="text-primary">{{ 30 | number }}</b> members
                 </span>
-                <span class="text-sm text-gray-500">
-                  <b class="text-cg-primary">{{ community.posts?.length | number }}</b> posts
+                <span class="text-sm text-base-content/60">
+                  <b class="text-primary">{{ community.postCount || 0 | number }}</b> posts
                 </span>
               </div>
             </div>
@@ -57,42 +57,45 @@
     <div class="lg:col-span-2 space-y-4">
       <h2 class="text-2xl font-semibold mb-6">All Communities</h2>
       @for (a of all; track a.forumId) {
-        <div class="group relative overflow-hidden rounded-md border border-gray-500/20 hover:border-accent transition-all duration-300 p-6">
+        <div class="p-8 rounded-xl border border-base-content/10 bg-base-200 hover:border-primary hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 relative overflow-hidden group">
           <div class="flex gap-4">
-            <div class="h-12 w-12 rounded bg-white/5 flex items-center justify-center text-cg-primary font-bold">
+            <div class="h-12 w-12 rounded bg-white/5 flex items-center justify-center text-primary font-bold">
               {{ getInitials(a.name) }}
             </div>
             <div>
-              <h3 class="font-semibold group-hover:text-cg-primary">{{ a.name }}</h3>
+              <h3 class="font-semibold group-hover:text-primary">{{ a.name }}</h3>
             </div>
           </div>
-          <button class="btn px-4 m-2 py-2 border border-gray-500/10 rounded hover:bg-accent transition-all duration-300 text-m">Join</button>
+          <div class="flex gap-2 m-4 justify-end">
+            <a [routerLink]="['/community', a.forumId]" class="btn px-4 py-2 border border-accent text-accent rounded hover:bg-accent hover:text-base-content transition-all duration-300 text-sm">View</a>
+            <button class="btn px-4 py-2 border border-gray-500/10 rounded hover:bg-white/10 transition-all duration-300 text-sm">Join</button>
+          </div>
         </div>
       }
     </div>
 
     <aside class="space-y-8">
-      <div class="rounded-md border border-gray-500/20  p-6">
+      <div class="rounded-md border border-base-content/10  p-6">
         <h3 class="mb-4 text-lg font-semibold">Browse by Category</h3>
         <div *ngFor="let cat of categories" class="space-y-2">
-            <button class="flex w-full items-center justify-between rounded-md border border-gray-500/20 mt-2 mb-2 px-3 py-3 text-sm hover:border-accent transition-all">
+            <button class="flex w-full items-center justify-between rounded-md border border-base-content/10 mt-2 mb-2 px-3 py-3 text-sm hover:border-accent transition-all">
               <div class="flex items-center gap-2">
                 <div class="h-3 w-3 rounded-full" [style.backgroundColor]="cat.color"></div>
                 <span>{{ cat.name }}</span>
               </div>
-              <span class="text-gray-500">{{ cat.count }}</span>
+              <span class="text-base-content/60">{{ cat.count }}</span>
             </button>
         </div>
       </div>
 
-      <div class="rounded-md border border-gray-500/20  p-6">
-        <h3 class="mb-4 text-lg font-semibold">Trending topics</h3>
+      <div class="rounded-md border border-base-content/10  p-6">
+        <h3 class="mb-4 text-lg font-semibold flex items-center gap-2">Trending Communities</h3>
         <div *ngFor="let t of trending" class="space-y-2">
-          <button class="flex w-full items-center justify-between rounded-md border border-gray-500/20 mt-2 mb-2 px-3 py-3 text-sm hover:border-accent transition-all">
+          <button [routerLink]="['/community', t.forumId]" class="flex w-full items-center justify-between rounded-md border border-base-content/10 mt-2 mb-2 px-3 py-3 text-sm hover:border-accent hover:text-accent transition-all cursor-pointer">
             <div class="flex items-center gap-2">
-              <span>{{ t.topic }}</span>
+              <span class="font-medium">{{ t.name }}</span>
             </div>
-            <span class="text-gray-500">{{ t.posts }} discussions</span>
+            <span class="text-base-content/60">{{ t.recentPostCount || 0 }} new posts</span>
           </button>
         </div>
       </div>
