@@ -58,4 +58,23 @@ export class UserService {
         UserRepository.createNewUser(user);
         return user;
     }
+
+    public static updateUserInfo(realUserName: string, newUserData: Partial<User>): User {
+        if (!realUserName || !newUserData) {
+            throw new Error("User not found");
+        }
+
+        const realUser: User = UserRepository.findUserByUsername(realUserName);
+        if (!realUser) {
+            throw new Error("User not found");
+        }
+
+        if (newUserData.username) realUser.username = newUserData.username;
+        if (newUserData.publicname) realUser.publicname = newUserData.publicname;
+        if (newUserData.description) realUser.description = newUserData.description;
+
+        UserRepository.updateUser(realUser);
+
+        return realUser;
+    }
 }

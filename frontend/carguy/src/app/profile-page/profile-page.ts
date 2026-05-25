@@ -1,10 +1,11 @@
-import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
-import {LoginPage} from '../login-page/login-page';
-import {User, Post, Comment} from '../../model';
+import { Component, ChangeDetectorRef, OnInit, inject } from '@angular/core';
+import { LoginPage } from '../login-page/login-page';
+import { User, Post, Comment } from '../../model';
 import { DatePipe, NgIf } from '@angular/common';
-import {UserService} from '../services/user-service';
-import {PostService} from '../services/post-service';
-import {CommentService} from '../services/comment-service';
+import { UserService } from '../services/user-service';
+import { PostService } from '../services/post-service';
+import { CommentService } from '../services/comment-service';
+import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -13,19 +14,32 @@ import { RouterModule, ActivatedRoute } from '@angular/router';
     LoginPage,
     DatePipe,
     NgIf,
+    FormsModule,
     RouterModule
   ],
   templateUrl: './profile-page.html',
-  styleUrl: './profile-page.css',
+  styleUrl: './profile-page.css'
 })
+
 export class ProfilePage implements OnInit {
+  public isEditing = false;
+
+
+  public editPublicName: string = '';
+  public editUsername: string = '';
+  public editDescription: string = '';
+
   loadedUser: User | null = null;
-  recentPosts: Post[] = [];
+
   recentComments: Comment[] = [];
+  recentPosts: Post[] = [];
   activeTab: 'posts' | 'comments' = 'posts';
-  isLoadingPosts = false;
+  isLoadingPosts: boolean = false;
+
   private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
+
+  public isSaving = false;
 
   get loggedIn(): boolean {
     return UserService.isLoggedIn();
@@ -36,14 +50,16 @@ export class ProfilePage implements OnInit {
   }
 
   get isOwnProfile(): boolean {
-    const loggedInUser = UserService.getCurrentUser();
-    return loggedInUser !== null && this.currentUser !== null && loggedInUser.uid === this.currentUser.uid;
+      const loggedInUser = UserService.getCurrentUser();
+      return loggedInUser !== null && this.currentUser !== null && loggedInUser.uid === this.currentUser.uid;
   }
+
+
 
   async ngOnInit() {
     const idParam = this.route.snapshot.paramMap.get('id');
     let userId: number | null = null;
-    
+
     if (idParam) {
       userId = Number(idParam);
     } else {
@@ -57,10 +73,10 @@ export class ProfilePage implements OnInit {
       try {
         this.loadedUser = await UserService.getUserById(userId);
         this.isLoadingPosts = true;
-        
+
         const [posts, comments] = await Promise.all([
-            PostService.getPostsByUser(userId),
-            CommentService.getCommentsByUser(userId)
+          PostService.getPostsByUser(userId),
+          CommentService.getCommentsByUser(userId)
         ]);
 
         this.recentPosts = posts;
@@ -79,4 +95,55 @@ export class ProfilePage implements OnInit {
   public logout(): void {
     UserService.logout();
   }
+
+  toggleEdit() {
+    const loggedInUser = UserService.getCurrentUser();
+    if (loggedInUser) {
+      this.editPublicName = loggedInUser.publicname;
+      this.editUsername = loggedInUser.username;
+      this.editDescription = loggedInUser.description || '';
+    }
+    this.isEditing = true;
+  }
+
+  async saveProfile() {
+    console.log("Saving called");
+
+    if (this.currentUser) {
+      this.isSaving = true;
+
+      const updatedUser: User = {
+        ...this.currentUser,
+        publicname: this.editPublicName,
+        username: this.editUsername,
+        description: this.editDescription,
+      }
+
+      try {
+        console.log("calling editUser with: ", this.currentUser, updatedUser);
+        this.currentUser = await UserService.editUserInfo(this.currentUser, updatedUser);
+        console.log("updated user info: ", this.currentUser);
+        this.isEditing = false;
+      } catch (err) {
+        console.error("failed to update user: ", err);
+      } finally {
+        this.isSaving = false;
+        this.cdr.detectChanges(); // Manually trigger change detection
+      }
+    } else {
+      console.log("Failed because no current user");
+    }
+  }
+
+  abortEdit() {
+    const loggedInUser = UserService.getCurrentUser();
+    if (loggedInUser) {
+      this.editPublicName = loggedInUser.publicname;
+      this.editUsername = loggedInUser.username;
+      this.editDescription = loggedInUser.description || '';
+    }
+    this.isEditing = false;
+  }
+
+
 }

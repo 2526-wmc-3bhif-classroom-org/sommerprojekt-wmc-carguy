@@ -74,6 +74,20 @@ export class UserRepository {
         return result;
     }
 
+    public static updateUser(user: User) {
+        const db = DB.getInstance();
+        db.prepare(`
+            UPDATE User
+            SET Username = ?, PublicName = ?, Description = ?
+            WHERE UID = ?
+        `).run(
+            user.username,
+            user.publicname,
+            user.description,
+            user.uid
+        );
+    }
+
     public static createNewUser(user: User): void {
         const db = DB.getInstance();
 
