@@ -15,9 +15,19 @@
           {{ getInitials(community.name) }}
         </div>
 
-        <div class="z-10 flex-1 text-center md:text-left">
-          <h1 class="text-4xl font-bold text-primary mb-2">{{ community.name }}</h1>
-          <p class="text-base-content/70 max-w-2xl mb-6">{{ community.description || 'A community for CarGuy enthusiasts.' }}</p>
+        <div class="z-10 flex-1 text-center md:text-left w-full">
+          @if (!isEditing) {
+            <h1 class="text-4xl font-bold text-primary mb-2">{{ community.name }}</h1>
+            <p class="text-base-content/70 max-w-2xl mb-6">{{ community.description || 'A community for CarGuy enthusiasts.' }}</p>
+          } @else {
+            <div class="mb-4 space-y-3 flex flex-col items-center md:items-start w-full">
+              <input type="text" [(ngModel)]="editName" class="input input-bordered w-full max-w-md bg-white/5 border-base-content/10 focus:border-primary text-xl font-bold text-left" placeholder="Community Name" />
+              <textarea [(ngModel)]="editDescription" class="textarea textarea-bordered w-full max-w-md bg-white/5 border-base-content/10 focus:border-primary text-base h-24 text-left" placeholder="Community Description"></textarea>
+              @if (updateError) {
+                <p class="text-error text-sm">{{ updateError }}</p>
+              }
+            </div>
+          }
 
           <div class="flex items-center gap-6 text-sm text-base-content/60 mb-6 justify-center md:justify-start">
             <span><b class="text-primary">{{ community.posts?.length || 0 }}</b> posts</span>
@@ -27,6 +37,15 @@
           <div class="flex flex-wrap gap-4 justify-center md:justify-start">
             @if (isLoggedIn) {
               <button (click)="openCreatePost()" class="btn btn-primary">Create Post</button>
+              @if (!isEditing) {
+                <button (click)="startEditing()" class="btn btn-outline border-accent/10 hover:border-accent hover:bg-transparent hover:text-accent">Edit Community</button>
+              } @else {
+                <button (click)="saveCommunity()" [disabled]="isUpdating || !editName.trim()" class="btn btn-success gap-2">
+                  @if (isUpdating) { <span class="loading loading-spinner loading-sm"></span> }
+                  Save
+                </button>
+                <button (click)="cancelEditing()" [disabled]="isUpdating" class="btn btn-ghost border border-base-content/10">Cancel</button>
+              }
             } @else {
               <a routerLink="/login" class="btn btn-outline border-accent/10 hover:border-accent hover:bg-transparent hover:text-accent">Login to Post</a>
             }
