@@ -5,8 +5,9 @@
       <h1 class="mb-2 text-4xl font-semibold text-accent">Communities</h1>
       <p class="text-accent">Join user-created groups focused on specific interests, topics, and activities</p>
     </div>
-    <button class="rounded-md bg-primary px-6 py-3 font-medium  hover:bg-opacity-90 transition-all flex items-center gap-2">
-      <span class="text-xl">+</span> Create Community
+    <button (click)="createCommunity()" class="btn btn-primary gap-2 z-10">
+      <span class="text-xl">+</span>
+      <span>Create Community</span>
     </button>
   </header>
 
@@ -39,7 +40,7 @@
 
               <div class="flex items-center gap-6 border-t border-base-content/10 pt-4">
                 <span class="text-sm text-base-content/60">
-                  <b class="text-primary">{{ 30 | number }}</b> members
+                  <b class="text-primary">{{ community.memberCount || 0 | number }}</b> members
                 </span>
                 <span class="text-sm text-base-content/60">
                   <b class="text-primary">{{ community.postCount || 0 | number }}</b> posts
