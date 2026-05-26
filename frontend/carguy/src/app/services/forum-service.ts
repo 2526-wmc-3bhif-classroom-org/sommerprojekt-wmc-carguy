@@ -7,9 +7,11 @@ async function handleResponse<T>(response: Response): Promise<T> {
     const errorText = await response.text();
     throw new Error(errorText || `Request failed with status ${response.status}`);
   }
-  // For POST requests that might return 201 Created with no body
-  if (response.status === 201 || response.status === 204) return {} as T;
-  return response.json();
+  if (response.status === 204) return {} as T;
+  
+  const text = await response.text();
+  if (!text) return {} as T;
+  return JSON.parse(text);
 }
 
 export const ForumService = {
@@ -41,12 +43,22 @@ export const ForumService = {
 
   /** * Create a new forum
    */
-  async createForum(name: string, author: User, description?: string): Promise<void> {
+  async createForum(name: string, author: User, description?: string): Promise<{message: string, forumId: number}> {
     const res = await fetch(`${API_BASE_URL}/forum`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, author, description }),
     });
-    return handleResponse<void>(res);
+    return handleResponse<{message: string, forumId: number}>(res);
+  },
+
+  /** Update an existing forum */
+  async updateForum(id: number, name: string, description?: string): Promise<{message: string}> {
+    const res = await fetch(`${API_BASE_URL}/forum/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, description }),
+    });
+    return handleResponse<{message: string}>(res);
   },
 };

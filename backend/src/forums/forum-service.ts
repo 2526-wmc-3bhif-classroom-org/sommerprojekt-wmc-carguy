@@ -21,7 +21,11 @@ export class ForumService {
         return this.forumRepository.findForumsByCategory(categoryId);
     }
 
-    public createForum(forum: Forum){
-        return this.forumRepository.createForum(forum);
+    public createForum(forum: Forum, authorUid?: number): number {
+        return this.forumRepository.createForum(forum, authorUid);
+    }
+
+    public updateForum(id: number, name: string, description?: string): boolean {
+        return this.forumRepository.updateForum(id, name, description);
     }
 }

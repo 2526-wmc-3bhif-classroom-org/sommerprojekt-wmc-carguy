@@ -9,9 +9,11 @@ export class ForumRepository {
         const db = DB.getInstance();
         const result = db.prepare(`
             SELECT f.ForumID as forumId, f.Name as name, f.Description as description, f.ParentForumID as parentForum, f.Forum_Category_id as category, f.CreatedAt as createdAt,
-                   COUNT(p.PID) as postCount
+                   COUNT(DISTINCT p.PID) as postCount,
+                   COUNT(DISTINCT u.UID) as memberCount
             FROM Forum f
             LEFT JOIN Post p ON f.ForumID = p.ForumID
+            LEFT JOIN User_In_Forum u ON f.ForumID = u.ForumID
             GROUP BY f.ForumID
         `).all() as Forum[];
         return result;
@@ -19,7 +21,14 @@ export class ForumRepository {
 
     public findForumById(id: number) : Forum {
         const db = DB.getInstance();
-        const result = db.prepare("SELECT ForumID as forumId, Name as name, Description as description, ParentForumID as parentForum, Forum_Category_id as category, CreatedAt as createdAt FROM Forum WHERE ForumID = ?").get(id) as Forum;
+        const result = db.prepare(`
+            SELECT f.ForumID as forumId, f.Name as name, f.Description as description, f.ParentForumID as parentForum, f.Forum_Category_id as category, f.CreatedAt as createdAt,
+                   COUNT(DISTINCT u.UID) as memberCount
+            FROM Forum f
+            LEFT JOIN User_In_Forum u ON f.ForumID = u.ForumID
+            WHERE f.ForumID = ?
+            GROUP BY f.ForumID
+        `).get(id) as Forum;
         if (result) {
             result.posts = this.postRepository.findPostByForum(result.forumId);
         }
@@ -28,13 +37,40 @@ export class ForumRepository {
 
     public findForumsByCategory(id: number) : Forum[] {
         const db = DB.getInstance();
-        const result = db.prepare("SELECT ForumID as forumId, Name as name, Description as description, ParentForumID as parentForum, Forum_Category_id as category, CreatedAt as createdAt FROM Forum WHERE Forum_Category_id = ?").all(id) as Forum[];
+        const result = db.prepare(`
+            SELECT f.ForumID as forumId, f.Name as name, f.Description as description, f.ParentForumID as parentForum, f.Forum_Category_id as category, f.CreatedAt as createdAt,
+                   COUNT(DISTINCT u.UID) as memberCount
+            FROM Forum f
+            LEFT JOIN User_In_Forum u ON f.ForumID = u.ForumID
+            WHERE f.Forum_Category_id = ?
+            GROUP BY f.ForumID
+        `).all(id) as Forum[];
         return result;
     }
 
-    public createForum(forum: Forum) {
+    public createForum(forum: Forum, authorUid?: number): number {
         const db = DB.getInstance();
-        db.prepare("Insert into Forum (Name, Description, CreatedAt) values (?, ?, ?)").run(forum.name, forum.description, forum.createdAt);
+        const insertForum = db.prepare("Insert into Forum (Name, Description, CreatedAt) values (?, ?, ?)");
+        const insertMember = db.prepare("Insert into User_In_Forum (UID, ForumID) values (?, ?)");
+
+        const transaction = db.transaction(() => {
+            const result = insertForum.run(forum.name, forum.description || null, typeof forum.createdAt === 'string' ? forum.createdAt : forum.createdAt.toISOString());
+            const newId = result.lastInsertRowid as number;
+            
+            if (authorUid) {
+                insertMember.run(authorUid, newId);
+            }
+            
+            return newId;
+        });
+
+        return transaction();
+    }
+
+    public updateForum(id: number, name: string, description?: string): boolean {
+        const db = DB.getInstance();
+        const result = db.prepare("UPDATE Forum SET Name = ?, Description = ? WHERE ForumID = ?").run(name, description || null, id);
+        return result.changes > 0;
     }
 
     public findTrendingForums(limit: number = 5) : Forum[] {
@@ -43,10 +79,12 @@ export class ForumRepository {
             SELECT f.ForumID as forumId, f.Name as name, f.Description as description, f.ParentForumID as parentForum, f.Forum_Category_id as category, f.CreatedAt as createdAt,
                    COUNT(DISTINCT p.PID) as recentPostCount,
                    COUNT(DISTINCT c.CID) as recentCommentCount,
+                   COUNT(DISTINCT u.UID) as memberCount,
                    (COUNT(DISTINCT p.PID) * 5 + COUNT(DISTINCT c.CID)) as TrendScore
             FROM Forum f
             LEFT JOIN Post p ON f.ForumID = p.ForumID AND p.PublishedAt >= datetime('now', '-7 days')
             LEFT JOIN Comment c ON p.PID = c.PID AND c.PublishedAt >= datetime('now', '-7 days')
+            LEFT JOIN User_In_Forum u ON f.ForumID = u.ForumID
             GROUP BY f.ForumID
             ORDER BY TrendScore DESC
             LIMIT ?
