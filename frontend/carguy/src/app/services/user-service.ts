@@ -107,16 +107,22 @@ export const UserService = {
   },
 
   getCurrentUser(): User | null {
-    if (!this.isLoggedIn()) return null;
+    if (!this.isLoggedIn()) {
+      curUser = null; // Explicitly set curUser to null if not logged in
+      return null;
+    }
     if (!curUser) {
       const stored = localStorage.getItem("currentUser");
       if (stored) {
         try {
           curUser = JSON.parse(stored);
-        } catch (e) {}
+        } catch (e) {
+          console.error("Failed to parse currentUser from localStorage", e);
+          curUser = null; // Ensure curUser is null on parsing error
+        }
       }
     }
-    return curUser || null;
+    return curUser;
   },
 
   async getUserById(id: number): Promise<User> {
