@@ -32,7 +32,7 @@ export const PostService = {
     return handleResponse<Post[]>(res);
   },
 
-  async createPost(title: string, content: string, author: User, forum: Forum): Promise<void> {
+  async createPost(title: string, content: string, author: User, forum: Forum, imageUrls?: string[]): Promise<void> {
     const res = await fetch(`${API_BASE_URL}/post`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -41,6 +41,7 @@ export const PostService = {
         content,
         author,
         forum,
+        imageUrls,
         publishedAt: new Date().toISOString(),
         likes: 0,
         dislikes: 0,

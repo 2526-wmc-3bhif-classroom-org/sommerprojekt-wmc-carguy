@@ -20,11 +20,25 @@ export class CommunityDetailComponent implements OnInit {
   showCreatePost = false;
   newPostTitle = '';
   newPostContent = '';
+  newPostImageUrls: string[] = [];
+  imageUrlInput = '';
+  isDragging = false;
   isSubmittingPost = false;
   postError = '';
+  selectedImage: string | null = null;
   private cdr = inject(ChangeDetectorRef);
 
   constructor(private route: ActivatedRoute) {}
+
+  openImageModal(url: string, event: Event) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.selectedImage = url;
+    const modal = document.getElementById('image_modal') as HTMLDialogElement;
+    if (modal) {
+      modal.showModal();
+    }
+  }
 
   get isLoggedIn(): boolean {
     return UserService.isLoggedIn();
@@ -58,11 +72,63 @@ export class CommunityDetailComponent implements OnInit {
     this.showCreatePost = true;
     this.newPostTitle = '';
     this.newPostContent = '';
+    this.newPostImageUrls = [];
+    this.imageUrlInput = '';
     this.postError = '';
   }
 
   closeCreatePost() {
     this.showCreatePost = false;
+  }
+  
+  addImageUrl() {
+    if (this.imageUrlInput.trim()) {
+      this.newPostImageUrls.push(this.imageUrlInput.trim());
+      this.imageUrlInput = '';
+    }
+  }
+
+  removeImageUrl(index: number) {
+    this.newPostImageUrls.splice(index, 1);
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    this.isDragging = true;
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    this.isDragging = false;
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    this.isDragging = false;
+    if (event.dataTransfer?.files) {
+      this.handleFiles(Array.from(event.dataTransfer.files));
+    }
+  }
+
+  onFileSelected(event: any) {
+    if (event.target.files) {
+      this.handleFiles(Array.from(event.target.files));
+    }
+  }
+
+  private handleFiles(files: File[]) {
+    for (const file of files) {
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target?.result) {
+            this.newPostImageUrls.push(e.target.result as string);
+            this.cdr.detectChanges();
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    }
   }
 
   async submitPost() {
@@ -73,7 +139,7 @@ export class CommunityDetailComponent implements OnInit {
     this.isSubmittingPost = true;
     this.postError = '';
     try {
-      await PostService.createPost(this.newPostTitle.trim(), this.newPostContent.trim(), user, this.community);
+      await PostService.createPost(this.newPostTitle.trim(), this.newPostContent.trim(), user, this.community, this.newPostImageUrls);
       this.showCreatePost = false;
       const id = this.community.forumId;
       this.community = await ForumService.getForumById(id);

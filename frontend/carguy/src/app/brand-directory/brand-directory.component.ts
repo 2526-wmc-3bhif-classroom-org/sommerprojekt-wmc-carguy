@@ -17,6 +17,19 @@ export class BrandDirectoryComponent {
   forums: Forum[] = [];
   trendingForums: Forum[] = [];
   trendingPosts: Post[] = [];
+  selectedImage: string | null = null;
+
+  constructor() {}
+
+  openImageModal(url: string, event: Event) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.selectedImage = url;
+    const modal = document.getElementById('image_modal') as HTMLDialogElement;
+    if (modal) {
+      modal.showModal();
+    }
+  }
 
   private cdr = inject(ChangeDetectorRef);
 

@@ -18,11 +18,25 @@ export class PostDetailComponent implements OnInit {
   comments: Comment[] = [];
   isLoading = true;
   newCommentContent = '';
+  newCommentImageUrls: string[] = [];
+  imageUrlInput = '';
+  isDragging = false;
   isSubmitting = false;
   errorMessage = '';
   voteState: 'like' | 'dislike' | null = null;
   commentVoteStates: Record<number, 'like' | 'dislike' | null> = {};
+  selectedImage: string | null = null;
   private cdr = inject(ChangeDetectorRef);
+
+  openImageModal(url: string, event: Event) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.selectedImage = url;
+    const modal = document.getElementById('image_modal') as HTMLDialogElement;
+    if (modal) {
+      modal.showModal();
+    }
+  }
 
   private get voteKey(): string {
     const user = UserService.getCurrentUser();
@@ -77,6 +91,56 @@ export class PostDetailComponent implements OnInit {
     }
   }
 
+  addImageUrl() {
+    if (this.imageUrlInput.trim()) {
+      this.newCommentImageUrls.push(this.imageUrlInput.trim());
+      this.imageUrlInput = '';
+    }
+  }
+
+  removeImageUrl(index: number) {
+    this.newCommentImageUrls.splice(index, 1);
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    this.isDragging = true;
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    this.isDragging = false;
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    this.isDragging = false;
+    if (event.dataTransfer?.files) {
+      this.handleFiles(Array.from(event.dataTransfer.files));
+    }
+  }
+
+  onFileSelected(event: any) {
+    if (event.target.files) {
+      this.handleFiles(Array.from(event.target.files));
+    }
+  }
+
+  private handleFiles(files: File[]) {
+    for (const file of files) {
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target?.result) {
+            this.newCommentImageUrls.push(e.target.result as string);
+            this.cdr.detectChanges();
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+  }
+
   async submitComment() {
     if (!this.newCommentContent.trim() || !this.post) return;
     const user = UserService.getCurrentUser();
@@ -85,8 +149,10 @@ export class PostDetailComponent implements OnInit {
     this.isSubmitting = true;
     this.errorMessage = '';
     try {
-      await CommentService.createComment(this.newCommentContent.trim(), user, this.post);
+      await CommentService.createComment(this.newCommentContent.trim(), user, this.post, this.newCommentImageUrls);
       this.newCommentContent = '';
+      this.newCommentImageUrls = [];
+      this.imageUrlInput = '';
       this.comments = await CommentService.getCommentsByPostId(this.post.pid);
       this.cdr.detectChanges();
     } catch (e) {

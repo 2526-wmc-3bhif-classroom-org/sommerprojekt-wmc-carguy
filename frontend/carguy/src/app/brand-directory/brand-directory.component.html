@@ -31,6 +31,22 @@
         <div>
           <h3 class="text-lg font-bold mb-2 group-hover:text-primary transition-colors line-clamp-2">{{ post.title }}</h3>
           <p class="text-sm text-base-content/70 line-clamp-3 mb-4">{{ post.content }}</p>
+          @if (post.imageUrls && post.imageUrls.length > 0) {
+          <div class="carousel w-full rounded-box mb-4 bg-base-200" (click)="$event.stopPropagation()">
+            @for (url of post.imageUrls; track $index) {
+            <div class="carousel-item w-full" id="slide-trending-{{post.pid}}-{{$index}}">
+              <img [src]="url" class="w-full h-48 object-cover cursor-pointer" alt="Post Image" (click)="openImageModal(url, $event)">
+            </div>
+            }
+          </div>
+          @if (post.imageUrls.length > 1) {
+          <div class="flex w-full justify-center gap-2 mb-4" (click)="$event.stopPropagation()">
+            @for (url of post.imageUrls; track $index) {
+            <a href="#slide-trending-{{post.pid}}-{{$index}}" class="btn btn-xs btn-circle">{{$index + 1}}</a>
+            }
+          </div>
+          }
+          }
         </div>
         <div class="flex items-center justify-between text-xs text-base-content/50">
           @if (post.author) {
@@ -88,4 +104,19 @@
     </div>
     }
   </div>
+
+  <!-- Image Modal -->
+  <dialog id="image_modal" class="modal">
+    <div class="modal-box w-11/12 max-w-5xl p-0 overflow-hidden bg-transparent shadow-none relative flex justify-center items-center">
+      @if (selectedImage) {
+        <img [src]="selectedImage" class="w-full h-auto object-contain max-h-[90vh]">
+      }
+      <form method="dialog" class="absolute top-2 right-2">
+        <button class="btn btn-sm btn-circle btn-ghost text-white bg-black/50 hover:bg-black/80">✕</button>
+      </form>
+    </div>
+    <form method="dialog" class="modal-backdrop bg-black/80">
+      <button>close</button>
+    </form>
+  </dialog>
 </div>
