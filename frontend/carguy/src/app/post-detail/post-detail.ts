@@ -16,6 +16,9 @@ import { UserService } from '../services/user-service';
 export class PostDetailComponent implements OnInit {
   post: Post | null = null;
   comments: Comment[] = [];
+  rootComments: Comment[] = [];
+  activeReplyCommentId: number | null = null;
+  replyContent = '';
   isLoading = true;
   newCommentContent = '';
   newCommentImageUrls: string[] = [];
@@ -99,6 +102,35 @@ export class PostDetailComponent implements OnInit {
     });
   }
 
+  get sortedRootComments(): Comment[] {
+    if (!this.rootComments) return [];
+    
+    // Sort rootComments copy
+    const rootCopy = [...this.rootComments];
+    
+    const sortFn = (list: Comment[]) => {
+      list.sort((a, b) => {
+        switch (this.sortMode) {
+          case 'oldest':
+            return new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime();
+          case 'most_liked':
+            return b.likes - a.likes;
+          case 'newest':
+          default:
+            return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+        }
+      });
+      for (const item of list) {
+        if (item.replies && item.replies.length > 0) {
+          sortFn(item.replies);
+        }
+      }
+    };
+    
+    sortFn(rootCopy);
+    return rootCopy;
+  }
+
   async ngOnInit() {
     const idParam = this.route.snapshot.paramMap.get('id');
     if (!idParam) {
@@ -109,6 +141,7 @@ export class PostDetailComponent implements OnInit {
       const id = Number(idParam);
       this.post = await PostService.getPostById(id);
       this.comments = await CommentService.getCommentsByPostId(id);
+      this.rootComments = this.buildCommentTree(this.comments);
       this.loadVoteState();
     } catch (error) {
       console.error('Failed to load post', error);
@@ -181,9 +214,88 @@ export class PostDetailComponent implements OnInit {
       this.newCommentImageUrls = [];
       this.imageUrlInput = '';
       this.comments = await CommentService.getCommentsByPostId(this.post.pid);
+      this.rootComments = this.buildCommentTree(this.comments);
+      this.loadVoteState();
       this.cdr.detectChanges();
     } catch (e) {
       this.errorMessage = e instanceof Error ? e.message : 'Failed to post comment.';
+    } finally {
+      this.isSubmitting = false;
+    }
+  }
+
+  buildCommentTree(flatComments: Comment[]): Comment[] {
+    const commentMap = new Map<number, Comment>();
+    const roots: Comment[] = [];
+
+    for (const comment of flatComments) {
+      comment.replies = [];
+      commentMap.set(comment.cid, comment);
+    }
+
+    for (const comment of flatComments) {
+      if (comment.parentComment && comment.parentComment.cid) {
+        const parent = commentMap.get(comment.parentComment.cid);
+        if (parent) {
+          parent.replies = parent.replies || [];
+          parent.replies.push(comment);
+        } else {
+          roots.push(comment);
+        }
+      } else {
+        roots.push(comment);
+      }
+    }
+
+    // Sort by publication date
+    const sortComments = (list: Comment[]) => {
+      list.sort((a, b) => new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime());
+      for (const item of list) {
+        if (item.replies && item.replies.length > 0) {
+          sortComments(item.replies);
+        }
+      }
+    };
+
+    sortComments(roots);
+    return roots;
+  }
+
+  toggleReplyForm(cid: number) {
+    if (!UserService.isLoggedIn()) return;
+    if (this.activeReplyCommentId === cid) {
+      this.activeReplyCommentId = null;
+      this.replyContent = '';
+    } else {
+      this.activeReplyCommentId = cid;
+      this.replyContent = '';
+    }
+    this.cdr.detectChanges();
+  }
+
+  cancelReply() {
+    this.activeReplyCommentId = null;
+    this.replyContent = '';
+    this.cdr.detectChanges();
+  }
+
+  async submitReply(parentComment: Comment) {
+    if (!this.replyContent.trim() || !this.post) return;
+    const user = UserService.getCurrentUser();
+    if (!user) return;
+
+    this.isSubmitting = true;
+    this.errorMessage = '';
+    try {
+      await CommentService.createReply(this.replyContent.trim(), user, this.post, parentComment);
+      this.replyContent = '';
+      this.activeReplyCommentId = null;
+      this.comments = await CommentService.getCommentsByPostId(this.post.pid);
+      this.rootComments = this.buildCommentTree(this.comments);
+      this.loadVoteState();
+      this.cdr.detectChanges();
+    } catch (e) {
+      this.errorMessage = e instanceof Error ? e.message : 'Failed to post reply.';
     } finally {
       this.isSubmitting = false;
     }

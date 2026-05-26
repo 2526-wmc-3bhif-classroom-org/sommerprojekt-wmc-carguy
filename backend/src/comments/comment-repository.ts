@@ -6,7 +6,7 @@ export class CommentRepository {
     public findAllComments(): Comment[] {
         const db = DB.getInstance();
         const rows = db.prepare(`
-            SELECT c.CID as cid, c.Content as content, c.PID as post, c.ParentCID as parentComment, c.PublishedAt as publishedAt, c.Likes as likes, c.Dislikes as dislikes,
+            SELECT c.CID as cid, c.Content as content, c.PID as post, c.ParentCID as parentComment, c.PublishedAt as publishedAt, c.ImageUrls as imageUrls, c.Likes as likes, c.Dislikes as dislikes,
                    u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname
             FROM Comment c
             LEFT JOIN User u ON c.UID = u.UID
@@ -18,6 +18,7 @@ export class CommentRepository {
             post: { pid: row.post } as any,
             parentComment: row.parentComment ? { cid: row.parentComment } as any : undefined,
             publishedAt: row.publishedAt,
+            imageUrls: row.imageUrls ? JSON.parse(row.imageUrls) : undefined,
             likes: row.likes,
             dislikes: row.dislikes,
             author: {
@@ -31,7 +32,7 @@ export class CommentRepository {
     public findCommentById(id: number): Comment | undefined {
         const db = DB.getInstance();
         const row = db.prepare(`
-            SELECT c.CID as cid, c.Content as content, c.PID as post, c.ParentCID as parentComment, c.PublishedAt as publishedAt, c.Likes as likes, c.Dislikes as dislikes,
+            SELECT c.CID as cid, c.Content as content, c.PID as post, c.ParentCID as parentComment, c.PublishedAt as publishedAt, c.ImageUrls as imageUrls, c.Likes as likes, c.Dislikes as dislikes,
                    u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname
             FROM Comment c
             LEFT JOIN User u ON c.UID = u.UID
@@ -46,6 +47,7 @@ export class CommentRepository {
             post: { pid: row.post } as any,
             parentComment: row.parentComment ? { cid: row.parentComment } as any : undefined,
             publishedAt: row.publishedAt,
+            imageUrls: row.imageUrls ? JSON.parse(row.imageUrls) : undefined,
             likes: row.likes,
             dislikes: row.dislikes,
             author: {
@@ -63,7 +65,7 @@ export class CommentRepository {
                    u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname
             FROM Comment c
             LEFT JOIN User u ON c.UID = u.UID
-            WHERE c.PID = ? AND c.ParentCID IS NULL
+            WHERE c.PID = ?
         `).all(postId) as any[];
 
         return rows.map(row => ({
@@ -72,6 +74,7 @@ export class CommentRepository {
             post: { pid: row.post } as any,
             parentComment: row.parentComment ? { cid: row.parentComment } as any : undefined,
             publishedAt: row.publishedAt,
+            imageUrls: row.imageUrls ? JSON.parse(row.imageUrls) : undefined,
             likes: row.likes,
             dislikes: row.dislikes,
             author: {
@@ -98,6 +101,7 @@ export class CommentRepository {
             post: { pid: row.post } as any,
             parentComment: row.parentComment ? { cid: row.parentComment } as any : undefined,
             publishedAt: row.publishedAt,
+            imageUrls: row.imageUrls ? JSON.parse(row.imageUrls) : undefined,
             likes: row.likes,
             dislikes: row.dislikes,
             author: {
@@ -124,6 +128,7 @@ export class CommentRepository {
             post: { pid: row.post } as any,
             parentComment: row.parentComment ? { cid: row.parentComment } as any : undefined,
             publishedAt: row.publishedAt,
+            imageUrls: row.imageUrls ? JSON.parse(row.imageUrls) : undefined,
             likes: row.likes,
             dislikes: row.dislikes,
             author: {
@@ -137,14 +142,15 @@ export class CommentRepository {
     public createComment(comment: Comment): void {
         const db = DB.getInstance();
         db.prepare(`
-            INSERT INTO Comment (Content, UID, PID, ParentCID, PublishedAt, Likes, Dislikes)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO Comment (Content, UID, PID, ParentCID, PublishedAt, ImageUrls, Likes, Dislikes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
             comment.content,
             comment.author.uid,
             comment.post.pid,
             null,
             comment.publishedAt,
+            comment.imageUrls ? JSON.stringify(comment.imageUrls) : null,
             0,
             0
         );
@@ -153,14 +159,15 @@ export class CommentRepository {
     public createReply(comment: Comment): void {
         const db = DB.getInstance();
         db.prepare(`
-            INSERT INTO Comment (Content, UID, PID, ParentCID, PublishedAt, Likes, Dislikes)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO Comment (Content, UID, PID, ParentCID, PublishedAt, ImageUrls, Likes, Dislikes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
             comment.content,
             comment.author.uid,
             comment.post.pid,
             comment.parentComment?.cid ?? null,
             comment.publishedAt,
+            comment.imageUrls ? JSON.stringify(comment.imageUrls) : null,
             0,
             0
         );
