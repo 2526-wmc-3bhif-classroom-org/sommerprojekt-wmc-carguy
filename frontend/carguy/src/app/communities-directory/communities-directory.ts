@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { ForumService } from '../services/forum-service';
 import { Forum } from '../../model';
 
@@ -18,6 +18,7 @@ export class CommunitiesRepository implements OnInit {
 
   count = 0;
   private cdr = inject(ChangeDetectorRef);
+  private router = inject(Router);
 
   async ngOnInit() {
     try {
@@ -30,6 +31,10 @@ export class CommunitiesRepository implements OnInit {
     } catch (error) {
       console.error('Failed to load forums', error);
     }
+  }
+
+  createCommunity(): void {
+    this.router.navigate(['/create-community']);
   }
 
   // Helper for the "Letter Avatar"
