@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { UserService } from '../services/user-service';
 
 @Component({
@@ -9,7 +9,11 @@ import { UserService } from '../services/user-service';
   templateUrl: './login-page.html',
   styleUrl: './login-page.css',
 })
+
 export class LoginPage {
+  @ViewChild('registerForm') registerForm!: NgForm;
+  @ViewChild('loginForm') loginForm!: NgForm;
+
   public activeTab: 'login' | 'register' = 'login';
   public username = '';
   public password = '';
@@ -18,7 +22,7 @@ export class LoginPage {
   public errorMessage = '';
   protected publicname = '';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private cdr: ChangeDetectorRef) {}
 
   public switchTab(tab: 'login' | 'register') {
     this.activeTab = tab;
@@ -26,29 +30,50 @@ export class LoginPage {
   }
 
   public async login() {
-    this.isLoading = true;
     this.errorMessage = '';
 
+    if (!this.loginForm.valid) {
+      this.errorMessage = 'Please fill out all required fields.';
+      Object.keys(this.loginForm.controls).forEach(field => {
+        const control = this.loginForm.controls[field];
+        control.markAsTouched({ onlySelf: true });
+      });
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.isLoading = true;
     try {
       await UserService.login(this.username, this.password);
       this.router.navigate(['/profile']);
     } catch (e) {
       this.errorMessage = e instanceof Error ? e.message : 'Login failed. Please try again.';
+      this.cdr.detectChanges();
     } finally {
       this.isLoading = false;
+      this.cdr.detectChanges();
     }
   }
 
   public async register() {
-    this.isLoading = true;
     this.errorMessage = '';
 
-    if (this.password !== this.confirmPassword) {
-      this.errorMessage = 'Passwords do not match.';
-      this.isLoading = false;
+    if (!this.registerForm.valid) {
+      this.errorMessage = 'Please fill out all required fields correctly.';
+      Object.keys(this.registerForm.controls).forEach(field => {
+        const control = this.registerForm.controls[field];
+        control.markAsTouched({ onlySelf: true });
+      });
+      this.cdr.detectChanges();
       return;
     }
 
+    if (this.password !== this.confirmPassword) {
+      this.errorMessage = 'Passwords do not match.';
+      return;
+    }
+
+    this.isLoading = true;
     try {
       await UserService.register(this.publicname, this.username, this.password);
       // Auto-login after successful registration
@@ -56,8 +81,10 @@ export class LoginPage {
       this.router.navigate(['/profile']);
     } catch (e) {
       this.errorMessage = e instanceof Error ? e.message : 'Registration failed. Please try again.';
+      this.cdr.detectChanges();
     } finally {
       this.isLoading = false;
+      this.cdr.detectChanges();
     }
   }
 }
