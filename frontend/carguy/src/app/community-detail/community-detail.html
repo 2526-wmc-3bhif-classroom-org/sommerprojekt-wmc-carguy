@@ -122,9 +122,14 @@
         <main class="lg:col-span-3 space-y-4">
           <div class="flex items-center justify-between border-b border-base-content/10 pb-4 mb-6">
             <h2 class="text-2xl font-semibold">Recent Posts</h2>
+            <select [(ngModel)]="sortMode" class="select select-sm select-bordered w-36 bg-base-200 border-base-content/20 focus:outline-none focus:border-accent">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="most_liked">Most Liked</option>
+            </select>
           </div>
 
-          @for (post of community.posts; track post.pid) {
+          @for (post of sortedPosts; track post.pid) {
             <a [routerLink]="['/post', post.pid]" class="p-8 rounded-xl border border-base-content/10 bg-base-200 hover:border-primary hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 relative overflow-hidden group cursor-pointer block">
               <div class="flex gap-4">
                 <!-- Static like/dislike, no voting -->
@@ -158,8 +163,14 @@
                     <div class="mb-4">
                       <div class="carousel rounded-box w-full max-h-64 border border-base-content/10">
                         @for (url of post.imageUrls; track $index) {
-                          <div class="carousel-item w-full relative">
+                          <div class="carousel-item w-full relative group/carousel" id="slide-community-{{post.pid}}-{{$index}}">
                             <img [src]="url" class="w-full h-full object-contain bg-base-300 cursor-pointer" (click)="openImageModal(url, $event)" />
+                            @if (post.imageUrls.length > 1) {
+                              <div class="absolute left-2 right-2 top-1/2 flex -translate-y-1/2 transform justify-between pointer-events-none opacity-0 group-hover/carousel:opacity-100 transition-opacity">
+                                <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-community-' + post.pid + '-' + ($index === 0 ? post.imageUrls.length - 1 : $index - 1))" class="btn btn-circle btn-sm bg-black/30 hover:bg-black/60 text-white border-none pointer-events-auto">❮</button>
+                                <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-community-' + post.pid + '-' + ($index === post.imageUrls.length - 1 ? 0 : $index + 1))" class="btn btn-circle btn-sm bg-black/30 hover:bg-black/60 text-white border-none pointer-events-auto">❯</button>
+                              </div>
+                            }
                           </div>
                         }
                       </div>

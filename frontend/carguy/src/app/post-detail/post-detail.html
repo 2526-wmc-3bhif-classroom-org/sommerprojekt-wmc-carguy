@@ -50,8 +50,14 @@
               <div class="mb-4">
                 <div class="carousel rounded-box w-full max-h-96 border border-base-content/10 bg-base-300">
                   @for (url of post.imageUrls; track $index) {
-                    <div class="carousel-item w-full relative">
+                    <div class="carousel-item w-full relative group/carousel" id="slide-post-{{post.pid}}-{{$index}}">
                       <img [src]="url" class="w-full h-full object-contain cursor-pointer" (click)="openImageModal(url, $event)" />
+                      @if (post.imageUrls.length > 1) {
+                        <div class="absolute left-2 right-2 top-1/2 flex -translate-y-1/2 transform justify-between pointer-events-none opacity-0 group-hover/carousel:opacity-100 transition-opacity">
+                          <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-post-' + post.pid + '-' + ($index === 0 ? post.imageUrls.length - 1 : $index - 1))" class="btn btn-circle btn-sm bg-black/30 hover:bg-black/60 text-white border-none pointer-events-auto">❮</button>
+                          <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-post-' + post.pid + '-' + ($index === post.imageUrls.length - 1 ? 0 : $index + 1))" class="btn btn-circle btn-sm bg-black/30 hover:bg-black/60 text-white border-none pointer-events-auto">❯</button>
+                        </div>
+                      }
                     </div>
                   }
                 </div>
@@ -66,7 +72,14 @@
 
       <!-- Comments section -->
       <div>
-        <h2 class="text-2xl font-semibold mb-6">{{ comments.length }} Comment{{ comments.length !== 1 ? 's' : '' }}</h2>
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-semibold">{{ comments.length }} Comment{{ comments.length !== 1 ? 's' : '' }}</h2>
+          <select [(ngModel)]="sortMode" class="select select-sm select-bordered w-36 bg-base-200 border-base-content/20 focus:outline-none focus:border-accent">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="most_liked">Most Liked</option>
+          </select>
+        </div>
 
         <!-- Add comment form -->
         @if (isLoggedIn) {
@@ -144,7 +157,7 @@
         }
 
         <!-- Comment list -->
-        @for (comment of comments; track comment.cid) {
+        @for (comment of sortedComments; track comment.cid) {
           <div class="p-6 rounded-xl border border-base-content/10 bg-base-200 mb-4 shadow-sm hover:border-primary transition-all duration-300 group flex gap-4">
             <!-- Comment Votes -->
             <div class="flex flex-col items-center gap-2 text-base-content/70 min-w-[32px] pt-1">
@@ -179,8 +192,14 @@
                 <div class="mb-4">
                   <div class="carousel rounded-box w-full max-h-64 border border-base-content/10 bg-base-300">
                     @for (url of comment.imageUrls; track $index) {
-                      <div class="carousel-item w-full relative">
+                      <div class="carousel-item w-full relative group/carousel" id="slide-comment-{{comment.cid}}-{{$index}}">
                         <img [src]="url" class="w-full h-full object-contain cursor-pointer" (click)="openImageModal(url, $event)" />
+                        @if (comment.imageUrls.length > 1) {
+                          <div class="absolute left-2 right-2 top-1/2 flex -translate-y-1/2 transform justify-between pointer-events-none opacity-0 group-hover/carousel:opacity-100 transition-opacity">
+                            <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-comment-' + comment.cid + '-' + ($index === 0 ? comment.imageUrls.length - 1 : $index - 1))" class="btn btn-circle btn-sm bg-black/30 hover:bg-black/60 text-white border-none pointer-events-auto">❮</button>
+                            <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-comment-' + comment.cid + '-' + ($index === comment.imageUrls.length - 1 ? 0 : $index + 1))" class="btn btn-circle btn-sm bg-black/30 hover:bg-black/60 text-white border-none pointer-events-auto">❯</button>
+                          </div>
+                        }
                       </div>
                     }
                   </div>

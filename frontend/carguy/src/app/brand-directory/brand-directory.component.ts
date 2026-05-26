@@ -31,6 +31,13 @@ export class BrandDirectoryComponent {
     }
   }
 
+  scrollToSlide(id: string) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }
+
   private cdr = inject(ChangeDetectorRef);
 
   async ngOnInit() {

@@ -25,6 +25,7 @@ export class PostDetailComponent implements OnInit {
   errorMessage = '';
   voteState: 'like' | 'dislike' | null = null;
   commentVoteStates: Record<number, 'like' | 'dislike' | null> = {};
+  sortMode: 'newest' | 'oldest' | 'most_liked' = 'newest';
   selectedImage: string | null = null;
   private cdr = inject(ChangeDetectorRef);
 
@@ -35,6 +36,13 @@ export class PostDetailComponent implements OnInit {
     const modal = document.getElementById('image_modal') as HTMLDialogElement;
     if (modal) {
       modal.showModal();
+    }
+  }
+
+  scrollToSlide(id: string) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }
   }
 
@@ -70,6 +78,25 @@ export class PostDetailComponent implements OnInit {
 
   get isLoggedIn(): boolean {
     return UserService.isLoggedIn();
+  }
+
+  get sortedComments(): Comment[] {
+    if (!this.comments) return [];
+    
+    // Create a copy to avoid mutating the original array
+    const commentsCopy = [...this.comments];
+    
+    return commentsCopy.sort((a, b) => {
+      switch (this.sortMode) {
+        case 'oldest':
+          return new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime();
+        case 'most_liked':
+          return b.likes - a.likes;
+        case 'newest':
+        default:
+          return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+      }
+    });
   }
 
   async ngOnInit() {
