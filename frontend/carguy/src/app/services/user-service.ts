@@ -2,26 +2,6 @@ import {User} from '../../model';
 
 const API_BASE_URL = "http://localhost:3000/api";
 
-/*async getCurrentUserProfile(): Promise<User | null> {
-  const token = this.getToken();
-  if (!token) return null;
-
-  try {
-      const currentUser = this.getCurrentUser();
-      if (!currentUser) return null;
-
-      const response = await fetch(`${API_BASE_URL}/profile`, {
-          headers: { "Authorization": `Bearer ${token}` },
-      });
-      return await handleResponse<User>(response);
-
-  } catch (error) {
-      console.error("Failed to fetch user profile:", error);
-      return null;
-      }
-  }
-}*/
-
 let curUser: User | null;
 
 async function handleResponse<T>(response: Response): Promise<T> {
