@@ -44,7 +44,7 @@ export class BrandDirectoryComponent {
     try {
       this.forums = await ForumService.getAllForums();
       this.trendingForums = await ForumService.getTrendingForums(4);
-      this.trendingPosts = await PostService.getTrendingPosts(4);
+      this.trendingPosts = await PostService.getTrendingPosts(10);
       this.cdr.detectChanges();
     } catch (error) {
       console.error('Failed to load dashboard data', error);
