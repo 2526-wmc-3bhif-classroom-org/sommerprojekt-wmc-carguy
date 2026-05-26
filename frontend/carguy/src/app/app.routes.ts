@@ -6,6 +6,7 @@ import {PostDetailComponent} from './post-detail/post-detail';
 import {ProfilePage} from './profile-page/profile-page';
 import {LoginPage} from './login-page/login-page';
 import {GuidesComponent} from './Guides/Guides';
+import { CreateCommunityComponent } from './create-community/create-community';
 
 export const routes: Routes = [
   { path: '', component: BrandDirectoryComponent },
@@ -16,4 +17,5 @@ export const routes: Routes = [
   { path: 'profile/:id', component: ProfilePage },
   { path: 'login', component: LoginPage },
   { path: 'guides', component: GuidesComponent },
+  { path: 'create-community', component: CreateCommunityComponent },
 ];
