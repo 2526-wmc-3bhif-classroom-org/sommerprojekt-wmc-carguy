@@ -25,6 +25,7 @@ export interface Post {
   forum: Forum;
   likes: number;
   dislikes: number;
+  imageUrls?: string[];
   comments?: Comment[];
   commentCount?: number;
 }
@@ -37,6 +38,7 @@ export interface Comment {
   parentComment?: Comment;
   replies?: Comment[];
   publishedAt: Date;
+  imageUrls?: string[];
   likes: number;
   dislikes: number;
 }

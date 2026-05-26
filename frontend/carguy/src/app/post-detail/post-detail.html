@@ -44,14 +44,42 @@
               <span>{{ post.publishedAt | date:'medium' }}</span>
             </div>
             <h1 class="text-3xl font-semibold text-accent mb-4">{{ post.title }}</h1>
-            <p class="text-base-content/80 leading-relaxed whitespace-pre-wrap">{{ post.content }}</p>
+            <p class="text-base-content/80 leading-relaxed whitespace-pre-wrap mb-4">{{ post.content }}</p>
+            
+            @if (post.imageUrls && post.imageUrls.length > 0) {
+              <div class="mb-4">
+                <div class="carousel rounded-box w-full max-h-96 border border-base-content/10 bg-base-300">
+                  @for (url of post.imageUrls; track $index) {
+                    <div class="carousel-item w-full relative group/carousel" id="slide-post-{{post.pid}}-{{$index}}">
+                      <img [src]="url" class="w-full h-full object-contain cursor-pointer" (click)="openImageModal(url, $event)" />
+                      @if (post.imageUrls.length > 1) {
+                        <div class="absolute left-2 right-2 top-1/2 flex -translate-y-1/2 transform justify-between pointer-events-none opacity-0 group-hover/carousel:opacity-100 transition-opacity">
+                          <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-post-' + post.pid + '-' + ($index === 0 ? post.imageUrls.length - 1 : $index - 1))" class="btn btn-circle btn-sm bg-black/30 hover:bg-black/60 text-white border-none pointer-events-auto">❮</button>
+                          <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-post-' + post.pid + '-' + ($index === post.imageUrls.length - 1 ? 0 : $index + 1))" class="btn btn-circle btn-sm bg-black/30 hover:bg-black/60 text-white border-none pointer-events-auto">❯</button>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+                @if (post.imageUrls.length > 1) {
+                  <p class="text-xs text-base-content/50 mt-1 text-right">{{ post.imageUrls.length }} images. Scroll horizontally to view more.</p>
+                }
+              </div>
+            }
           </div>
         </div>
       </div>
 
       <!-- Comments section -->
       <div>
-        <h2 class="text-2xl font-semibold mb-6">{{ comments.length }} Comment{{ comments.length !== 1 ? 's' : '' }}</h2>
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-semibold">{{ comments.length }} Comment{{ comments.length !== 1 ? 's' : '' }}</h2>
+          <select [(ngModel)]="sortMode" class="select select-sm select-bordered w-36 bg-base-200 border-base-content/20 focus:outline-none focus:border-accent">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="most_liked">Most Liked</option>
+          </select>
+        </div>
 
         <!-- Add comment form -->
         @if (isLoggedIn) {
@@ -60,9 +88,50 @@
             <textarea
               [(ngModel)]="newCommentContent"
               placeholder="What are your thoughts?"
-              class="textarea w-full bg-white/5 border border-base-content/10 text-black placeholder-gray-500 focus:border-accent focus:outline-none rounded-md p-3 resize-none"
+              class="textarea w-full bg-white/5 border border-base-content/10 text-black placeholder-gray-500 focus:border-accent focus:outline-none rounded-md p-3 resize-none mb-4"
               rows="4"
             ></textarea>
+            
+            <div class="space-y-3">
+              <p class="text-sm font-medium text-base-content/80">Images (Optional)</p>
+              <div class="flex gap-2">
+                <input
+                  [(ngModel)]="imageUrlInput"
+                  (keyup.enter)="addImageUrl()"
+                  type="text"
+                  placeholder="Paste image URL here"
+                  class="input input-sm flex-1 bg-white/5 border border-base-content/10 text-black placeholder-gray-500 focus:border-accent focus:outline-none rounded-md"
+                />
+                <button (click)="addImageUrl()" class="btn btn-sm btn-outline border-base-content/20 hover:border-accent hover:text-accent">Add</button>
+              </div>
+              
+              <div 
+                (dragover)="onDragOver($event)" 
+                (dragleave)="onDragLeave($event)" 
+                (drop)="onDrop($event)"
+                [class.border-accent]="isDragging"
+                [class.bg-accent]="isDragging"
+                [class.bg-opacity-10]="isDragging"
+                class="border-2 border-dashed border-base-content/20 rounded-md p-6 flex flex-col items-center justify-center text-center transition-colors relative cursor-pointer hover:border-accent/50 hover:bg-base-300/50"
+              >
+                <input type="file" multiple accept="image/*" (change)="onFileSelected($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2 text-base-content/50"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                <p class="text-sm text-base-content/60">Drag and drop images here or click to browse</p>
+              </div>
+
+              @if (newCommentImageUrls.length > 0) {
+                <div class="flex flex-wrap gap-2 mt-3">
+                  @for (url of newCommentImageUrls; track $index) {
+                    <div class="relative group w-20 h-20 rounded-md overflow-hidden border border-base-content/10">
+                      <img [src]="url" class="w-full h-full object-cover" />
+                      <button (click)="removeImageUrl($index)" class="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
             @if (errorMessage) {
               <p class="text-red-400 text-sm mt-2">{{ errorMessage }}</p>
             }
@@ -88,38 +157,121 @@
         }
 
         <!-- Comment list -->
-        @for (comment of comments; track comment.cid) {
-          <div class="p-6 rounded-xl border border-base-content/10 bg-base-200 mb-4 shadow-sm hover:border-primary transition-all duration-300 group flex gap-4">
-            <!-- Comment Votes -->
-            <div class="flex flex-col items-center gap-2 text-base-content/70 min-w-[32px] pt-1">
-              <button (click)="likeComment(comment)" class="flex flex-col items-center transition-colors hover:text-green-400"
-                [class.text-green-400]="commentVoteStates[comment.cid] === 'like'">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></svg>
-                <span class="font-semibold text-xs mt-1">{{ comment.likes }}</span>
-              </button>
-              <button (click)="dislikeComment(comment)" class="flex flex-col items-center transition-colors hover:text-red-400"
-                [class.text-red-400]="commentVoteStates[comment.cid] === 'dislike'">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/></svg>
-                <span class="font-semibold text-xs mt-1">{{ comment.dislikes }}</span>
-              </button>
+        <ng-template #commentTemplate let-comment="comment" let-depth="depth">
+          <div class="relative transition-all duration-300" [ngClass]="depth > 0 ? 'ml-4 sm:ml-8 mt-4 pl-3 sm:pl-4 border-l-2 border-base-content/10 hover:border-primary/40' : 'mb-6'">
+            
+            <div class="p-6 rounded-xl border border-base-content/10 bg-base-200 shadow-sm hover:border-primary/50 transition-all duration-300 flex gap-4">
+              <!-- Comment Votes -->
+              <div class="flex flex-col items-center gap-2 text-base-content/70 min-w-[32px] pt-1">
+                <button (click)="likeComment(comment)" class="flex flex-col items-center transition-colors hover:text-green-400"
+                  [class.text-green-400]="commentVoteStates[comment.cid] === 'like'">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></svg>
+                  <span class="font-semibold text-xs mt-1">{{ comment.likes }}</span>
+                </button>
+                <button (click)="dislikeComment(comment)" class="flex flex-col items-center transition-colors hover:text-red-400"
+                  [class.text-red-400]="commentVoteStates[comment.cid] === 'dislike'">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/></svg>
+                  <span class="font-semibold text-xs mt-1">{{ comment.dislikes }}</span>
+                </button>
+              </div>
+
+              <!-- Comment Content & Metadata -->
+              <div class="flex-1">
+                <div class="text-xs text-base-content/60 mb-2 flex items-center gap-2 flex-wrap">
+                  @if (comment.author) {
+                    <a [routerLink]="['/profile', comment.author.uid]" class="font-medium text-base-content/80 hover:text-accent transition-colors cursor-pointer">
+                      u/{{ comment.author.username }}
+                    </a>
+                  } @else {
+                    <span class="font-medium text-base-content/80">u/unknown</span>
+                  }
+                  <span>•</span>
+                  <span>{{ comment.publishedAt | date:'short' }}</span>
+                  @if (comment.parentComment) {
+                    <span class="text-accent/60 flex items-center gap-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></svg>
+                      replied to u/{{ comment.parentComment.author?.username || 'unknown' }}
+                    </span>
+                  }
+                </div>
+                
+                <p class="text-base-content/90 leading-relaxed mb-3 whitespace-pre-wrap">{{ comment.content }}</p>
+
+                <!-- Comment Images -->
+                @if (comment.imageUrls && comment.imageUrls.length > 0) {
+                  <div class="mb-3">
+                    <div class="carousel rounded-box w-full max-h-64 border border-base-content/10 bg-base-300">
+                      @for (url of comment.imageUrls; track $index) {
+                        <div class="carousel-item w-full relative group/carousel" id="slide-comment-{{comment.cid}}-{{$index}}">
+                          <img [src]="url" class="w-full h-full object-contain cursor-pointer" (click)="openImageModal(url, $event)" />
+                          @if (comment.imageUrls.length > 1) {
+                            <div class="absolute left-2 right-2 top-1/2 flex -translate-y-1/2 transform justify-between pointer-events-none opacity-0 group-hover/carousel:opacity-100 transition-opacity">
+                              <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-comment-' + comment.cid + '-' + ($index === 0 ? comment.imageUrls.length - 1 : $index - 1))" class="btn btn-circle btn-sm bg-black/30 hover:bg-black/60 text-white border-none pointer-events-auto">❮</button>
+                              <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-comment-' + comment.cid + '-' + ($index === comment.imageUrls.length - 1 ? 0 : $index + 1))" class="btn btn-circle btn-sm bg-black/30 hover:bg-black/60 text-white border-none pointer-events-auto">❯</button>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                    @if (comment.imageUrls.length > 1) {
+                      <p class="text-xs text-base-content/50 mt-1 text-right">{{ comment.imageUrls.length }} images. Scroll to view more.</p>
+                    }
+                  </div>
+                }
+
+                <!-- Inline Action -->
+                @if (isLoggedIn) {
+                  <div class="flex items-center gap-4 mt-2">
+                    <button (click)="toggleReplyForm(comment.cid)" class="text-xs text-base-content/60 hover:text-accent flex items-center gap-1 transition-colors font-medium">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                      Reply
+                    </button>
+                  </div>
+                }
+              </div>
             </div>
 
-            <!-- Comment Content -->
-            <div class="flex-1">
-              <div class="text-xs text-base-content/60 mb-2 flex items-center gap-2">
-                @if (comment.author) {
-                  <a [routerLink]="['/profile', comment.author.uid]" class="font-medium text-base-content/80 hover:text-accent transition-colors cursor-pointer">
-                    u/{{ comment.author.username }}
-                  </a>
-                } @else {
-                  <span class="font-medium text-base-content/80">u/unknown</span>
+            <!-- Inline Reply Form -->
+            @if (activeReplyCommentId === comment.cid) {
+              <div class="ml-4 sm:ml-8 mt-3 p-4 rounded-xl border border-base-content/10 bg-base-200 shadow-md">
+                <p class="text-xs text-base-content/60 mb-2">Replying to u/{{ comment.author?.username || 'unknown' }}</p>
+                <textarea
+                  [(ngModel)]="replyContent"
+                  placeholder="Write a supportive reply..."
+                  class="textarea w-full bg-white/5 border border-base-content/10 text-black placeholder-gray-500 focus:border-accent focus:outline-none rounded-md p-3 resize-none"
+                  rows="3"
+                ></textarea>
+                @if (errorMessage && activeReplyCommentId === comment.cid) {
+                  <p class="text-red-400 text-xs mt-1">{{ errorMessage }}</p>
                 }
-                <span>•</span>
-                <span>{{ comment.publishedAt | date:'short' }}</span>
+                <div class="flex justify-end gap-2 mt-2">
+                  <button (click)="cancelReply()" class="btn btn-xs btn-ghost text-xs">Cancel</button>
+                  <button
+                    (click)="submitReply(comment)"
+                    [disabled]="!replyContent.trim() || isSubmitting"
+                    class="btn btn-xs btn-primary text-xs"
+                  >
+                    @if (isSubmitting) {
+                      <span class="loading loading-spinner loading-xs"></span>
+                    } @else {
+                      Post Reply
+                    }
+                  </button>
+                </div>
               </div>
-              <p class="text-base-content/90 leading-relaxed">{{ comment.content }}</p>
-            </div>
+            }
+
+            <!-- Recursive replies -->
+            @if (comment.replies && comment.replies.length > 0) {
+              @for (reply of comment.replies; track reply.cid) {
+                <ng-container *ngTemplateOutlet="commentTemplate; context: { comment: reply, depth: depth + 1 }"></ng-container>
+              }
+            }
           </div>
+        </ng-template>
+
+        @for (comment of sortedRootComments; track comment.cid) {
+          <ng-container *ngTemplateOutlet="commentTemplate; context: { comment: comment, depth: 0 }"></ng-container>
         } @empty {
           <div class="rounded-2xl border border-base-content/10 bg-base-200 p-12 text-center shadow-xl">
             <p class="text-base-content/60">No comments yet. Be the first to share your thoughts!</p>
@@ -136,4 +288,19 @@
       <a routerLink="/communities" class="btn px-4 py-2 border border-accent text-accent rounded-md hover:bg-accent hover:text-base-content transition-all duration-300 text-sm">Back to Communities</a>
     </div>
   }
+
+  <!-- Image Modal -->
+  <dialog id="image_modal" class="modal">
+    <div class="modal-box w-11/12 max-w-5xl p-0 overflow-hidden bg-transparent shadow-none relative flex justify-center items-center">
+      @if (selectedImage) {
+        <img [src]="selectedImage" class="w-full h-auto object-contain max-h-[90vh]">
+      }
+      <form method="dialog" class="absolute top-2 right-2">
+        <button class="btn btn-sm btn-circle btn-ghost text-white bg-black/50 hover:bg-black/80">✕</button>
+      </form>
+    </div>
+    <form method="dialog" class="modal-backdrop bg-black/80">
+      <button>close</button>
+    </form>
+  </dialog>
 </div>

@@ -52,6 +52,47 @@
                 class="textarea w-full bg-white/5 border border-base-content/10 text-black placeholder-gray-500 focus:border-accent focus:outline-none resize-none rounded-md"
                 rows="5"
               ></textarea>
+
+              <div class="space-y-3">
+                <p class="text-sm font-medium text-base-content/80">Images (Optional)</p>
+                <div class="flex gap-2">
+                  <input
+                    [(ngModel)]="imageUrlInput"
+                    (keyup.enter)="addImageUrl()"
+                    type="text"
+                    placeholder="Paste image URL here"
+                    class="input input-sm flex-1 bg-white/5 border border-base-content/10 text-black placeholder-gray-500 focus:border-accent focus:outline-none rounded-md"
+                  />
+                  <button (click)="addImageUrl()" class="btn btn-sm btn-outline border-base-content/20 hover:border-accent hover:text-accent">Add</button>
+                </div>
+                
+                <div 
+                  (dragover)="onDragOver($event)" 
+                  (dragleave)="onDragLeave($event)" 
+                  (drop)="onDrop($event)"
+                  [class.border-accent]="isDragging"
+                  [class.bg-accent]="isDragging"
+                  [class.bg-opacity-10]="isDragging"
+                  class="border-2 border-dashed border-base-content/20 rounded-md p-6 flex flex-col items-center justify-center text-center transition-colors relative cursor-pointer hover:border-accent/50 hover:bg-base-300/50"
+                >
+                  <input type="file" multiple accept="image/*" (change)="onFileSelected($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2 text-base-content/50"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                  <p class="text-sm text-base-content/60">Drag and drop images here or click to browse</p>
+                </div>
+
+                @if (newPostImageUrls.length > 0) {
+                  <div class="flex flex-wrap gap-2 mt-3">
+                    @for (url of newPostImageUrls; track $index) {
+                      <div class="relative group w-20 h-20 rounded-md overflow-hidden border border-base-content/10">
+                        <img [src]="url" class="w-full h-full object-cover" />
+                        <button (click)="removeImageUrl($index)" class="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
               @if (postError) {
                 <p class="text-red-400 text-sm">{{ postError }}</p>
               }
@@ -81,9 +122,14 @@
         <main class="lg:col-span-3 space-y-4">
           <div class="flex items-center justify-between border-b border-base-content/10 pb-4 mb-6">
             <h2 class="text-2xl font-semibold">Recent Posts</h2>
+            <select [(ngModel)]="sortMode" class="select select-sm select-bordered w-36 bg-base-200 border-base-content/20 focus:outline-none focus:border-accent">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="most_liked">Most Liked</option>
+            </select>
           </div>
 
-          @for (post of community.posts; track post.pid) {
+          @for (post of sortedPosts; track post.pid) {
             <a [routerLink]="['/post', post.pid]" class="p-8 rounded-xl border border-base-content/10 bg-base-200 hover:border-primary hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 relative overflow-hidden group cursor-pointer block">
               <div class="flex gap-4">
                 <!-- Static like/dislike, no voting -->
@@ -112,6 +158,27 @@
                   </div>
                   <h3 class="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">{{ post.title }}</h3>
                   <p class="text-base-content/70 mb-4 line-clamp-3">{{ post.content }}</p>
+                  
+                  @if (post.imageUrls && post.imageUrls.length > 0) {
+                    <div class="mb-4">
+                      <div class="carousel rounded-box w-full max-h-64 border border-base-content/10">
+                        @for (url of post.imageUrls; track $index) {
+                          <div class="carousel-item w-full relative group/carousel" id="slide-community-{{post.pid}}-{{$index}}">
+                            <img [src]="url" class="w-full h-full object-contain bg-base-300 cursor-pointer" (click)="openImageModal(url, $event)" />
+                            @if (post.imageUrls.length > 1) {
+                              <div class="absolute left-2 right-2 top-1/2 flex -translate-y-1/2 transform justify-between pointer-events-none opacity-0 group-hover/carousel:opacity-100 transition-opacity">
+                                <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-community-' + post.pid + '-' + ($index === 0 ? post.imageUrls.length - 1 : $index - 1))" class="btn btn-circle btn-sm bg-black/30 hover:bg-black/60 text-white border-none pointer-events-auto">❮</button>
+                                <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-community-' + post.pid + '-' + ($index === post.imageUrls.length - 1 ? 0 : $index + 1))" class="btn btn-circle btn-sm bg-black/30 hover:bg-black/60 text-white border-none pointer-events-auto">❯</button>
+                              </div>
+                            }
+                          </div>
+                        }
+                      </div>
+                      @if (post.imageUrls.length > 1) {
+                        <p class="text-xs text-base-content/50 mt-1 text-right">{{ post.imageUrls.length }} images. Scroll to view more.</p>
+                      }
+                    </div>
+                  }
                   <div class="flex items-center gap-4 text-sm text-base-content/60 border-t border-base-content/10 pt-4">
                     <div class="flex items-center gap-1">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -172,4 +239,19 @@
       <a routerLink="/communities" class="btn px-4 py-2 border border-accent text-accent rounded-md hover:bg-accent hover:text-base-content transition-all duration-300 text-sm">Back to Directory</a>
     </div>
   }
+
+  <!-- Image Modal -->
+  <dialog id="image_modal" class="modal">
+    <div class="modal-box w-11/12 max-w-5xl p-0 overflow-hidden bg-transparent shadow-none relative flex justify-center items-center">
+      @if (selectedImage) {
+        <img [src]="selectedImage" class="w-full h-auto object-contain max-h-[90vh]">
+      }
+      <form method="dialog" class="absolute top-2 right-2">
+        <button class="btn btn-sm btn-circle btn-ghost text-white bg-black/50 hover:bg-black/80">✕</button>
+      </form>
+    </div>
+    <form method="dialog" class="modal-backdrop bg-black/80">
+      <button>close</button>
+    </form>
+  </dialog>
 </div>

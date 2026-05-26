@@ -20,11 +20,33 @@ export class CommunityDetailComponent implements OnInit {
   showCreatePost = false;
   newPostTitle = '';
   newPostContent = '';
+  newPostImageUrls: string[] = [];
+  imageUrlInput = '';
+  isDragging = false;
   isSubmittingPost = false;
   postError = '';
+  selectedImage: string | null = null;
+  sortMode: 'newest' | 'oldest' | 'most_liked' = 'newest';
   private cdr = inject(ChangeDetectorRef);
 
   constructor(private route: ActivatedRoute) {}
+
+  openImageModal(url: string, event: Event) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.selectedImage = url;
+    const modal = document.getElementById('image_modal') as HTMLDialogElement;
+    if (modal) {
+      modal.showModal();
+    }
+  }
+
+  scrollToSlide(id: string) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }
 
   get isLoggedIn(): boolean {
     return UserService.isLoggedIn();
@@ -53,16 +75,87 @@ export class CommunityDetailComponent implements OnInit {
     return name.substring(0, 2).toUpperCase();
   }
 
+  get sortedPosts(): Post[] {
+    if (!this.community?.posts) return [];
+    
+    // Create a copy to avoid mutating the original array
+    const posts = [...this.community.posts];
+    
+    return posts.sort((a, b) => {
+      switch (this.sortMode) {
+        case 'oldest':
+          return new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime();
+        case 'most_liked':
+          return b.likes - a.likes;
+        case 'newest':
+        default:
+          return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+      }
+    });
+  }
+
   openCreatePost() {
     if (!this.isLoggedIn) return;
     this.showCreatePost = true;
     this.newPostTitle = '';
     this.newPostContent = '';
+    this.newPostImageUrls = [];
+    this.imageUrlInput = '';
     this.postError = '';
   }
 
   closeCreatePost() {
     this.showCreatePost = false;
+  }
+  
+  addImageUrl() {
+    if (this.imageUrlInput.trim()) {
+      this.newPostImageUrls.push(this.imageUrlInput.trim());
+      this.imageUrlInput = '';
+    }
+  }
+
+  removeImageUrl(index: number) {
+    this.newPostImageUrls.splice(index, 1);
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    this.isDragging = true;
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    this.isDragging = false;
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    this.isDragging = false;
+    if (event.dataTransfer?.files) {
+      this.handleFiles(Array.from(event.dataTransfer.files));
+    }
+  }
+
+  onFileSelected(event: any) {
+    if (event.target.files) {
+      this.handleFiles(Array.from(event.target.files));
+    }
+  }
+
+  private handleFiles(files: File[]) {
+    for (const file of files) {
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target?.result) {
+            this.newPostImageUrls.push(e.target.result as string);
+            this.cdr.detectChanges();
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    }
   }
 
   async submitPost() {
@@ -73,7 +166,7 @@ export class CommunityDetailComponent implements OnInit {
     this.isSubmittingPost = true;
     this.postError = '';
     try {
-      await PostService.createPost(this.newPostTitle.trim(), this.newPostContent.trim(), user, this.community);
+      await PostService.createPost(this.newPostTitle.trim(), this.newPostContent.trim(), user, this.community, this.newPostImageUrls);
       this.showCreatePost = false;
       const id = this.community.forumId;
       this.community = await ForumService.getForumById(id);

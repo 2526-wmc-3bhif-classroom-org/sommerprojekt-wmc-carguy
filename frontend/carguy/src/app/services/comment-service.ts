@@ -47,18 +47,18 @@ export const CommentService = {
 
   /** * Create a new top-level comment
    */
-  async createComment(content: string, author: User, post: Post): Promise<void> {
+  async createComment(content: string, author: User, post: Post, imageUrls?: string[]): Promise<void> {
     const res = await fetch(`${API_BASE_URL}/comment`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content, author, post }),
+      body: JSON.stringify({ content, author, post, imageUrls }),
     });
     return handleResponse<void>(res);
   },
 
   /** * Create a reply to another comment
    */
-  async createReply(content: string, author: User, post: Post, parentComment: Comment): Promise<void> {
+  async createReply(content: string, author: User, post: Post, parentComment: Comment, imageUrls?: string[]): Promise<void> {
     const res = await fetch(`${API_BASE_URL}/posts/comments`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -66,7 +66,8 @@ export const CommentService = {
         content,
         author,
         post,
-        comment: parentComment
+        comment: parentComment,
+        imageUrls
       }),
     });
     return handleResponse<void>(res);
