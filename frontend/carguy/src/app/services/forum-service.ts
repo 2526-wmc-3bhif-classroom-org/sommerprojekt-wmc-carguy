@@ -23,7 +23,7 @@ export const ForumService = {
   },
 
   /** Get trending forums */
-  async getTrendingForums(limit: number = 5): Promise<Forum[]> {
+  async getTrendingForums(limit: number = 10): Promise<Forum[]> {
     const res = await fetch(`${API_BASE_URL}/forums/trending?limit=${limit}`);
     return handleResponse<Forum[]>(res);
   },

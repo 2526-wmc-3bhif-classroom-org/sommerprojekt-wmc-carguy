@@ -22,13 +22,6 @@ export class CommunityDetailComponent implements OnInit {
   newPostContent = '';
   isSubmittingPost = false;
   postError = '';
-  
-  isEditing = false;
-  editName = '';
-  editDescription = '';
-  isUpdating = false;
-  updateError = '';
-
   private cdr = inject(ChangeDetectorRef);
 
   constructor(private route: ActivatedRoute) {}
@@ -58,40 +51,6 @@ export class CommunityDetailComponent implements OnInit {
   getInitials(name?: string): string {
     if (!name) return 'C';
     return name.substring(0, 2).toUpperCase();
-  }
-
-  startEditing() {
-    if (!this.community) return;
-    this.isEditing = true;
-    this.editName = this.community.name;
-    this.editDescription = this.community.description || '';
-    this.updateError = '';
-  }
-
-  cancelEditing() {
-    this.isEditing = false;
-  }
-
-  async saveCommunity() {
-    if (!this.community || !this.editName.trim()) {
-      this.updateError = 'Name is required.';
-      return;
-    }
-    
-    this.isUpdating = true;
-    this.updateError = '';
-    
-    try {
-      await ForumService.updateForum(this.community.forumId, this.editName.trim(), this.editDescription.trim());
-      this.community.name = this.editName.trim();
-      this.community.description = this.editDescription.trim();
-      this.isEditing = false;
-    } catch (e: any) {
-      this.updateError = e.message || 'Failed to update community.';
-    } finally {
-      this.isUpdating = false;
-      this.cdr.detectChanges();
-    }
   }
 
   openCreatePost() {

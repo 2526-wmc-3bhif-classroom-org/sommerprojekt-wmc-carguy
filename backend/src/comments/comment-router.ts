@@ -46,12 +46,13 @@ commentRouter.get("/comment/:id", (req, res) => {
 });
 
 commentRouter.post("/comment", (req, res) => {
-    const { content, author, post } = req.body;
+    const { content, author, post, imageUrls } = req.body;
     const comment: Comment = {
         cid: 0,
         content,
         author,
         post,
+        imageUrls,
         publishedAt: new Date().toISOString() as any,
         likes: 0,
         dislikes: 0
@@ -61,13 +62,14 @@ commentRouter.post("/comment", (req, res) => {
 });
 
 commentRouter.post("/posts/comments", (req, res) => {
-    const { content, author, post, comment: parentComment } = req.body;
+    const { content, author, post, comment: parentComment, imageUrls } = req.body;
     const reply: Comment = {
         cid: 0,
         content,
         author,
         post,
         parentComment,
+        imageUrls,
         publishedAt: new Date().toISOString() as any,
         likes: 0,
         dislikes: 0

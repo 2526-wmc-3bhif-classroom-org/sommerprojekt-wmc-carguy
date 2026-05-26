@@ -46,6 +46,7 @@ export interface Post {
   parentPost?: Post;
   replies?: Post[];
   publishedAt: Date;
+  imageUrls?: string[];
   likes: number;
   dislikes: number;
   category?: PostCategory;
@@ -71,6 +72,7 @@ export interface Comment {
   parentComment?: Comment;
   replies?: Comment[];
   publishedAt: Date;
+  imageUrls?: string[];
   likes: number;
   dislikes: number;
 }

@@ -17,6 +17,26 @@ export class BrandDirectoryComponent {
   forums: Forum[] = [];
   trendingForums: Forum[] = [];
   trendingPosts: Post[] = [];
+  selectedImage: string | null = null;
+
+  constructor() {}
+
+  openImageModal(url: string, event: Event) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.selectedImage = url;
+    const modal = document.getElementById('image_modal') as HTMLDialogElement;
+    if (modal) {
+      modal.showModal();
+    }
+  }
+
+  scrollToSlide(id: string) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }
 
   private cdr = inject(ChangeDetectorRef);
 
@@ -24,7 +44,7 @@ export class BrandDirectoryComponent {
     try {
       this.forums = await ForumService.getAllForums();
       this.trendingForums = await ForumService.getTrendingForums(4);
-      this.trendingPosts = await PostService.getTrendingPosts(4);
+      this.trendingPosts = await PostService.getTrendingPosts(10);
       this.cdr.detectChanges();
     } catch (error) {
       console.error('Failed to load dashboard data', error);

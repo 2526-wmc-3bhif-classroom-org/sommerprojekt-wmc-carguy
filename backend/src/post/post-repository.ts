@@ -6,17 +6,21 @@ export class PostRepository {
     public findAllRootPosts(): Post[] {
         const db = DB.getInstance();
 
-        return db.prepare(`
-            SELECT PID as pid, Title as title, Content as content, UID as author, ForumID as forum, ParentPID as parentPost, Post_Category_id as category, PublishedAt as publishedAt, Likes as likes, Dislikes as dislikes FROM Post
+        const rows = db.prepare(`
+            SELECT PID as pid, Title as title, Content as content, UID as author, ForumID as forum, ParentPID as parentPost, Post_Category_id as category, PublishedAt as publishedAt, ImageUrls as imageUrls, Likes as likes, Dislikes as dislikes FROM Post
             WHERE ParentPID IS NULL
-        `).all() as Post[];
+        `).all() as any[];
+        return rows.map(row => ({
+            ...row,
+            imageUrls: row.imageUrls ? JSON.parse(row.imageUrls) : undefined
+        })) as Post[];
     }
 
     public findPostById(id: number): Post | undefined {
         const db = DB.getInstance();
 
         const row = db.prepare(`
-            SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.Likes as likes, p.Dislikes as dislikes,
+            SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.ImageUrls as imageUrls, p.Likes as likes, p.Dislikes as dislikes,
                    u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname
             FROM Post p
             LEFT JOIN User u ON p.UID = u.UID
@@ -33,6 +37,7 @@ export class PostRepository {
             parentPost: row.parentPost ? { pid: row.parentPost } as any : undefined,
             category: row.category ? { postCategoryId: row.category } as any : undefined,
             publishedAt: row.publishedAt,
+            imageUrls: row.imageUrls ? JSON.parse(row.imageUrls) : undefined,
             likes: row.likes,
             dislikes: row.dislikes,
             author: {
@@ -46,17 +51,21 @@ export class PostRepository {
     public findRepliesByParentId(parentId: number): Post[] {
         const db = DB.getInstance();
 
-        return db.prepare(`
-            SELECT PID as pid, Title as title, Content as content, UID as author, ForumID as forum, ParentPID as parentPost, Post_Category_id as category, PublishedAt as publishedAt, Likes as likes, Dislikes as dislikes FROM Post
+        const rows = db.prepare(`
+            SELECT PID as pid, Title as title, Content as content, UID as author, ForumID as forum, ParentPID as parentPost, Post_Category_id as category, PublishedAt as publishedAt, ImageUrls as imageUrls, Likes as likes, Dislikes as dislikes FROM Post
             WHERE ParentPID = ?
-        `).all(parentId) as Post[];
+        `).all(parentId) as any[];
+        return rows.map(row => ({
+            ...row,
+            imageUrls: row.imageUrls ? JSON.parse(row.imageUrls) : undefined
+        })) as Post[];
     }
 
     public findPostByForum(forumId: number): Post[] {
         const db = DB.getInstance();
 
         const rows = db.prepare(`
-            SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.Likes as likes, p.Dislikes as dislikes,
+            SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.ImageUrls as imageUrls, p.Likes as likes, p.Dislikes as dislikes,
                    u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname,
                    COUNT(c.CID) as commentCount
             FROM Post p
@@ -74,6 +83,7 @@ export class PostRepository {
             parentPost: row.parentPost,
             category: row.category,
             publishedAt: row.publishedAt,
+            imageUrls: row.imageUrls ? JSON.parse(row.imageUrls) : undefined,
             likes: row.likes,
             dislikes: row.dislikes,
             commentCount: row.commentCount,
@@ -89,7 +99,7 @@ export class PostRepository {
         const db = DB.getInstance();
 
         const rows = db.prepare(`
-            SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.Likes as likes, p.Dislikes as dislikes,
+            SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.ImageUrls as imageUrls, p.Likes as likes, p.Dislikes as dislikes,
                    u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname,
                    COUNT(c.CID) as commentCount
             FROM Post p
@@ -107,6 +117,7 @@ export class PostRepository {
             parentPost: row.parentPost,
             category: row.category,
             publishedAt: row.publishedAt,
+            imageUrls: row.imageUrls ? JSON.parse(row.imageUrls) : undefined,
             likes: row.likes,
             dislikes: row.dislikes,
             commentCount: row.commentCount,
@@ -121,10 +132,14 @@ export class PostRepository {
     public findPostByCategory(categoryId: number): Post[] {
         const db = DB.getInstance();
 
-        return db.prepare(`
-            SELECT PID as pid, Title as title, Content as content, UID as author, ForumID as forum, ParentPID as parentPost, Post_Category_id as category, PublishedAt as publishedAt, Likes as likes, Dislikes as dislikes FROM Post
+        const rows = db.prepare(`
+            SELECT PID as pid, Title as title, Content as content, UID as author, ForumID as forum, ParentPID as parentPost, Post_Category_id as category, PublishedAt as publishedAt, ImageUrls as imageUrls, Likes as likes, Dislikes as dislikes FROM Post
             WHERE Post_Category_id = ?
-        `).all(categoryId) as Post[];
+        `).all(categoryId) as any[];
+        return rows.map(row => ({
+            ...row,
+            imageUrls: row.imageUrls ? JSON.parse(row.imageUrls) : undefined
+        })) as Post[];
     }
 
     public createPost(post: Post): void {
@@ -132,8 +147,8 @@ export class PostRepository {
 
         db.prepare(`
             INSERT INTO Post
-            (Title, Content, UID, ForumID, ParentPID, Post_Category_id, PublishedAt, Likes, Dislikes)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (Title, Content, UID, ForumID, ParentPID, Post_Category_id, PublishedAt, ImageUrls, Likes, Dislikes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
             post.title ?? null,
             post.content,
@@ -142,6 +157,7 @@ export class PostRepository {
             null,
             post.category?.postCategoryId ?? null,
             post.publishedAt,
+            post.imageUrls ? JSON.stringify(post.imageUrls) : null,
             0,
             0
         );
@@ -172,8 +188,8 @@ export class PostRepository {
 
         db.prepare(`
             INSERT INTO Post
-            (Title, Content, UID, ForumID, ParentPID, Post_Category_id, PublishedAt, Likes, Dislikes)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (Title, Content, UID, ForumID, ParentPID, Post_Category_id, PublishedAt, ImageUrls, Likes, Dislikes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
             null,
             post.content,
@@ -182,6 +198,7 @@ export class PostRepository {
             post.parentPost?.pid ?? null,
             post.category?.postCategoryId ?? null,
             post.publishedAt,
+            post.imageUrls ? JSON.stringify(post.imageUrls) : null,
             0,
             0
         );
@@ -191,7 +208,7 @@ export class PostRepository {
         const db = DB.getInstance();
 
         const rows = db.prepare(`
-            SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.Likes as likes, p.Dislikes as dislikes,
+            SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.ImageUrls as imageUrls, p.Likes as likes, p.Dislikes as dislikes,
                    u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname,
                    COUNT(c.CID) as commentCount,
                    (p.Likes - p.Dislikes + COALESCE(COUNT(c.CID), 0) * 2) as TrendScore
@@ -213,6 +230,7 @@ export class PostRepository {
             parentPost: row.parentPost ? { pid: row.parentPost } as any : undefined,
             category: row.category ? { postCategoryId: row.category } as any : undefined,
             publishedAt: row.publishedAt,
+            imageUrls: row.imageUrls ? JSON.parse(row.imageUrls) : undefined,
             likes: row.likes,
             dislikes: row.dislikes,
             commentCount: row.commentCount,

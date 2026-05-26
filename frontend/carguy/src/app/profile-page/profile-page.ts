@@ -6,7 +6,7 @@ import { UserService } from '../services/user-service';
 import { PostService } from '../services/post-service';
 import { CommentService } from '../services/comment-service';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile-page',
@@ -37,6 +37,7 @@ export class ProfilePage implements OnInit {
 
   private cdr = inject(ChangeDetectorRef);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   public isSaving = false;
 
@@ -91,6 +92,7 @@ export class ProfilePage implements OnInit {
 
   public logout(): void {
     UserService.logout();
+    this.router.navigate(['/login']);
   }
 
   toggleEdit() {
