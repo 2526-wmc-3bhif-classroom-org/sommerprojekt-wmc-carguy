@@ -60,6 +60,7 @@ export interface Forum {
   posts?: Post[];
   createdAt: Date;
   category?: ForumCategory;
+  memberCount?: number;
 }
 
 export interface Comment {
