@@ -28,4 +28,20 @@ export class ForumService {
     public updateForum(id: number, name: string, description?: string): boolean {
         return this.forumRepository.updateForum(id, name, description);
     }
+
+    public deleteForum(id: number): boolean {
+        return this.forumRepository.deleteForum(id);
+    }
+
+    public joinForum(userId: number, forumId: number): boolean {
+        return this.forumRepository.joinForum(userId, forumId);
+    }
+
+    public leaveForum(userId: number, forumId: number): boolean {
+        return this.forumRepository.leaveForum(userId, forumId);
+    }
+
+    public isUserInForum(userId: number, forumId: number): boolean {
+        return this.forumRepository.isUserInForum(userId, forumId);
+    }
 }
