@@ -63,8 +63,13 @@ forumRouter.post("/forum", (req, res) => {
         createdAt: createdAt
     };
 
-    const newId = forumService.createForum(forum, author?.uid);
-    res.status(201).json({ message: "Forum created", forumId: newId });
+    try {
+        const newId = forumService.createForum(forum, author?.uid);
+        res.status(201).json({ message: "Forum created", forumId: newId });
+    } catch (e: any) {
+        console.error("Error creating forum:", e);
+        res.status(500).send("Failed to create forum. Author might be invalid.");
+    }
 });
 
 forumRouter.put("/forum/:id", (req, res) => {
@@ -81,4 +86,46 @@ forumRouter.put("/forum/:id", (req, res) => {
     }
     
     res.json({ message: "Forum updated successfully" });
+});
+
+forumRouter.delete("/forum/:id", (req, res) => {
+    const id = Number(req.params.id);
+    
+    if (isNaN(id)) return res.status(400).send("Invalid id");
+
+    const deleted = forumService.deleteForum(id);
+    if (!deleted) {
+        return res.status(404).send("Forum not found");
+    }
+
+    res.status(204).send();
+});
+
+forumRouter.post("/forum/:id/join", (req, res) => {
+    const forumId = Number(req.params.id);
+    const userId = req.body.userId;
+    if (isNaN(forumId) || !userId) return res.status(400).send("Invalid input");
+    
+    const joined = forumService.joinForum(userId, forumId);
+    if (joined) res.status(200).send({ message: "Joined successfully" });
+    else res.status(400).send("Could not join forum");
+});
+
+forumRouter.post("/forum/:id/leave", (req, res) => {
+    const forumId = Number(req.params.id);
+    const userId = req.body.userId;
+    if (isNaN(forumId) || !userId) return res.status(400).send("Invalid input");
+    
+    const left = forumService.leaveForum(userId, forumId);
+    if (left) res.status(200).send({ message: "Left successfully" });
+    else res.status(400).send("Could not leave forum");
+});
+
+forumRouter.get("/forum/:id/member/:userId", (req, res) => {
+    const forumId = Number(req.params.id);
+    const userId = Number(req.params.userId);
+    if (isNaN(forumId) || isNaN(userId)) return res.status(400).send("Invalid input");
+    
+    const isMember = forumService.isUserInForum(userId, forumId);
+    res.json({ isMember });
 });
