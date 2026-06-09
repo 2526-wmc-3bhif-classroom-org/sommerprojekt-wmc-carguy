@@ -1,11 +1,11 @@
-<div class="mx-auto max-w-[1400px] px-8 py-12 min-h-screen">
-  <header class="mb-12 mt-12">
+<div class="mx-auto max-w-[1400px] px-6 py-8 min-h-screen pt-20">
+  <header class="mb-6 mt-4">
     <h1 class="text-4xl font-bold text-primary mb-4 tracking-tight">Brand Directory</h1>
     <p class="text-base-content/70 text-lg max-w-3xl">Explore communities for every automotive brand. Join discussions, share
       knowledge, and connect with fellow enthusiasts.</p>
   </header>
 
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
     <div class="stat-card">
       <div class="text-3xl font-extrabold text-primary">142</div>
       <div class="text-base-content/60 font-medium text-sm uppercase tracking-wider">Active Brands</div>
@@ -21,13 +21,13 @@
   </div>
 
   @if (trendingPosts.length > 0) {
-  <div class="mb-12">
-    <h2 class="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
+  <div class="mb-8">
+    <h2 class="text-2xl font-bold text-primary mb-4 flex items-center gap-2">
       Trending Posts
     </h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       @for (post of trendingPosts; track post.pid) {
-      <div [routerLink]="['/post', post.pid]" class="card border border-base-content/10 hover:border-primary transition-all duration-300 group cursor-pointer p-6 flex flex-col justify-between">
+      <div [routerLink]="['/post', post.pid]" class="premium-card rounded-2xl group cursor-pointer p-5 flex flex-col justify-between">
         <div>
           <h3 class="text-lg font-bold mb-2 group-hover:text-primary transition-colors line-clamp-2">{{ post.title }}</h3>
           <p class="text-sm text-base-content/70 line-clamp-3 mb-4">{{ post.content }}</p>
@@ -77,13 +77,13 @@
   }
 
   @if (trendingForums.length > 0) {
-  <div class="mb-12">
-    <h2 class="text-2xl font-bold text-accent mb-6 flex items-center gap-2">
+  <div class="mb-8">
+    <h2 class="text-2xl font-bold text-accent mb-4 flex items-center gap-2">
       Trending Communities
     </h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       @for (forum of trendingForums; track forum.forumId) {
-      <div [routerLink]="['/community', forum.forumId]" class="card border border-base-content/10 hover:border-accent transition-all duration-300 group cursor-pointer p-6">
+      <div [routerLink]="['/community', forum.forumId]" class="premium-card rounded-2xl group cursor-pointer p-5">
         <h3 class="text-xl font-bold mb-2 group-hover:text-accent transition-colors">{{ forum.name }}</h3>
         <p class="text-sm text-base-content/70 line-clamp-2 mb-4">{{ forum.description }}</p>
         <a class="text-accent font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
@@ -95,19 +95,22 @@
   </div>
   }
 
-  <h2 class="text-2xl font-bold text-primary mb-6">All Communities</h2>
+  <h2 class="text-2xl font-bold text-primary mb-4">All Communities</h2>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 z-10">
     @for (forum of forums; track forum.forumId) {
     <div [routerLink]="['/community', forum.forumId]"
-      class="card border border-base-content/10 hover:border-accent transition-all duration-300 group cursor-pointer p-8">
-      <div class="w-12 h-12 rounded-lg mb-6 shadow-lg" [style.backgroundColor]=""></div>
-      <h3 class="text-xl font-bold mb-2 group-hover:text-accent transition-colors">{{ forum.name }}</h3>
-      <div class="flex items-center gap-2 text-sm text-base-content/60 mb-6">
+      class="premium-card rounded-2xl group cursor-pointer p-6">
+      <div class="w-12 h-12 rounded-xl mb-4 shadow-md flex items-center justify-center text-white text-lg font-black tracking-wide transition-transform duration-300 group-hover:scale-105"
+           [style.backgroundColor]="getBrandColor(forum.name)">
+        {{ forum.name.charAt(0) }}
+      </div>
+      <h3 class="text-lg font-bold mb-2 group-hover:text-accent transition-colors">{{ forum.name }}</h3>
+      <div class="flex items-center gap-2 text-xs text-base-content/60 mb-4">
         <span>{{ forum.subForums?.length }} models</span>
         <span class="opacity-30">•</span>
         <span>{{ forum.memberCount || 0 }} members</span>
       </div>
-      <a class="text-accent font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+      <a class="text-accent text-sm font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
         Explore <span class="text-lg">›</span>
       </a>
     </div>
