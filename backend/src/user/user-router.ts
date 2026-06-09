@@ -15,7 +15,7 @@ userRouter.get("/users", (req, res) => {
 userRouter.get("/user/:id", (req, res) => {
     const id = Number(req.params.id);
 
-    if (typeof id !== "number") {
+    if (isNaN(id)) {
         return res.status(400).send("Invalid id");
     }
 
@@ -99,8 +99,14 @@ userRouter.post("/update", (req: Request, res: Response) => {
         const newUserName: string = req.body.newUsername;
         const newPublicName: string = req.body.newPublicName;
         const newDescription: string = req.body.newDescription;
+        const newImage: string = req.body.newImage;
 
-        let user = UserService.updateUserInfo(realUserName, {username: newUserName, publicname: newPublicName, description: newDescription} as User);
+        let user = UserService.updateUserInfo(realUserName, {
+            username: newUserName,
+            publicname: newPublicName,
+            description: newDescription,
+            image: newImage
+        } as User);
 
         return res.status(StatusCodes.OK).send({
             message: "User updated successfully",

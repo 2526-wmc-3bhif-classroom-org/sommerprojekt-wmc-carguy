@@ -22,7 +22,7 @@ forumRouter.get("/forums/trending", (req, res) => {
 forumRouter.get("/forum/:id", (req, res) => {
     const id = Number(req.params.id);
 
-    if (typeof id !== "number") {
+    if (isNaN(id)) {
         return res.status(400).send("Invalid id");
     }
 
@@ -38,7 +38,7 @@ forumRouter.get("/forum/:id", (req, res) => {
 forumRouter.get("/forum/category/:categoryId", (req, res) => {
     const categoryId = Number(req.params.categoryId);
 
-    if (typeof categoryId !== "number") {
+    if (isNaN(categoryId)) {
         return res.status(400).send("Invalid categoryId");
     }
 

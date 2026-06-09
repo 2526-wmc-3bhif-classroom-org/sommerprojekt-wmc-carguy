@@ -27,6 +27,7 @@ export class ProfilePage implements OnInit {
   public editPublicName: string = '';
   public editUsername: string = '';
   public editDescription: string = '';
+  public editImage: string = '';
 
   loadedUser: User | null = null;
 
@@ -101,6 +102,7 @@ export class ProfilePage implements OnInit {
       this.editPublicName = loggedInUser.publicname;
       this.editUsername = loggedInUser.username;
       this.editDescription = loggedInUser.description || '';
+      this.editImage = loggedInUser.image || '';
     }
     this.isEditing = true;
   }
@@ -116,6 +118,7 @@ export class ProfilePage implements OnInit {
         publicname: this.editPublicName,
         username: this.editUsername,
         description: this.editDescription,
+        image: this.editImage,
       }
 
       try {
@@ -140,8 +143,23 @@ export class ProfilePage implements OnInit {
       this.editPublicName = loggedInUser.publicname;
       this.editUsername = loggedInUser.username;
       this.editDescription = loggedInUser.description || '';
+      this.editImage = loggedInUser.image || '';
     }
     this.isEditing = false;
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          this.editImage = e.target.result as string;
+          this.cdr.detectChanges();
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
 

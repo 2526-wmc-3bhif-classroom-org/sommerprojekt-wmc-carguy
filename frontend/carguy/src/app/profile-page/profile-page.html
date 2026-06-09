@@ -8,38 +8,59 @@
     class="mb-12 mt-12 flex flex-col md:flex-row items-center md:items-start gap-8 bg-base-200 p-8 rounded-2xl border border-base-content/10 shadow-xl relative overflow-hidden">
     <div class="absolute inset-0 bg-linear-to-r from-primary/10 to-transparent"></div>
 
-    <div class="z-10 bg-base-200/20 backdrop-blur-md rounded-full p-2">
-      <div class="w-32 h-32 rounded-full bg-base-300 flex items-center justify-center text-4xl font-bold text-primary border border-base-content/10 overflow-hidden">
-        <img *ngIf="currentUser?.image" [src]="currentUser?.image" class="w-full h-full object-cover">
-        <span *ngIf="!currentUser?.image">{{ currentUser?.publicname?.charAt(0) || 'U' }}</span>
+    <div class="z-10 bg-base-200/20 backdrop-blur-md rounded-full p-2 relative group/avatar">
+      <div class="w-32 h-32 rounded-full bg-base-300 flex items-center justify-center text-4xl font-bold text-primary border border-base-content/10 overflow-hidden relative">
+        @if (isEditing) {
+          @if (editImage) {
+            <img [src]="editImage" class="w-full h-full object-cover">
+          } @else {
+            <span>{{ editPublicName.charAt(0) || 'U' }}</span>
+          }
+          <!-- Sleek Edit Overlay -->
+          <div class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white text-xs font-semibold opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300 pointer-events-none z-10">
+            <svg class="w-6 h-6 mb-1 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"></path>
+            </svg>
+            <span class="text-center px-2 text-[10px]">Change Picture</span>
+          </div>
+          <!-- Invisible File Input -->
+          <input type="file" accept="image/*" (change)="onFileSelected($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" />
+        } @else {
+          @if (currentUser?.image) {
+            <img [src]="currentUser?.image" class="w-full h-full object-cover">
+          } @else {
+            <span>{{ currentUser?.publicname?.charAt(0) || 'U' }}</span>
+          }
+        }
       </div>
     </div>
 
-    @if (isOwnProfile) {
-      <div class="z-10 flex-1 text-center md:text-left">
-        <div *ngIf="!isEditing">
-          <h1 class="text-4xl font-bold text-primary mb-2 flex items-center gap-2 flex-wrap justify-center md:justify-start">
-            {{currentUser?.publicname }}
-            <span *ngIf="(currentUser?.totalAura || 0) >= 100" class="badge badge-success flex items-center gap-1 text-xs py-1 px-2.5 font-semibold text-white">
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="inline-block"><polyline points="20 6 9 17 4 12"/></svg>
-              Verified
-            </span>
-          </h1>
-          <p class="text-base-content/70 font-medium mb-4">{{ currentUser?.username }} <span class="mx-2">•</span> {{
-            currentUser?.title || 'Member' }}</p>
-          <p class="text-base-content/70 max-w-2xl">{{ currentUser?.description || 'No description provided.' }}</p>
-        </div>
+    <div class="z-10 flex-1 text-center md:text-left">
+      <div *ngIf="!isEditing">
+        <h1 class="text-4xl font-bold text-primary mb-2 flex items-center gap-2 flex-wrap justify-center md:justify-start">
+          {{currentUser?.publicname }}
+          <span *ngIf="(currentUser?.totalAura || 0) >= 100" class="badge badge-success flex items-center gap-1 text-xs py-1 px-2.5 font-semibold text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="inline-block"><polyline points="20 6 9 17 4 12"/></svg>
+            Verified
+          </span>
+        </h1>
+        <p class="text-base-content/70 font-medium mb-4">{{ currentUser?.username }} <span class="mx-2">•</span> {{
+          currentUser?.title || 'Member' }}</p>
+        <p class="text-base-content/70 max-w-2xl">{{ currentUser?.description || 'No description provided.' }}</p>
+      </div>
 
-        <div *ngIf="isEditing" class="flex flex-col gap-2">
-          <input [(ngModel)]="editPublicName" class="input input-bordered w-full max-w-xs bg-base-200 text-primary text-4xl font-bold h-auto py-1 mb-2" />
-          <div class="flex items-center gap-2 mb-2">
-            <input [(ngModel)]="editUsername" class="input input-bordered bg-base-200 text-base-content/70 font-medium py-1 h-auto" />
-            <span class="text-base-content/70 mx-2">•</span>
-            <span class="text-base-content/70">{{ currentUser?.title || 'Member' }}</span>
-          </div>
-          <textarea [(ngModel)]="editDescription" class="textarea textarea-bordered w-full max-w-2xl bg-base-200 text-base-content/70" placeholder="Description"></textarea>
+      <div *ngIf="isEditing" class="flex flex-col gap-2">
+        <input [(ngModel)]="editPublicName" class="input input-bordered w-full max-w-xs bg-base-200 text-primary text-4xl font-bold h-auto py-1 mb-2" />
+        <div class="flex items-center gap-2 mb-2">
+          <input [(ngModel)]="editUsername" class="input input-bordered bg-base-200 text-base-content/70 font-medium py-1 h-auto" />
+          <span class="text-base-content/70 mx-2">•</span>
+          <span class="text-base-content/70">{{ currentUser?.title || 'Member' }}</span>
         </div>
+        <textarea [(ngModel)]="editDescription" class="textarea textarea-bordered w-full max-w-2xl bg-base-200 text-base-content/70" placeholder="Description"></textarea>
+      </div>
 
+      @if (isOwnProfile) {
         <div class="mt-6 flex flex-wrap gap-4 justify-center md:justify-start">
           <div *ngIf="!isEditing" class="flex gap-4">
             <button (click)="toggleEdit()" class="btn btn-primary">Edit Profile</button>
@@ -62,8 +83,8 @@
             </button>
           }
         </div>
-      </div>
-    }
+      }
+    </div>
   </header>
 
   <!-- Stats Section -->
