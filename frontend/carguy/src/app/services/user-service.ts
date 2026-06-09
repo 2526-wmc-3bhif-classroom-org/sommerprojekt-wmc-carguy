@@ -133,11 +133,13 @@ export const UserService = {
         username: oldUser.username,
         newUsername: newUser.username,
         newPublicName: newUser.publicname,
-        newDescription: newUser.description
+        newDescription: newUser.description,
+        newImage: newUser.image
       })
     });
 
     const data = await handleResponse<{user: User}>(response);
+    localStorage.setItem("currentUser", JSON.stringify(data.user));
     curUser = data.user;
     return data.user;
   }
