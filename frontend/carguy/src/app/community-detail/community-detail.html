@@ -34,17 +34,31 @@
             <span>Created on <b class="text-primary">{{ community.createdAt | date:'mediumDate' }}</b></span>
           </div>
 
-          <div class="flex flex-wrap gap-4 justify-center md:justify-start">
+          <div class="flex flex-wrap gap-4 justify-center md:justify-start mt-4">
             @if (isLoggedIn) {
-              <button (click)="openCreatePost()" class="btn btn-primary">Create Post</button>
-              @if (!isEditing) {
-                <button (click)="startEditing()" class="btn btn-outline border-accent/10 hover:border-accent hover:bg-transparent hover:text-accent">Edit Community</button>
-              } @else {
-                <button (click)="saveCommunity()" [disabled]="isUpdating || !editName.trim()" class="btn btn-success gap-2">
-                  @if (isUpdating) { <span class="loading loading-spinner loading-sm"></span> }
-                  Save
+              @if (!isMember) {
+                <button (click)="joinCommunity()" [disabled]="isMembershipLoading" class="btn btn-outline border-primary text-primary hover:bg-primary hover:text-white">
+                  @if (isMembershipLoading) { <span class="loading loading-spinner loading-sm"></span> }
+                  Join Community
                 </button>
-                <button (click)="cancelEditing()" [disabled]="isUpdating" class="btn btn-ghost border border-base-content/10">Cancel</button>
+              } @else {
+                <button (click)="leaveCommunity()" [disabled]="isMembershipLoading" class="btn btn-outline border-base-content/20 text-base-content/70 hover:bg-base-content/10 hover:text-base-content">
+                  @if (isMembershipLoading) { <span class="loading loading-spinner loading-sm"></span> }
+                  Leave Community
+                </button>
+              }
+              <button (click)="openCreatePost()" class="btn btn-primary">Create Post</button>
+              @if (canEditCommunity) {
+                @if (!isEditing) {
+                  <button (click)="startEditing()" class="btn btn-outline border-accent/10 hover:border-accent hover:bg-transparent hover:text-accent">Edit Community</button>
+                  <button (click)="deleteCommunity()" class="btn btn-outline border-error/50 text-error hover:bg-error hover:text-white hover:border-error ml-auto md:ml-0">Delete Community</button>
+                } @else {
+                  <button (click)="saveCommunity()" [disabled]="isUpdating || !editName.trim()" class="btn btn-success gap-2">
+                    @if (isUpdating) { <span class="loading loading-spinner loading-sm"></span> }
+                    Save
+                  </button>
+                  <button (click)="cancelEditing()" [disabled]="isUpdating" class="btn btn-ghost border border-base-content/10">Cancel</button>
+                }
               }
             } @else {
               <a routerLink="/login" class="btn btn-outline border-accent/10 hover:border-accent hover:bg-transparent hover:text-accent">Login to Post</a>
@@ -84,10 +98,10 @@
                   />
                   <button (click)="addImageUrl()" class="btn btn-sm btn-outline border-base-content/20 hover:border-accent hover:text-accent">Add</button>
                 </div>
-                
-                <div 
-                  (dragover)="onDragOver($event)" 
-                  (dragleave)="onDragLeave($event)" 
+
+                <div
+                  (dragover)="onDragOver($event)"
+                  (dragleave)="onDragLeave($event)"
                   (drop)="onDrop($event)"
                   [class.border-accent]="isDragging"
                   [class.bg-accent]="isDragging"
@@ -180,7 +194,7 @@
                   </div>
                   <h3 class="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">{{ post.title }}</h3>
                   <p class="text-base-content/70 mb-4 line-clamp-3">{{ post.content }}</p>
-                  
+
                   @if (post.imageUrls && post.imageUrls.length > 0) {
                     <div class="mb-4">
                       <div class="carousel rounded-box w-full max-h-64 border border-base-content/10">
