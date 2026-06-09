@@ -6,6 +6,7 @@ import { SearchService, SearchResults } from '../services/search-service';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
+import { ThemeService } from '../services/theme-service';
 
 @Component({
   selector: 'app-navbar',
@@ -30,6 +31,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   private router = inject(Router);
   private elementRef = inject(ElementRef);
+  protected themeService = inject(ThemeService);
 
   public ngOnInit(): void {
     this.searchSubscription = this.searchSubject.pipe(
@@ -160,6 +162,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   public closeMenu(): void {
     this.isMenuOpen = false;
+  }
+
+  public toggleTheme(event: MouseEvent): void {
+    this.themeService.toggleTheme(event);
   }
 
   protected readonly UserService = UserService;

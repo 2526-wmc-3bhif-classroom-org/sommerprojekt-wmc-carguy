@@ -97,7 +97,7 @@
 
     <label class="swap swap-rotate mr-4">
       <!-- this hidden checkbox controls the state -->
-      <input type="checkbox" class="theme-controller" value="dark" />
+      <input type="checkbox" [checked]="themeService.isDarkMode" (click)="toggleTheme($event)" class="opacity-0 absolute" />
 
       <!-- sun icon -->
       <svg
