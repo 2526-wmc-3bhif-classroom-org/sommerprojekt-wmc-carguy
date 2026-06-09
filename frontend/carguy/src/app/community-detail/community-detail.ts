@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ForumService } from '../services/forum-service';
 import { PostService } from '../services/post-service';
@@ -39,12 +39,86 @@ export class CommunityDetailComponent implements OnInit {
   selectedImage: string | null = null;
   sortMode: 'newest' | 'oldest' | 'most_liked' = 'newest';
 
+  isMember = false;
+  isMembershipLoading = false;
+
   private cdr = inject(ChangeDetectorRef);
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
 
   get isLoggedIn(): boolean {
     return UserService.isLoggedIn();
+  }
+
+  get canEditCommunity(): boolean {
+    const user = UserService.getCurrentUser();
+    return this.isLoggedIn && !!user && !!this.community && this.community.authorId === user.uid;
+  }
+
+  async checkMembership() {
+    if (!this.isLoggedIn || !this.community) return;
+    const user = UserService.getCurrentUser();
+    if (!user) return;
+    try {
+      this.isMember = await ForumService.isUserInForum(this.community.forumId, user.uid);
+    } catch (e) {
+      this.isMember = false;
+    }
+  }
+
+  async joinCommunity() {
+    if (!this.isLoggedIn || !this.community) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    const user = UserService.getCurrentUser();
+    if (!user) return;
+    
+    this.isMembershipLoading = true;
+    try {
+      await ForumService.joinForum(this.community.forumId, user.uid);
+      this.isMember = true;
+      if(this.community.memberCount !== undefined) this.community.memberCount++;
+    } catch (e) {
+      console.error('Failed to join', e);
+    } finally {
+      this.isMembershipLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  async leaveCommunity() {
+    if (!this.isLoggedIn || !this.community) return;
+    const user = UserService.getCurrentUser();
+    if (!user) return;
+    
+    this.isMembershipLoading = true;
+    try {
+      await ForumService.leaveForum(this.community.forumId, user.uid);
+      this.isMember = false;
+      if(this.community.memberCount !== undefined && this.community.memberCount > 0) this.community.memberCount--;
+    } catch (e) {
+      console.error('Failed to leave', e);
+    } finally {
+      this.isMembershipLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  async deleteCommunity() {
+    if (!this.community) return;
+    if (confirm(`Are you sure you want to delete the community "${this.community.name}"?`)) {
+      try {
+        await ForumService.deleteForum(this.community.forumId);
+        this.router.navigate(['/communities']);
+      } catch (error) {
+        console.error('Failed to delete community', error);
+        alert('Failed to delete community.');
+      }
+    }
   }
 
   async ngOnInit() {
@@ -53,6 +127,7 @@ export class CommunityDetailComponent implements OnInit {
       try {
         const id = Number(idParam);
         this.community = await ForumService.getForumById(id);
+        await this.checkMembership();
       } catch (error) {
         console.error('Failed to load community details', error);
       } finally {
@@ -87,10 +162,10 @@ export class CommunityDetailComponent implements OnInit {
       this.updateError = 'Name is required.';
       return;
     }
-    
+
     this.isUpdating = true;
     this.updateError = '';
-    
+
     try {
       await ForumService.updateForum(this.community.forumId, this.editName.trim(), this.editDescription.trim());
       this.community.name = this.editName.trim();
