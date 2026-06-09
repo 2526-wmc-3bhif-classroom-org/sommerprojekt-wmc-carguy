@@ -52,6 +52,7 @@ export interface Forum {
   posts?: Post[];
   postCount?: number;
   memberCount?: number;
+  authorId?: number;
   createdAt: Date;
 }
 
