@@ -8,7 +8,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
     throw new Error(errorText || `Request failed with status ${response.status}`);
   }
   if (response.status === 204) return {} as T;
-  
+
   const text = await response.text();
   if (!text) return {} as T;
   return JSON.parse(text);
@@ -61,4 +61,36 @@ export const ForumService = {
     });
     return handleResponse<{message: string}>(res);
   },
+
+  /** Delete a forum */
+  async deleteForum(id: number): Promise<void> {
+    const res = await fetch(`${API_BASE_URL}/forum/${id}`, {
+      method: "DELETE"
+    });
+    return handleResponse<void>(res);
+  },
+
+  async joinForum(id: number, userId: number): Promise<{message: string}> {
+    const res = await fetch(`${API_BASE_URL}/forum/${id}/join`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId })
+    });
+    return handleResponse<{message: string}>(res);
+  },
+
+  async leaveForum(id: number, userId: number): Promise<{message: string}> {
+    const res = await fetch(`${API_BASE_URL}/forum/${id}/leave`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId })
+    });
+    return handleResponse<{message: string}>(res);
+  },
+
+  async isUserInForum(id: number, userId: number): Promise<boolean> {
+    const res = await fetch(`${API_BASE_URL}/forum/${id}/member/${userId}`);
+    const data = await handleResponse<{isMember: boolean}>(res);
+    return data.isMember;
+  }
 };
