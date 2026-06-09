@@ -91,3 +91,14 @@ export interface UserInForum {
   uid: number;
   forumId: number;
 }
+
+export interface Guide {
+  id: number;
+  title: string;
+  description: string;
+  content: string[];
+  author: User;
+  publishedAt: string;
+  likes: number;
+  dislikes: number;
+}

@@ -7,12 +7,33 @@ export class PostRepository {
         const db = DB.getInstance();
 
         const rows = db.prepare(`
-            SELECT PID as pid, Title as title, Content as content, UID as author, ForumID as forum, ParentPID as parentPost, Post_Category_id as category, PublishedAt as publishedAt, ImageUrls as imageUrls, Likes as likes, Dislikes as dislikes FROM Post
-            WHERE ParentPID IS NULL
+            SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.ImageUrls as imageUrls, p.Likes as likes, p.Dislikes as dislikes,
+                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname,
+                   (
+                       (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Post WHERE UID = u.UID) + 
+                       (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Comment WHERE UID = u.UID)
+                   ) as authorTotalAura
+            FROM Post p
+            LEFT JOIN User u ON p.UID = u.UID
+            WHERE p.ParentPID IS NULL
         `).all() as any[];
         return rows.map(row => ({
-            ...row,
-            imageUrls: row.imageUrls ? JSON.parse(row.imageUrls) : undefined
+            pid: row.pid,
+            title: row.title,
+            content: row.content,
+            forum: { forumId: row.forum } as any,
+            parentPost: row.parentPost ? { pid: row.parentPost } as any : undefined,
+            category: row.category ? { postCategoryId: row.category } as any : undefined,
+            publishedAt: row.publishedAt,
+            imageUrls: row.imageUrls ? JSON.parse(row.imageUrls) : undefined,
+            likes: row.likes,
+            dislikes: row.dislikes,
+            author: {
+                uid: row.authorUid,
+                username: row.authorUsername,
+                publicname: row.authorPublicname,
+                totalAura: row.authorTotalAura
+            } as User
         })) as Post[];
     }
 
@@ -21,7 +42,11 @@ export class PostRepository {
 
         const row = db.prepare(`
             SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.ImageUrls as imageUrls, p.Likes as likes, p.Dislikes as dislikes,
-                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname
+                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname,
+                   (
+                       (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Post WHERE UID = u.UID) + 
+                       (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Comment WHERE UID = u.UID)
+                   ) as authorTotalAura
             FROM Post p
             LEFT JOIN User u ON p.UID = u.UID
             WHERE p.PID = ?
@@ -43,7 +68,8 @@ export class PostRepository {
             author: {
                 uid: row.authorUid,
                 username: row.authorUsername,
-                publicname: row.authorPublicname
+                publicname: row.authorPublicname,
+                totalAura: row.authorTotalAura
             } as User
         } as Post;
     }
@@ -52,12 +78,33 @@ export class PostRepository {
         const db = DB.getInstance();
 
         const rows = db.prepare(`
-            SELECT PID as pid, Title as title, Content as content, UID as author, ForumID as forum, ParentPID as parentPost, Post_Category_id as category, PublishedAt as publishedAt, ImageUrls as imageUrls, Likes as likes, Dislikes as dislikes FROM Post
-            WHERE ParentPID = ?
+            SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.ImageUrls as imageUrls, p.Likes as likes, p.Dislikes as dislikes,
+                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname,
+                   (
+                       (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Post WHERE UID = u.UID) + 
+                       (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Comment WHERE UID = u.UID)
+                   ) as authorTotalAura
+            FROM Post p
+            LEFT JOIN User u ON p.UID = u.UID
+            WHERE p.ParentPID = ?
         `).all(parentId) as any[];
         return rows.map(row => ({
-            ...row,
-            imageUrls: row.imageUrls ? JSON.parse(row.imageUrls) : undefined
+            pid: row.pid,
+            title: row.title,
+            content: row.content,
+            forum: { forumId: row.forum } as any,
+            parentPost: row.parentPost ? { pid: row.parentPost } as any : undefined,
+            category: row.category ? { postCategoryId: row.category } as any : undefined,
+            publishedAt: row.publishedAt,
+            imageUrls: row.imageUrls ? JSON.parse(row.imageUrls) : undefined,
+            likes: row.likes,
+            dislikes: row.dislikes,
+            author: {
+                uid: row.authorUid,
+                username: row.authorUsername,
+                publicname: row.authorPublicname,
+                totalAura: row.authorTotalAura
+            } as User
         })) as Post[];
     }
 
@@ -67,6 +114,10 @@ export class PostRepository {
         const rows = db.prepare(`
             SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.ImageUrls as imageUrls, p.Likes as likes, p.Dislikes as dislikes,
                    u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname,
+                   (
+                       (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Post WHERE UID = u.UID) + 
+                       (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Comment WHERE UID = u.UID)
+                   ) as authorTotalAura,
                    COUNT(c.CID) as commentCount
             FROM Post p
             LEFT JOIN User u ON p.UID = u.UID
@@ -79,9 +130,9 @@ export class PostRepository {
             pid: row.pid,
             title: row.title,
             content: row.content,
-            forum: row.forum,
-            parentPost: row.parentPost,
-            category: row.category,
+            forum: { forumId: row.forum } as any,
+            parentPost: row.parentPost ? { pid: row.parentPost } as any : undefined,
+            category: row.category ? { postCategoryId: row.category } as any : undefined,
             publishedAt: row.publishedAt,
             imageUrls: row.imageUrls ? JSON.parse(row.imageUrls) : undefined,
             likes: row.likes,
@@ -90,7 +141,8 @@ export class PostRepository {
             author: {
                 uid: row.authorUid,
                 username: row.authorUsername,
-                publicname: row.authorPublicname
+                publicname: row.authorPublicname,
+                totalAura: row.authorTotalAura
             } as User
         })) as Post[];
     }
@@ -101,6 +153,10 @@ export class PostRepository {
         const rows = db.prepare(`
             SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.ImageUrls as imageUrls, p.Likes as likes, p.Dislikes as dislikes,
                    u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname,
+                   (
+                       (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Post WHERE UID = u.UID) + 
+                       (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Comment WHERE UID = u.UID)
+                   ) as authorTotalAura,
                    COUNT(c.CID) as commentCount
             FROM Post p
             LEFT JOIN User u ON p.UID = u.UID
@@ -113,9 +169,9 @@ export class PostRepository {
             pid: row.pid,
             title: row.title,
             content: row.content,
-            forum: row.forum,
-            parentPost: row.parentPost,
-            category: row.category,
+            forum: { forumId: row.forum } as any,
+            parentPost: row.parentPost ? { pid: row.parentPost } as any : undefined,
+            category: row.category ? { postCategoryId: row.category } as any : undefined,
             publishedAt: row.publishedAt,
             imageUrls: row.imageUrls ? JSON.parse(row.imageUrls) : undefined,
             likes: row.likes,
@@ -124,7 +180,8 @@ export class PostRepository {
             author: {
                 uid: row.authorUid,
                 username: row.authorUsername,
-                publicname: row.authorPublicname
+                publicname: row.authorPublicname,
+                totalAura: row.authorTotalAura
             } as User
         })) as Post[];
     }
@@ -133,12 +190,33 @@ export class PostRepository {
         const db = DB.getInstance();
 
         const rows = db.prepare(`
-            SELECT PID as pid, Title as title, Content as content, UID as author, ForumID as forum, ParentPID as parentPost, Post_Category_id as category, PublishedAt as publishedAt, ImageUrls as imageUrls, Likes as likes, Dislikes as dislikes FROM Post
-            WHERE Post_Category_id = ?
+            SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.ImageUrls as imageUrls, p.Likes as likes, p.Dislikes as dislikes,
+                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname,
+                   (
+                       (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Post WHERE UID = u.UID) + 
+                       (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Comment WHERE UID = u.UID)
+                   ) as authorTotalAura
+            FROM Post p
+            LEFT JOIN User u ON p.UID = u.UID
+            WHERE p.Post_Category_id = ?
         `).all(categoryId) as any[];
         return rows.map(row => ({
-            ...row,
-            imageUrls: row.imageUrls ? JSON.parse(row.imageUrls) : undefined
+            pid: row.pid,
+            title: row.title,
+            content: row.content,
+            forum: { forumId: row.forum } as any,
+            parentPost: row.parentPost ? { pid: row.parentPost } as any : undefined,
+            category: row.category ? { postCategoryId: row.category } as any : undefined,
+            publishedAt: row.publishedAt,
+            imageUrls: row.imageUrls ? JSON.parse(row.imageUrls) : undefined,
+            likes: row.likes,
+            dislikes: row.dislikes,
+            author: {
+                uid: row.authorUid,
+                username: row.authorUsername,
+                publicname: row.authorPublicname,
+                totalAura: row.authorTotalAura
+            } as User
         })) as Post[];
     }
 
@@ -210,6 +288,10 @@ export class PostRepository {
         const rows = db.prepare(`
             SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.ImageUrls as imageUrls, p.Likes as likes, p.Dislikes as dislikes,
                    u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname,
+                   (
+                       (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Post WHERE UID = u.UID) + 
+                       (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Comment WHERE UID = u.UID)
+                   ) as authorTotalAura,
                    COUNT(c.CID) as commentCount,
                    (p.Likes - p.Dislikes + COALESCE(COUNT(c.CID), 0) * 2) as TrendScore
             FROM Post p
@@ -237,7 +319,8 @@ export class PostRepository {
             author: {
                 uid: row.authorUid,
                 username: row.authorUsername,
-                publicname: row.authorPublicname
+                publicname: row.authorPublicname,
+                totalAura: row.authorTotalAura
             } as User
         })) as Post[];
     }

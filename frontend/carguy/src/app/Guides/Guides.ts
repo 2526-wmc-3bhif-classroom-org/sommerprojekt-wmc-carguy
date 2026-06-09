@@ -1,101 +1,140 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-export interface Guide {
-  id: number;
-  title: string;
-  description: string;
-  content: string[];
-}
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { GuideService, Guide } from '../services/guide-service';
+import { UserService } from '../services/user-service';
 
 @Component({
   selector: 'app-guides',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './Guides.html',
   styleUrl: './Guides.css'
 })
-export class GuidesComponent implements OnDestroy {
+export class GuidesComponent implements OnInit, OnDestroy {
+  private cdr = inject(ChangeDetectorRef);
   selectedGuide: Guide | null = null;
-  guides: Guide[] = [
-    {
-      id: 1,
-      title: 'Setting Up Your Profile',
-      description: 'Learn how to perfectly set up your profile and fill your virtual garage with your favorite cars.',
-      content: [
-        'First, navigate to your profile page by clicking your avatar in the top right corner.',
-        'Click on "Edit Profile" to add a personal bio, social links, and upload a profile picture that represents you.',
-        'To build your "Virtual Garage", click the "Add Vehicle" button. You can specify the make, model, year, and even upload photos of your actual car.',
-        'Don\'t forget to save your changes!'
-      ]
-    },
-    {
-      id: 2,
-      title: 'Finding the Right Community',
-      description: 'Discover how to find, join, and participate in the best car communities for your interests.',
-      content: [
-        'Navigate to the "Communities" tab using the main navigation bar.',
-        'You can browse through curated categories (like JDM, Muscle, or Euro) or use the search bar to find niche groups.',
-        'Once you find a community you like, click the "Join" button on the community card.',
-        'Introduce yourself in the community\'s main feed to start interacting with other enthusiasts!'
-      ]
-    },
-    {
-      id: 3,
-      title: 'Exploring Brands & Models',
-      description: 'A guide to efficiently using our brand directory to learn everything about your dream cars.',
-      content: [
-        'Click on "Brands" in the top navigation to view our comprehensive list of car manufacturers.',
-        'You can search for specific brands or sort them by popularity and region.',
-        'Clicking on a brand card will take you to its dedicated page, where you can see all their popular models, historical specs, and user reviews.',
-        'Use this section to research your next project car or dream build.'
-      ]
-    },
-    {
-      id: 4,
-      title: 'Crafting the Perfect Post',
-      description: 'Tips & tricks on how to create engaging posts in communities and start discussions.',
-      content: [
-        'Go to a community you have joined and click the "Create Post" button.',
-        'Start with a catchy, descriptive title so people know exactly what you are talking about.',
-        'In the description, provide enough context. If you are asking a mechanical question, include your car\'s exact year, make, and model.',
-        'Always try to attach high-quality photos. Car guys love pictures! A good photo can drastically increase your post\'s engagement.'
-      ]
-    },
-    {
-      id: 5,
-      title: 'Connecting with Others',
-      description: 'How to use our platform to exchange ideas and connect with other car enthusiasts.',
-      content: [
-        'The best way to connect is by being active in the comment sections of posts you find interesting.',
-        'Share your automotive knowledge, offer help to those asking questions, and be respectful to everyone.',
-        'If you find a user with a similar build or interests, click on their profile and check out their garage.',
-        'Building a network makes the CarGuy experience much more enjoyable.'
-      ]
-    },
-    {
-      id: 6,
-      title: 'Advanced Search Tips',
-      description: 'Master the search function to quickly and precisely find exactly the content, models, or members you are looking for.',
-      content: [
-        'Use the global search bar in the top navigation to look for specific topics.',
-        'You can filter your results to only show "Communities", "Brands", or specific "Posts".',
-        'For exact matches, wrap your search query in quotes. For example: "Porsche 911 GT3".',
-        'Use keywords like "help" or "build" alongside your car model to find relevant project threads.'
-      ]
+  guides: Guide[] = [];
+
+  // Form State
+  showCreateForm = false;
+  newGuideTitle = '';
+  newGuideDescription = '';
+  newGuideSteps: string[] = [''];
+  isSubmitting = false;
+  errorMessage = '';
+
+  get isLoggedIn(): boolean {
+    return UserService.isLoggedIn();
+  }
+
+  get canPostGuides(): boolean {
+    const user = UserService.getCurrentUser();
+    return user !== null && ((user.totalAura || 0) >= 100 || user.role === 'admin');
+  }
+
+  async ngOnInit() {
+    await this.refreshUserAura();
+    await this.loadGuides();
+  }
+
+  async refreshUserAura() {
+    const loggedInUser = UserService.getCurrentUser();
+    if (loggedInUser) {
+      try {
+        const updatedUser = await UserService.getUserById(loggedInUser.uid);
+        localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+        this.cdr.detectChanges();
+      } catch (err) {
+        console.error("Failed to refresh user aura:", err);
+      }
     }
-  ];
+  }
+
+  async loadGuides() {
+    try {
+      this.guides = await GuideService.getGuides();
+      this.cdr.detectChanges();
+    } catch (err) {
+      console.error("Failed to load guides:", err);
+    }
+  }
 
   openGuide(guide: Guide): void {
     this.selectedGuide = guide;
     // Prevent scrolling on the background when modal is open
     document.body.style.overflow = 'hidden';
+    this.cdr.detectChanges();
   }
 
   closeGuide(): void {
     this.selectedGuide = null;
     // Restore scrolling
     document.body.style.overflow = 'auto';
+    this.cdr.detectChanges();
+  }
+
+  openCreateForm() {
+    this.showCreateForm = true;
+    this.newGuideTitle = '';
+    this.newGuideDescription = '';
+    this.newGuideSteps = [''];
+    this.errorMessage = '';
+    document.body.style.overflow = 'hidden';
+    this.cdr.detectChanges();
+  }
+
+  closeCreateForm() {
+    this.showCreateForm = false;
+    document.body.style.overflow = 'auto';
+    this.cdr.detectChanges();
+  }
+
+  addStep() {
+    this.newGuideSteps.push('');
+    this.cdr.detectChanges();
+  }
+
+  removeStep(index: number) {
+    if (this.newGuideSteps.length > 1) {
+      this.newGuideSteps.splice(index, 1);
+    } else {
+      this.newGuideSteps[0] = '';
+    }
+    this.cdr.detectChanges();
+  }
+
+  async submitGuide() {
+    const title = this.newGuideTitle.trim();
+    const description = this.newGuideDescription.trim();
+    const steps = this.newGuideSteps.map(s => s.trim()).filter(s => s !== '');
+
+    if (!title || !description || steps.length === 0) {
+      this.errorMessage = 'Please fill out all fields and add at least one step.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.errorMessage = '';
+    this.cdr.detectChanges();
+
+    try {
+      await GuideService.createGuide(title, description, steps);
+      this.closeCreateForm();
+      await this.loadGuides();
+    } catch (err) {
+      if (err instanceof Error) {
+        this.errorMessage = err.message;
+      } else {
+        this.errorMessage = 'An unexpected error occurred.';
+      }
+      this.cdr.detectChanges();
+    } finally {
+      this.isSubmitting = false;
+      this.cdr.detectChanges();
+    }
   }
 
   // Ensure we restore scrolling if the user navigates away while the modal is open

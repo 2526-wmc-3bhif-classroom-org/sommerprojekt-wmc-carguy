@@ -3,6 +3,7 @@ import { forumRouter } from "./forums/forum-router";
 import { userRouter } from "./user/user-router";
 import { postRouter } from "./post/post-router";
 import { commentRouter } from "./comments/comment-router";
+import { guideRouter } from "./guides/guide-router";
 import { DB } from "./database";
 
 const app = express();
@@ -14,6 +15,7 @@ app.use("/api", forumRouter);
 app.use("/api", userRouter);
 app.use("/api", postRouter);
 app.use("/api", commentRouter);
+app.use("/api", guideRouter);
 
 const startServer = async () => {
     try {

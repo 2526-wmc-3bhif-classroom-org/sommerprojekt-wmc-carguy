@@ -14,6 +14,7 @@ export class UserRepository {
                 Title as title, 
                 Image as image, 
                 CreatedAt as createdAt,
+                Role as role,
                 (SELECT COUNT(*) FROM Post WHERE UID = User.UID) as totalPosts,
                 (SELECT COUNT(*) FROM Comment WHERE UID = User.UID) as totalComments,
                 (
@@ -37,6 +38,7 @@ export class UserRepository {
                 Title as title, 
                 Image as image, 
                 CreatedAt as createdAt,
+                Role as role,
                 (SELECT COUNT(*) FROM Post WHERE UID = User.UID) as totalPosts,
                 (SELECT COUNT(*) FROM Comment WHERE UID = User.UID) as totalComments,
                 (
@@ -61,6 +63,7 @@ export class UserRepository {
                 Title as title, 
                 Image as image, 
                 CreatedAt as createdAt,
+                Role as role,
                 (SELECT COUNT(*) FROM Post WHERE UID = User.UID) as totalPosts,
                 (SELECT COUNT(*) FROM Comment WHERE UID = User.UID) as totalComments,
                 (

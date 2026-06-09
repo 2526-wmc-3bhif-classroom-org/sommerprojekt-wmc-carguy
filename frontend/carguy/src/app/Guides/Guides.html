@@ -1,17 +1,32 @@
 <div class="mx-auto max-w-[1400px] px-8 py-12 min-h-screen pt-24 relative">
 
-  <header class="mb-12 flex items-start justify-between">
-    <div class="header w-full text-left">
+  <header class="mb-12 flex items-start justify-between flex-wrap gap-4">
+    <div class="header text-left">
       <h1 class="text-4xl font-semibold mb-2">Platform Guides</h1>
       <p class="text-lg opacity-80">Explore our comprehensive guides and tutorials to get the most out of CarGuy.</p>
     </div>
+    @if (canPostGuides) {
+      <button (click)="openCreateForm()" class="btn btn-primary">Create Guide</button>
+    }
   </header>
 
   <div class="guides-grid">
     @for (guide of guides; track guide.id) {
       <div class="guide-card card bg-base-100 shadow-xl border border-base-content/10 hover:border-accent transition-all duration-300">
         <div class="card-body">
-          <h2 class="card-title">{{ guide.title }}</h2>
+          <div class="text-xs opacity-60 mb-2 flex items-center gap-1.5 flex-wrap">
+            @if (guide.author) {
+              <a [routerLink]="['/profile', guide.author.uid]" class="hover:text-accent transition-colors flex items-center gap-1 font-medium">
+                By u/{{ guide.author.username }}
+                <span *ngIf="(guide.author.totalAura || 0) >= 100" class="tooltip tooltip-top" data-tip="Verified User (100+ Aura)">
+                  <svg class="text-success inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0 1 12 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 0 1 3.498 1.307 4.491 4.491 0 0 1 1.307 3.497A4.49 4.49 0 0 1 21.75 12a4.49 4.49 0 0 1-1.549 3.397 4.491 4.491 0 0 1-1.307 3.498 4.491 4.491 0 0 1-3.497 1.307A4.49 4.49 0 0 1 12 21.75a4.49 4.49 0 0 1-3.397-1.549 4.49 4.49 0 0 1-3.498-1.306 4.491 4.491 0 0 1-1.307-3.498A4.49 4.49 0 0 1 2.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 0 1 1.307-3.497 4.49 4.49 0 0 1 3.497-1.307Zm7.007 6.387a.75.75 0 0 0-1.06-1.061l-3.879 3.879-1.97-1.97a.75.75 0 1 0-1.06 1.06l2.5 2.5a.75.75 0 0 0 1.06 0l4.41-4.41Z" clip-rule="evenodd"/></svg>
+                </span>
+              </a>
+            } @else {
+              <span>By u/system</span>
+            }
+          </div>
+          <h2 class="card-title text-accent">{{ guide.title }}</h2>
           <p class="guide-description">{{ guide.description }}</p>
 
           <div class="card-actions justify-between items-center mt-4">
@@ -40,7 +55,23 @@
 
         <div class="mt-2 mb-6">
           <h2 class="text-3xl font-bold text-accent mb-2">{{ selectedGuide.title }}</h2>
-          <div class="flex items-center gap-4 text-sm opacity-70 mb-6 pb-4 border-b border-white/10"></div>
+          <div class="flex items-center gap-2 text-sm opacity-70 mb-6 pb-4 border-b border-white/10">
+            @if (selectedGuide.author) {
+              <span>Written by</span>
+              <a [routerLink]="['/profile', selectedGuide.author.uid]" (click)="closeGuide()" class="font-medium text-accent hover:underline flex items-center gap-1">
+                u/{{ selectedGuide.author.username }}
+                <span *ngIf="(selectedGuide.author.totalAura || 0) >= 100">
+                  <svg class="text-success inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0 1 12 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 0 1 3.498 1.307 4.491 4.491 0 0 1 1.307 3.497A4.49 4.49 0 0 1 21.75 12a4.49 4.49 0 0 1-1.549 3.397 4.491 4.491 0 0 1-1.307 3.498 4.491 4.491 0 0 1-3.497 1.307A4.49 4.49 0 0 1 12 21.75a4.49 4.49 0 0 1-3.397-1.549 4.49 4.49 0 0 1-3.498-1.306 4.491 4.491 0 0 1-1.307-3.498A4.49 4.49 0 0 1 2.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 0 1 1.307-3.497 4.49 4.49 0 0 1 3.497-1.307Zm7.007 6.387a.75.75 0 0 0-1.06-1.061l-3.879 3.879-1.97-1.97a.75.75 0 1 0-1.06 1.06l2.5 2.5a.75.75 0 0 0 1.06 0l4.41-4.41Z" clip-rule="evenodd"/></svg>
+                </span>
+              </a>
+            } @else {
+              <span>Written by system</span>
+            }
+            @if (selectedGuide.publishedAt) {
+              <span>•</span>
+              <span>{{ selectedGuide.publishedAt | date:'mediumDate' }}</span>
+            }
+          </div>
 
           <p class="text-lg opacity-90 mb-8 italic border-l-4 border-accent pl-4">
             {{ selectedGuide.description }}
@@ -62,6 +93,94 @@
 
         <div class="modal-action mt-8 pt-4 border-t border-white/10">
           <button (click)="closeGuide()" class="btn bg-accent text-base-content hover:bg-opacity-90 border-none">Got it, thanks!</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal for Creating a Guide -->
+  @if (showCreateForm) {
+    <div class="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-8">
+      <div class="modal-box bg-base-100 border border-primary shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative rounded-2xl p-8">
+
+        <button
+          (click)="closeCreateForm()"
+          class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 hover:bg-white/10 hover:text-primary">
+          ✕
+        </button>
+
+        <h2 class="text-3xl font-bold text-primary mb-6">Create a Guide</h2>
+
+        <div class="space-y-4">
+          <div class="form-control">
+            <label class="label"><span class="label-text font-semibold text-base-content/80">Guide Title</span></label>
+            <input
+              [(ngModel)]="newGuideTitle"
+              type="text"
+              placeholder="e.g. How to replace spark plugs"
+              class="input input-bordered w-full bg-white/5 text-base-content focus:border-primary"
+            />
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text font-semibold text-base-content/80">Short Description</span></label>
+            <textarea
+              [(ngModel)]="newGuideDescription"
+              placeholder="Provide a brief summary of what this guide covers..."
+              class="textarea textarea-bordered w-full bg-white/5 text-base-content focus:border-primary"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text font-semibold text-base-content/80">Steps</span></label>
+            <div class="space-y-3">
+              @for (step of newGuideSteps; track $index) {
+                <div class="flex gap-2 items-start">
+                  <div class="shrink-0 w-8 h-8 rounded-full bg-primary/20 border border-primary text-primary flex items-center justify-center font-bold text-sm mt-1">
+                    {{ $index + 1 }}
+                  </div>
+                  <input
+                    [(ngModel)]="newGuideSteps[$index]"
+                    type="text"
+                    placeholder="Describe this step..."
+                    class="input input-bordered flex-1 bg-white/5 text-base-content focus:border-primary"
+                  />
+                  <button
+                    (click)="removeStep($index)"
+                    [disabled]="newGuideSteps.length <= 1"
+                    class="btn btn-error btn-square btn-sm mt-1"
+                  >
+                    ✕
+                  </button>
+                </div>
+              }
+            </div>
+            <button (click)="addStep()" class="btn btn-outline btn-sm btn-primary w-fit mt-4">
+              + Add Step
+            </button>
+          </div>
+
+          @if (errorMessage) {
+            <div class="alert alert-error text-sm py-2 px-4 mt-4">
+              <span>{{ errorMessage }}</span>
+            </div>
+          }
+
+          <div class="modal-action mt-8 pt-4 border-t border-base-content/10 flex justify-end gap-3">
+            <button (click)="closeCreateForm()" class="btn btn-ghost">Cancel</button>
+            <button
+              (click)="submitGuide()"
+              [disabled]="isSubmitting || !newGuideTitle.trim() || !newGuideDescription.trim()"
+              class="btn btn-primary"
+            >
+              @if (isSubmitting) {
+                <span class="loading loading-spinner loading-sm"></span>
+              } @else {
+                Publish Guide
+              }
+            </button>
+          </div>
         </div>
       </div>
     </div>
