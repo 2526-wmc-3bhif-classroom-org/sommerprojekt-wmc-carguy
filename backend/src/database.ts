@@ -143,6 +143,7 @@ export class DB {
                                                  Description Text,
                                                  ParentForumID Integer,
                                                  Forum_Category_id Integer,
+                                                 AuthorID Integer,
                                                  CreatedAt Text not null,
                                                  constraint PK_Forum primary key (ForumID),
                 constraint FK_ForumParent foreign key (ParentForumID)
