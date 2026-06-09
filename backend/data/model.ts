@@ -62,6 +62,7 @@ export interface Forum {
   createdAt: Date;
   category?: ForumCategory;
   memberCount?: number;
+  authorId?: number;
 }
 
 export interface Comment {
