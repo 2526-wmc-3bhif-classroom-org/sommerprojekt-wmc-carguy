@@ -1,11 +1,12 @@
 import { Component, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule, NgForm } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { UserService } from '../services/user-service';
 
 @Component({
   selector: 'app-login-page',
-  imports: [FormsModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './login-page.html',
   styleUrl: './login-page.css',
 })
