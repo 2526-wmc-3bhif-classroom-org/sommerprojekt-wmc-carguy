@@ -5,8 +5,9 @@ import {CommunityDetailComponent} from './community-detail/community-detail';
 import {PostDetailComponent} from './post-detail/post-detail';
 import {ProfilePage} from './profile-page/profile-page';
 import {LoginPage} from './login-page/login-page';
-import {GuidesComponent} from './Guides/Guides';
+import { GuidesComponent } from './Guides/Guides';
 import { CreateCommunityComponent } from './create-community/create-community';
+import { SearchResultsComponent } from './search-results/search-results';
 
 export const routes: Routes = [
   { path: '', component: BrandDirectoryComponent },
@@ -18,4 +19,5 @@ export const routes: Routes = [
   { path: 'login', component: LoginPage },
   { path: 'guides', component: GuidesComponent },
   { path: 'create-community', component: CreateCommunityComponent },
+  { path: 'search', component: SearchResultsComponent },
 ];

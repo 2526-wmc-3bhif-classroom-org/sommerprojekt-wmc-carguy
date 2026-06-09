@@ -1,0 +1,9 @@
+/* Custom spacing and hover scales for search results */
+.card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab {
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
