@@ -109,7 +109,8 @@ export class UserService {
         newUsername: newUser.username,
         newPublicName: newUser.publicname,
         newDescription: newUser.description,
-        newImage: newUser.image
+        newImage: newUser.image,
+        newTitle: newUser.title
       })
     );
 
