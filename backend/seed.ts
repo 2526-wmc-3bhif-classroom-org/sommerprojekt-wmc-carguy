@@ -148,7 +148,6 @@ const postsData = [
         1, 1, 1, "2025-02-01T10:00:00.000Z",
         JSON.stringify([
             "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800",
-            "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800",
             "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?w=800"
         ]), 42, 3
     ],
@@ -163,8 +162,8 @@ const postsData = [
         "The upcoming M5 hybrid reportedly weighs over 5,300 lbs. While it has 717 hp, the sheer mass seems to defy the physics of a track sedan. Take a look at these spy shots and weight distribution spec sheets. Will this change the agility profile of BMW M permanently?",
         9, 1, 3, "2025-02-10T09:15:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800",
-            "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800"
+            "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800",
+            "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?w=800"
         ]), 64, 12
     ],
     [
@@ -316,8 +315,8 @@ const postsData = [
         "Just finished a full DIY wrap of my Audi RS3. Took me about 45 hours over two weekends. The satin green contrast with carbon fiber mirror caps looks amazing under sunlight.",
         8, 7, 5, "2025-03-24T16:20:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=800",
-            "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=800"
+            "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=800",
+            "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=800"
         ]), 98, 2
     ],
 
@@ -392,7 +391,7 @@ const postsData = [
         11, 11, 4, "2025-04-14T09:00:00.000Z",
         JSON.stringify([
             "https://images.unsplash.com/photo-1562141961-b5d185202685?w=800",
-            "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800"
+            "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=800"
         ]), 88, 0
     ],
     [
@@ -548,7 +547,7 @@ const postsData = [
         12, 10, 2, "2025-05-22T13:00:00.000Z",
         JSON.stringify([
             "https://images.unsplash.com/photo-1616422285623-13ff0162193c?w=800",
-            "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800"
+            "https://images.unsplash.com/photo-1618043701381-8012678f8cb0?w=800"
         ]), 89, 0
     ],
 
@@ -753,6 +752,74 @@ const postsData = [
         "Comparing the HP Reverb G2 vs Meta Quest 3 vs Pimax Crystal for frame rate stability, field of view, and cockpit text readability.",
         14, 14, 4, "2025-05-25T03:30:00.000Z",
         JSON.stringify([]), 45, 0
+    ],
+
+    // --- Additional posts with fitting car images ---
+
+    // BMW Forum (ForumID 1)
+    [
+        81, "BMW M4 CSL: The last pure M car?",
+        "The M4 CSL is 240 lbs lighter than the standard M4 Competition and produces 543 hp from the S58. Carbon fiber roof, bucket seats, and no rear seats. Is this the last truly hardcore BMW M car before full electrification?",
+        1, 1, 1, "2025-05-26T09:00:00.000Z",
+        JSON.stringify([
+            "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800",
+            "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?w=800"
+        ]), 88, 3
+    ],
+
+    // Mercedes-AMG Forum (ForumID 2)
+    [
+        82, "AMG GT Black Series: The pinnacle of AMG engineering",
+        "The GT Black Series with the flat-plane 730 hp V8 set a Nürburgring production car record. Here are detailed photos of the aerodynamic package — front splitter, adjustable wing, and dive planes.",
+        3, 2, 2, "2025-05-26T10:00:00.000Z",
+        JSON.stringify([
+            "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800",
+            "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=800"
+        ]), 134, 1
+    ],
+
+    // Audi Sport Forum (ForumID 3)
+    [
+        83, "Audi RS4 Avant B8: The sleeper wagon",
+        "The 4.2L FSI V8 in the B8 RS4 Avant revs to 8,250 RPM and sounds incredible. With a simple ECU tune you can push well past 450 hp. Here are dyno graphs and some canyon road shots of my silver example.",
+        8, 3, 5, "2025-05-26T11:00:00.000Z",
+        JSON.stringify([
+            "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=800",
+            "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=800"
+        ]), 76, 2
+    ],
+
+    // Porsche Purists Forum (ForumID 9)
+    [
+        84, "Porsche Cayman GT4 track walk: Spa-Francorchamps",
+        "Spent the weekend lapping Spa in my GT4 RS. The Eau Rouge complex at full speed with the flat-six screaming is a religious experience. Sharing onboard footage stills and paddock shots.",
+        11, 9, 2, "2025-05-26T12:00:00.000Z",
+        JSON.stringify([
+            "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800",
+            "https://images.unsplash.com/photo-1611245801317-112e6c1df8ed?w=800"
+        ]), 109, 0
+    ],
+
+    // JDM Legends Forum (ForumID 10)
+    [
+        85, "Nissan GT-R R35: A decade of tuning evolution",
+        "From stock 480 hp all the way to 1,500 hp with a built VR38DETT and Alpha Performance kit. The GT-R platform is the most tunable AWD supercar ever made. Build timeline photos inside.",
+        12, 10, 5, "2025-05-26T13:00:00.000Z",
+        JSON.stringify([
+            "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800",
+            "https://images.unsplash.com/photo-1618043701381-8012678f8cb0?w=800"
+        ]), 147, 2
+    ],
+
+    // Offroad & SUV Forum (ForumID 6)
+    [
+        86, "Toyota Land Cruiser 300 Series vs Defender 130: Overlanding battle",
+        "Both are top-tier expedition platforms. The LC300 has legendary reliability and resale value. The Defender has more premium tech and on-road comfort. Here are photos from a week-long Morocco desert trip.",
+        5, 6, 2, "2025-05-26T14:00:00.000Z",
+        JSON.stringify([
+            "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800",
+            "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=800"
+        ]), 93, 4
     ]
 ];
 

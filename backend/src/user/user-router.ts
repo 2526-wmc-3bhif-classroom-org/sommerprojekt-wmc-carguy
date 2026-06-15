@@ -123,4 +123,5 @@ userRouter.post("/update", requireAuth, (req: Request, res: Response) => {
         }
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({ message: "An unexpected error occurred" });
     }
+
 })

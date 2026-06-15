@@ -23,7 +23,17 @@
       "PowerShell(Start-Sleep 8; try { Invoke-RestMethod -Uri \"http://localhost:3000/api/posts/forum/1\" -TimeoutSec 5 | Select-Object pid, likes, commentCount | Select-Object -First 3 } catch { Write-Output \"Fehler: $_\" })",
       "PowerShell(try { $r = Invoke-RestMethod -Uri \"http://localhost:3000/api/posts/forum/1\" -TimeoutSec 5; $r | Select-Object pid, likes, commentCount | Select-Object -First 3 } catch { Write-Output \"Fehler: $_\" })",
       "PowerShell($r = Invoke-RestMethod -Uri \"http://localhost:3000/api/posts/forum/1\" -TimeoutSec 5; Write-Output \"Posts: $\\($r.Count\\)\"; $r | ForEach-Object { Write-Output \"pid=$\\($_.pid\\) likes=$\\($_.likes\\) commentCount=$\\($_.commentCount\\)\" })",
-      "PowerShell($r = Invoke-RestMethod -Uri \"http://localhost:3000/api/posts/1/like\" -Method PATCH; Write-Output \"like: $\\($r.message\\)\"; $r2 = Invoke-RestMethod -Uri \"http://localhost:3000/api/posts/1/unlike\" -Method PATCH; Write-Output \"unlike: $\\($r2.message\\)\")"
+      "PowerShell($r = Invoke-RestMethod -Uri \"http://localhost:3000/api/posts/1/like\" -Method PATCH; Write-Output \"like: $\\($r.message\\)\"; $r2 = Invoke-RestMethod -Uri \"http://localhost:3000/api/posts/1/unlike\" -Method PATCH; Write-Output \"unlike: $\\($r2.message\\)\")",
+      "Bash(npm start *)",
+      "Bash(echo \"PID: $!\")",
+      "Read(//tmp/**)",
+      "Bash(curl -s http://localhost:3000/api/guides)",
+      "Bash(pkill -f \"tsx ./src/server.ts\")",
+      "Bash(python3 -c \"import sys,json; guides=json.load\\(sys.stdin\\); [print\\(f'ID {g[\\\\\"id\\\\\"]}: {g[\\\\\"title\\\\\"]}'\\) for g in sorted\\(guides, key=lambda x: x['id']\\)]\")",
+      "Bash(node -e \"const d=require\\('fs'\\).readFileSync\\('/dev/stdin','utf8'\\); const g=JSON.parse\\(d\\); g.sort\\(\\(a,b\\)=>a.id-b.id\\).forEach\\(x=>console.log\\('ID',x.id,':',x.title\\)\\)\")",
+      "Bash(node -e \"const g=JSON.parse\\(require\\('fs'\\).readFileSync\\('/tmp/guides.json','utf8'\\)\\); g.sort\\(\\(a,b\\)=>a.id-b.id\\).forEach\\(x=>console.log\\('ID',x.id,':',x.title\\)\\)\")",
+      "Read(//c/3WMC/CarGuy/frontend/carguy/**)",
+      "Bash(echo \"Frontend PID: $!\")"
     ]
   }
 }
