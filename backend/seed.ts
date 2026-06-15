@@ -82,7 +82,9 @@ const forums = [
     [9, "Porsche Purists", "For fans of Zuffenhausen's sports cars: 911s, transaxle models, Cayman GT4, and GT3 RS builds.", null, 1, "2025-01-16T10:00:00.000Z"],
     [10, "JDM Legends", "Discussion on Japanese Domestic Market performance cars: GT-R, Supra, RX-7, Evo, STI, and MX-5.", null, 1, "2025-01-17T11:00:00.000Z"],
     [11, "Garage DIY & Maintenance", "Share your home mechanic advice, tool reviews, fluid change guides, and general troubleshooting tips.", null, 8, "2025-01-18T12:00:00.000Z"],
-    [12, "Automotive Photography", "Show off your high-quality car spots, camera settings, lens recommendations, and editing techniques.", null, 9, "2025-01-19T13:00:00.000Z"]
+    [12, "Automotive Photography", "Show off your high-quality car spots, camera settings, lens recommendations, and editing techniques.", null, 9, "2025-01-19T13:00:00.000Z"],
+    [13, "Classic Muscle Cars", "For fans of vintage American V8s: Mustangs, Camaros, Chargers, and restoration builds.", null, 7, "2025-01-20T10:00:00.000Z"],
+    [14, "Sim Racing & eSports", "Discuss rigs, wheelbases, Assetto Corsa, iRacing, Gran Turismo, and virtual lap times.", null, 10, "2025-01-21T11:00:00.000Z"]
 ];
 const insertForum = db.prepare("INSERT INTO Forum (ForumID, Name, Description, ParentForumID, Forum_Category_id, CreatedAt) VALUES (?, ?, ?, ?, ?, ?)");
 for (const f of forums) {
@@ -94,43 +96,43 @@ const pw = bcrypt.hashSync("password123", 10);
 const adminPw = bcrypt.hashSync("admin123", 10);
 
 const users = [
-    [1, "max_m3", pw, "Max M.", "BMW enthusiast since the E30 era. Track day regular. Current driver: Alpine White E92 M3.", "user", "BMW Veteran", "2025-01-15T12:00:00.000Z"],
-    [2, "speed_demon", pw, "Anna Speed", "Professional racing instructor and amateur GT3 racer. Love F1 and fast laps.", "user", "Track Instructor", "2025-01-16T08:30:00.000Z"],
-    [3, "carlo_amg", pw, "Carlo B.", "If it doesn't rumble, I don't drive it. AMG V8 advocate.", "user", "V8 Purist", "2025-01-20T14:00:00.000Z"],
-    [4, "tesla_tim", pw, "Tim Watts", "EV developer and software engineer. Electric is the future, deal with it.", "user", "EV Pioneer", "2025-01-21T10:00:00.000Z"],
-    [5, "offroad_sam", pw, "Sam Wilder", "Overlander. Land Cruiser owner. Seeking trails, mountains, and muddy campgrounds.", "user", "Trailblazer", "2025-01-22T11:00:00.000Z"],
-    [6, "classic_clara", pw, "Clara Vintage", "Restoring air-cooled Porsches and vintage muscle cars. Flat-six soundtrack is king.", "user", "Master Restorer", "2025-01-23T12:00:00.000Z"],
-    [7, "turbo_tommy", pw, "Tom Boost", "JDM tuner. Dedicated to turbo builds, custom offsets, and dyno runs.", "user", "Boost Addict", "2025-01-24T13:00:00.000Z"],
-    [8, "jerry_audi", pw, "Jerry Quattro", "Audi RS6 Avant driver. Wagons are the ultimate daily driver format.", "user", "Wagon Mafia", "2025-01-25T14:00:00.000Z"],
-    [9, "car_advisor", pw, "David L.", "Auto broker and car reviewer. Happy to help you decide your next financial mistake.", "user", "Buying Expert", "2025-01-26T15:00:00.000Z"],
-    [10, "admin", adminPw, "Platform Admin", "System administrator for CarGuy community. Keep it clean!", "admin", "Admin", "2025-01-10T09:00:00.000Z"],
-    [11, "porsche_pete", pw, "Pete Flat6", "Porsche collector. Owns a 993 Turbo, 997 GT3, and a Taycan Cross Turismo.", "user", "GT Collector", "2025-01-27T10:00:00.000Z"],
-    [12, "jdm_yuki", pw, "Yuki Sato", "Gran Turismo veteran. Owns a Midnight Purple R34 Skyline GT-R.", "user", "JDM Purist", "2025-01-28T11:00:00.000Z"],
-    [13, "clean_rig", pw, "Marcus Foam", "Detallist. Obsessed with paint correction, ceramic coatings, and snow foam.", "user", "Detailing Guru", "2025-01-29T12:00:00.000Z"],
-    [14, "virtual_racer", pw, "Sarah Sim", "Professional sim racer. Direct drive wheels, VR headsets, and virtual apexes.", "user", "Sim Expert", "2025-01-30T13:00:00.000Z"],
-    [15, "track_day_tony", pw, "Tony Apex", "Supercharged NA Miata project car owner. Weight reduction is free horsepower.", "user", "Miata Driver", "2025-01-31T14:00:00.000Z"]
+    [1, "max_m3", pw, "Max M.", "BMW enthusiast since the E30 era. Track day regular. Current driver: Alpine White E92 M3.", "user", "BMW Veteran", "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&h=120&fit=crop", "2025-01-15T12:00:00.000Z"],
+    [2, "speed_demon", pw, "Anna Speed", "Professional racing instructor and amateur GT3 racer. Love F1 and fast laps.", "user", "Track Instructor", "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop", "2025-01-16T08:30:00.000Z"],
+    [3, "carlo_amg", pw, "Carlo B.", "If it doesn't rumble, I don't drive it. AMG V8 advocate.", "user", "V8 Purist", "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=120&h=120&fit=crop", "2025-01-20T14:00:00.000Z"],
+    [4, "tesla_tim", pw, "Tim Watts", "EV developer and software engineer. Electric is the future, deal with it.", "user", "EV Pioneer", "https://images.unsplash.com/photo-1628157582853-a796fa650a6a?w=120&h=120&fit=crop", "2025-01-21T10:00:00.000Z"],
+    [5, "offroad_sam", pw, "Sam Wilder", "Overlander. Land Cruiser owner. Seeking trails, mountains, and muddy campgrounds.", "user", "Trailblazer", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop", "2025-01-22T11:00:00.000Z"],
+    [6, "classic_clara", pw, "Clara Vintage", "Restoring air-cooled Porsches and vintage muscle cars. Flat-six soundtrack is king.", "user", "Master Restorer", "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=120&h=120&fit=crop", "2025-01-23T12:00:00.000Z"],
+    [7, "turbo_tommy", pw, "Tom Boost", "JDM tuner. Dedicated to turbo builds, custom offsets, and dyno runs.", "user", "Boost Addict", "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop", "2025-01-24T13:00:00.000Z"],
+    [8, "jerry_audi", pw, "Jerry Quattro", "Audi RS6 Avant driver. Wagons are the ultimate daily driver format.", "user", "Wagon Mafia", "https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=120&h=120&fit=crop", "2025-01-25T14:00:00.000Z"],
+    [9, "car_advisor", pw, "David L.", "Auto broker and car reviewer. Happy to help you decide your next financial mistake.", "user", "Buying Expert", "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&h=120&fit=crop", "2025-01-26T15:00:00.000Z"],
+    [10, "admin", adminPw, "Platform Admin", "System administrator for CarGuy community. Keep it clean!", "admin", "Admin", "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&h=120&fit=crop", "2025-01-10T09:00:00.000Z"],
+    [11, "porsche_pete", pw, "Pete Flat6", "Porsche collector. Owns a 993 Turbo, 997 GT3, and a Taycan Cross Turismo.", "user", "GT Collector", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop", "2025-01-27T10:00:00.000Z"],
+    [12, "jdm_yuki", pw, "Yuki Sato", "Gran Turismo veteran. Owns a Midnight Purple R34 Skyline GT-R.", "user", "JDM Purist", "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop", "2025-01-28T11:00:00.000Z"],
+    [13, "clean_rig", pw, "Marcus Foam", "Detallist. Obsessed with paint correction, ceramic coatings, and snow foam.", "user", "Detailing Guru", "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&h=120&fit=crop", "2025-01-29T12:00:00.000Z"],
+    [14, "virtual_racer", pw, "Sarah Sim", "Professional sim racer. Direct drive wheels, VR headsets, and virtual apexes.", "user", "Sim Expert", "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&h=120&fit=crop", "2025-01-30T13:00:00.000Z"],
+    [15, "track_day_tony", pw, "Tony Apex", "Supercharged NA Miata project car owner. Weight reduction is free horsepower.", "user", "Miata Driver", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop", "2025-01-31T14:00:00.000Z"]
 ];
-const insertUser = db.prepare("INSERT INTO User (UID, Username, Password, PublicName, Description, Role, Title, CreatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+const insertUser = db.prepare("INSERT INTO User (UID, Username, Password, PublicName, Description, Role, Title, Image, CreatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 for (const u of users) {
-    insertUser.run(u[0], u[1], u[2], u[3], u[4], u[5], u[6], adjustDate(u[7] as string));
+    insertUser.run(u[0], u[1], u[2], u[3], u[4], u[5], u[6], u[7], adjustDate(u[8] as string));
 }
 
 // --- Communities Subscriptions (User_In_Forum) ---
 const subscriptions = [
-    [1, 1], [1, 5], [1, 7], [1, 11],
-    [2, 4], [2, 1], [2, 7], [2, 9],
-    [3, 2], [3, 5], [3, 7],
-    [4, 8], [4, 5], [4, 11],
-    [5, 6], [5, 5], [5, 11],
-    [6, 7], [6, 5], [6, 9], [6, 11],
-    [7, 7], [7, 10], [7, 11],
+    [1, 1], [1, 5], [1, 7], [1, 11], [1, 13],
+    [2, 4], [2, 1], [2, 7], [2, 9], [2, 14],
+    [3, 2], [3, 5], [3, 7], [3, 13],
+    [4, 8], [4, 5], [4, 11], [4, 14],
+    [5, 6], [5, 5], [5, 11], [5, 13],
+    [6, 7], [6, 5], [6, 9], [6, 11], [6, 13],
+    [7, 7], [7, 10], [7, 11], [7, 13],
     [8, 3], [8, 5], [8, 12],
-    [9, 5], [9, 1], [9, 2], [9, 3], [9, 9],
-    [11, 9], [11, 12], [11, 11],
+    [9, 5], [9, 1], [9, 2], [9, 3], [9, 9], [9, 13],
+    [11, 9], [11, 12], [11, 11], [11, 13],
     [12, 10], [12, 7], [12, 12],
     [13, 11], [13, 12], [13, 7],
-    [14, 4], [14, 10],
-    [15, 7], [15, 10], [15, 11]
+    [14, 4], [14, 10], [14, 14],
+    [15, 7], [15, 10], [15, 11], [15, 14]
 ];
 const insertSub = db.prepare("INSERT INTO User_In_Forum (UID, ForumID) VALUES (?, ?)");
 for (const sub of subscriptions) {
@@ -551,11 +553,206 @@ const postsData = [
     ],
 
     // --- DIY (ForumID 11) ---
+    // --- DIY (ForumID 11) ---
     [
         50, "Cleaning a dirty engine bay: Step-by-step instructions",
         "A dirty engine bay holds heat and makes it hard to spot oil leaks. Here is how to safely detail your engine bay using plastic wrap to protect the alternator, APC, and a soft detailing brush.",
         13, 11, 4, "2025-05-24T10:00:00.000Z",
         JSON.stringify([]), 55, 0
+    ],
+    // --- New BMW Posts (ForumID 1) ---
+    [
+        51, "M3 Competition G80: Is the grille growing on you?",
+        "After one year of ownership of the G80 M3 Competition, I have to admit the controversial front grille has completely grown on me. The performance of the S58 engine and the xDrive system is absolutely mindblowing. Track day shots inside!",
+        1, 1, 1, "2025-05-24T12:00:00.000Z",
+        JSON.stringify(["https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800"]), 40, 2
+    ],
+    [
+        52, "E46 M3 subframe reinforcement guide",
+        "Detailed guide on preparing, welding, and sealing the rear subframe reinforcement plates on the E46 chassis. Highly recommended to do before it cracks.",
+        1, 1, 4, "2025-05-24T13:00:00.000Z",
+        JSON.stringify([]), 30, 0
+    ],
+    // --- New Mercedes-AMG Posts (ForumID 2) ---
+    [
+        53, "C63 AMG W204 vs W205: Sound comparison",
+        "Is the hot-V twin-turbo 4.0L V8 in the W205 actually louder than the legendary 6.2L NA V8 in the W204? Share your decibel readings and exhaust modifications.",
+        3, 2, 1, "2025-05-24T14:00:00.000Z",
+        JSON.stringify([]), 35, 1
+    ],
+    [
+        54, "AMG ONE hypercar: F1 tech on the street",
+        "Discussing the engineering marvel of the Mercedes-AMG ONE. Fitting a literal 1.6L F1 hybrid engine into a road-legal car is insane.",
+        2, 2, 3, "2025-05-24T14:30:00.000Z",
+        JSON.stringify([]), 55, 0
+    ],
+    // --- New Audi Sport Posts (ForumID 3) ---
+    [
+        55, "RS3 5-Cylinder: The best sounding hot hatch?",
+        "The 2.5 TFSI engine has a unique 1-2-4-5-3 firing order that sounds like a mini V10. Installed a Milltek exhaust. Cold start video clip.",
+        8, 3, 1, "2025-05-24T15:00:00.000Z",
+        JSON.stringify(["https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=800"]), 62, 1
+    ],
+    [
+        56, "Audi Quattro UR-Quattro restoration journey",
+        "Starting a restoration of a 1983 Audi Ur-Quattro. Finding parts for the early 10V engine is proving to be a massive challenge. Any leads on body panels?",
+        6, 3, 5, "2025-05-24T15:30:00.000Z",
+        JSON.stringify([]), 47, 0
+    ],
+    // --- New Formula 1 Posts (ForumID 4) ---
+    [
+        57, "F1 2026 Engine Rules: More electric power",
+        "The MGU-H is dropped, and electric power is tripled to 350kW. Will this make the cars feel like heavy hybrids, or will the power delivery be spectacular?",
+        2, 4, 3, "2025-05-24T16:00:00.000Z",
+        JSON.stringify([]), 29, 3
+    ],
+    [
+        58, "Top 10 F1 livery designs of all time",
+        "From the Jordan 191 to the JPS Lotus and Marlboro McLaren. What is your favorite F1 paint scheme ever designed?",
+        14, 4, 1, "2025-05-24T16:30:00.000Z",
+        JSON.stringify(["https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800"]), 48, 2
+    ],
+    // --- New Car Buying Advice Posts (ForumID 5) ---
+    [
+        59, "Should I buy a high mileage Porsche Cayman 987?",
+        "Found a 2007 Cayman 2.7L with 120k miles for $14,000. Spotless service history but IMS has not been retrofitted. Is it worth the gamble?",
+        9, 5, 4, "2025-05-24T17:00:00.000Z",
+        JSON.stringify([]), 18, 1
+    ],
+    [
+        60, "Best reliable winter daily driver under 10k$",
+        "Need a dependable daily for snowy commutes. Thinking Subaru Impreza vs Mazda 3 AWD vs Lexus RX350. What has the best rust resistance?",
+        9, 5, 4, "2025-05-24T17:30:00.000Z",
+        JSON.stringify([]), 22, 0
+    ],
+    // --- New Offroad & SUV Posts (ForumID 6) ---
+    [
+        61, "Suzuki Jimny overland build: Tiny but capable",
+        "Fitting my Jimny with a custom drawer system, 2-inch lift, and roof rack. Who says you need a massive rig to explore the wilderness?",
+        5, 6, 5, "2025-05-24T18:00:00.000Z",
+        JSON.stringify(["https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800"]), 73, 1
+    ],
+    [
+        62, "Recovery tracks: MaxTrax vs cheaper alternatives",
+        "Are original MaxTrax really worth $300, or do the cheap $80 recovery boards do the same job when you are stuck in deep mud?",
+        5, 6, 2, "2025-05-24T18:30:00.000Z",
+        JSON.stringify([]), 39, 2
+    ],
+    // --- New Tuning & Customization Posts (ForumID 7) ---
+    [
+        63, "Stage 2 tuning checklist for VAG 2.0 TSI engines",
+        "Downpipe, intercooler, intake, and clutch upgrade requirements before flashing a Stage 2 ECU tune. Sharing dyno graphs.",
+        7, 7, 4, "2025-05-24T19:00:00.000Z",
+        JSON.stringify([]), 41, 0
+    ],
+    [
+        64, "Tein vs BC Racing coilovers: Budget review",
+        "Comparing ride comfort and track durability of BC Racing BR series vs Tein Flex Z coilovers on a daily driven sports car.",
+        7, 7, 2, "2025-05-24T19:30:00.000Z",
+        JSON.stringify([]), 33, 1
+    ],
+    // --- New Tesla & EV Lounge Posts (ForumID 8) ---
+    [
+        65, "Tesla Model 3 Highland review: Solid improvements",
+        "Having driven the refreshed Model 3 for 5,000 miles, the suspension comfort and cabin quietness are a massive step up from the pre-refresh version.",
+        4, 8, 2, "2025-05-24T20:00:00.000Z",
+        JSON.stringify([]), 52, 3
+    ],
+    [
+        66, "Solid State batteries: Timeline and expectations",
+        "When will we actually see solid state batteries in production EVs? Toyota claims 2027, but scaling mass manufacturing is a different beast.",
+        4, 8, 3, "2025-05-24T20:30:00.000Z",
+        JSON.stringify([]), 28, 0
+    ],
+    // --- New Porsche Purists Posts (ForumID 9) ---
+    [
+        67, "Porsche 996: The most undervalued 911?",
+        "With the headlights and IMS issues driving prices down, a clean manual 996 Carrera under 20k$ seems like the ultimate entry point to 911 ownership.",
+        11, 9, 1, "2025-05-24T21:00:00.000Z",
+        JSON.stringify(["https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=800"]), 49, 2
+    ],
+    [
+        68, "Porsche 928 GTS restoration: Mechanical nightmare",
+        "The vacuum lines and wiring harnesses on the late 928 V8 are incredibly complex. Spent the weekend diagnosing a parasitic battery drain.",
+        6, 9, 5, "2025-05-24T21:30:00.000Z",
+        JSON.stringify([]), 36, 0
+    ],
+    // --- New JDM Legends Posts (ForumID 10) ---
+    [
+        69, "Subaru WRX STI EJ25 engine safety mods",
+        "How to prevent the notorious ringland failure: cylinder 4 chamber cooling mod, oil pickup upgrade, and a high-quality tune.",
+        12, 10, 4, "2025-05-24T22:00:00.000Z",
+        JSON.stringify([]), 63, 1
+    ],
+    [
+        70, "Honda Civic Type R EK9: The high-revving hatch",
+        "There is something magical about a naturally aspirated 1.6L B16B engine screaming all the way to 8,200 RPM in a chassis that weighs under 2,400 lbs.",
+        12, 10, 1, "2025-05-24T22:30:00.000Z",
+        JSON.stringify(["https://images.unsplash.com/photo-1618043701381-8012678f8cb0?w=800"]), 85, 0
+    ],
+    // --- New Garage DIY & Maintenance Posts (ForumID 11) ---
+    [
+        71, "Best engine oil brands: Project lab analysis",
+        "Comparing Mobil1 vs Liqui Moly vs Pennzoil Platinum after 5,000 miles of track and daily driving. Oil analysis sheets attached.",
+        11, 11, 1, "2025-05-24T23:00:00.000Z",
+        JSON.stringify([]), 59, 1
+    ],
+    [
+        72, "How to fix a stripped thread: Time-Sert vs Heli-Coil",
+        "If you stripped an oil pan bolt thread, here is why a Time-Sert solid bushing is far superior and more reliable than a Heli-Coil spring wire.",
+        11, 11, 4, "2025-05-24T23:30:00.000Z",
+        JSON.stringify([]), 44, 0
+    ],
+    // --- New Automotive Photography Posts (ForumID 12) ---
+    [
+        73, "Panning shots tutorial: Capturing motion at 1/30s",
+        "How to track a moving car with your camera to blur the background while keeping the vehicle razor sharp. Settings, lens choice, and technique tips.",
+        12, 12, 4, "2025-05-25T00:00:00.000Z",
+        JSON.stringify(["https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=800"]), 92, 1
+    ],
+    [
+        74, "Best lenses for car shows: 35mm vs 50mm vs 85mm",
+        "Comparing focal lengths in crowded spaces. The 35mm is great for tight spots, but the 85mm creates beautiful isolation if you have the distance.",
+        13, 12, 1, "2025-05-25T00:30:00.000Z",
+        JSON.stringify([]), 38, 0
+    ],
+    // --- New Classic Muscle Cars Posts (ForumID 13) ---
+    [
+        75, "1969 Dodge Charger restoration: Barn find build",
+        "Starting a restoration on a Charger found in a barn. Rusted floor pans need replacing, and the 440 Magnum engine needs a full rebuild. Teardown photos!",
+        6, 13, 5, "2025-05-25T01:00:00.000Z",
+        JSON.stringify(["https://images.unsplash.com/photo-1616422285623-13ff0162193c?w=800"]), 115, 0
+    ],
+    [
+        76, "Classic Ford Mustang: Restomod vs Original spec",
+        "Should a vintage Mustang be kept strictly stock with drum brakes and points ignition, or retrofitted with modern suspension, disc brakes, and EFI?",
+        6, 13, 1, "2025-05-25T01:30:00.000Z",
+        JSON.stringify([]), 64, 4
+    ],
+    [
+        77, "LS Swap everything: The ultimate engine swap debate",
+        "Is putting a modern Chevy LS V8 into a classic Dodge or Ford a brilliant performance upgrade or a complete insult to automotive heritage?",
+        3, 13, 1, "2025-05-25T02:00:00.000Z",
+        JSON.stringify([]), 49, 12
+    ],
+    // --- New Sim Racing & Gaming Posts (ForumID 14) ---
+    [
+        78, "Sim Racing rig setup: Aluminum extrusion guide",
+        "Why building a custom rig using 8020 aluminum extrusion is the most cost-effective and rigid solution for direct-drive wheelbases.",
+        14, 14, 5, "2025-05-25T02:30:00.000Z",
+        JSON.stringify(["https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=800"]), 83, 1
+    ],
+    [
+        79, "Assetto Corsa vs iRacing: Physics comparison",
+        "Which sim offers the most realistic tire slip angles, force feedback detail, and online multiplayer safety rating systems?",
+        14, 14, 1, "2025-05-25T03:00:00.000Z",
+        JSON.stringify([]), 72, 3
+    ],
+    [
+        80, "Best VR headset for sim racing in 2025",
+        "Comparing the HP Reverb G2 vs Meta Quest 3 vs Pimax Crystal for frame rate stability, field of view, and cockpit text readability.",
+        14, 14, 4, "2025-05-25T03:30:00.000Z",
+        JSON.stringify([]), 45, 0
     ]
 ];
 
@@ -737,7 +934,22 @@ const commentsData = [
     // Thread on Engine Bay Cleaning (Post 50)
     [78, "Never spray high-pressure water directly at the fuse box or ignition coils. Gentle mist only!", 11, 50, null, "2025-05-24T10:30:00.000Z", 38, 0],
     [79, "Yes. Cover them with plastic grocery bags first and use a leaf blower to dry it off immediately.", 13, 50, 78, "2025-05-24T11:00:00.000Z", 29, 0],
-    [80, "Used this guide today. My engine bay looks like it just rolled off the assembly line. Thanks!", 1, 50, null, "2025-05-24T15:00:00.000Z", 18, 0]
+    [80, "Used this guide today. My engine bay looks like it just rolled off the assembly line. Thanks!", 1, 50, null, "2025-05-24T15:00:00.000Z", 18, 0],
+    // New threads on newly created posts
+    [101, "The G80 grille definitely looks better in person than in pictures. The S58 is an absolute beast.", 2, 51, null, "2025-05-24T12:15:00.000Z", 15, 0],
+    [102, "Totally agree. The performance makes you forget about the design anyway. Stage 1 tune gets you to 600hp easily.", 7, 51, 101, "2025-05-24T12:30:00.000Z", 8, 0],
+    [103, "W204 NA V8 sounds way more raw and mechanical. The W205 has a deep rumble but you can hear the turbos silencing the top end.", 1, 53, null, "2025-05-24T14:15:00.000Z", 12, 1],
+    [104, "VAG 2.5 TFSI is one of the greatest engines ever. The sound is unmatched in the hot-hatch segment.", 3, 55, null, "2025-05-24T15:10:00.000Z", 25, 0],
+    [105, "Love the Jimny! It's proof that you don't need a massive 100k Land Cruiser to go overlanding.", 5, 61, null, "2025-05-24T18:15:00.000Z", 18, 0],
+    [106, "Highland is indeed a massive upgrade in build quality. No more panel gap issues and the suspension is actually comfortable.", 4, 65, null, "2025-05-24T20:15:00.000Z", 14, 1],
+    [107, "B16B screaming VTEC at 8,200 RPM is pure automotive therapy. Modern turbo cars are fast but don't give you that engagement.", 15, 70, null, "2025-05-24T22:45:00.000Z", 30, 0],
+    [108, "Liqui Moly Leichtlauf is my go-to for my German track cars. Clean Blackstone reports every time.", 11, 71, null, "2025-05-24T23:15:00.000Z", 22, 0],
+    [109, "A 1969 Charger is the holy grail of muscle cars. Keep us posted with pictures as you progress!", 6, 75, null, "2025-05-25T01:15:00.000Z", 41, 0],
+    [110, "8020 aluminum profile is the only way to go. Zero flex even with a 25Nm direct-drive wheelbase.", 14, 78, null, "2025-05-25T02:45:00.000Z", 19, 0],
+    [111, "Mustang restomods are beautiful if done right. A modern suspension makes them actually handle corners.", 6, 76, null, "2025-05-25T01:45:00.000Z", 14, 2],
+    [112, "LS swaps are cheap power, but they ruin the soul of vintage Mustangs/Chargers. Keep it brand loyal!", 3, 77, null, "2025-05-25T02:15:00.000Z", 21, 5],
+    [113, "iRacing has the best online competitive structure, but Assetto Corsa has the best mods and cruising servers.", 14, 79, null, "2025-05-25T03:15:00.000Z", 12, 0],
+    [114, "Quest 3 is the sweet spot for VR. Great lenses and easy setup, though Pimax has better FOV if you have the budget.", 14, 80, null, "2025-05-25T03:45:00.000Z", 9, 0]
 ];
 
 const insertComment = db.prepare(`
@@ -752,9 +964,9 @@ db.close();
 
 console.log("Rich car community seed inserted successfully!");
 console.log("  Categories: 10 categories loaded");
-console.log("  Forums: 12 active forums loaded");
+console.log("  Forums: 14 active forums loaded");
 console.log("  Users: 15 active profiles loaded (passwords: 'password123', admin: 'admin123')");
-console.log("  Subscribers: 46 memberships mapped");
-console.log("  Posts: 50 media-rich posts loaded");
-console.log("  Comments: 100 detailed replies and sub-threads loaded");
-console.log("Total entries in database: ~230+ entries populated.");
+console.log("  Subscribers: 58 memberships mapped");
+console.log("  Posts: 80 media-rich posts loaded");
+console.log("  Comments: 114 detailed replies and sub-threads loaded");
+console.log("Total entries in database: ~300+ entries populated.");
