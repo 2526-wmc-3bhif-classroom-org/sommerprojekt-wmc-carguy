@@ -288,6 +288,9 @@ export class PostRepository {
         const rows = db.prepare(`
             SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, p.ParentPID as parentPost, p.Post_Category_id as category, p.PublishedAt as publishedAt, p.ImageUrls as imageUrls, p.Likes as likes, p.Dislikes as dislikes,
                    u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname,
+                   f.Name as forumName,
+                   fc.Forum_Category_id as forumCategoryId,
+                   fc.Forum_Category_Name as forumCategoryName,
                    (
                        (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Post WHERE UID = u.UID) + 
                        (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Comment WHERE UID = u.UID)
@@ -297,6 +300,8 @@ export class PostRepository {
             FROM Post p
             LEFT JOIN User u ON p.UID = u.UID
             LEFT JOIN Comment c ON p.PID = c.PID
+            LEFT JOIN Forum f ON p.ForumID = f.ForumID
+            LEFT JOIN Forum_Category fc ON f.Forum_Category_id = fc.Forum_Category_id
             WHERE p.ParentPID IS NULL
               AND p.PublishedAt >= datetime('now', '-7 days')
             GROUP BY p.PID
@@ -308,7 +313,14 @@ export class PostRepository {
             pid: row.pid,
             title: row.title,
             content: row.content,
-            forum: { forumId: row.forum } as any,
+            forum: {
+                forumId: row.forum,
+                name: row.forumName,
+                category: row.forumCategoryId ? {
+                    forumCategoryId: row.forumCategoryId,
+                    forumCategoryName: row.forumCategoryName
+                } : undefined
+            } as any,
             parentPost: row.parentPost ? { pid: row.parentPost } as any : undefined,
             category: row.category ? { postCategoryId: row.category } as any : undefined,
             publishedAt: row.publishedAt,

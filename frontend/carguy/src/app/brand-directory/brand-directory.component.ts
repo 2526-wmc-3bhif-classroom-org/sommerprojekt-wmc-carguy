@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ForumService } from '../services/forum-service';
 import { PostService } from '../services/post-service';
-import { Forum, Post } from '../../model';
+import { Forum, ForumCategory, Post } from '../../model';
 import { getBrandColor } from '../brand-colors';
 import { openImageModal, scrollToSlide } from '../image-modal';
 
@@ -17,6 +17,8 @@ import { openImageModal, scrollToSlide } from '../image-modal';
 export class BrandDirectoryComponent implements OnInit {
 
   forums: Forum[] = [];
+  categories: ForumCategory[] = [];
+  selectedCategoryId: number | null = null;
   trendingForums: Forum[] = [];
   trendingPosts: Post[] = [];
   selectedImage: string | null = null;
@@ -62,11 +64,58 @@ export class BrandDirectoryComponent implements OnInit {
     return num.toString();
   }
 
+  selectCategory(categoryId: number | null) {
+    this.selectedCategoryId = categoryId;
+  }
+
+  get filteredTrendingForums(): Forum[] {
+    if (this.selectedCategoryId === null) {
+      return this.trendingForums;
+    }
+    return this.trendingForums.filter(
+      forum => forum.category?.forumCategoryId === this.selectedCategoryId
+    );
+  }
+
+  get filteredTrendingPosts(): Post[] {
+    if (this.selectedCategoryId === null) {
+      return this.trendingPosts;
+    }
+    return this.trendingPosts.filter(
+      post => post.forum?.category?.forumCategoryId === this.selectedCategoryId
+    );
+  }
+
+  scrollPosts(carousel: HTMLDivElement, direction: 'left' | 'right') {
+    const scrollAmount = 340; // width of card + gap
+    if (direction === 'left') {
+      carousel.scrollLeft -= scrollAmount;
+    } else {
+      carousel.scrollLeft += scrollAmount;
+    }
+  }
+
   async ngOnInit() {
     try {
       this.forums = await this.forumService.getAllForums();
-      this.trendingForums = await this.forumService.getTrendingForums(4);
-      this.trendingPosts = await this.postService.getTrendingPosts(10);
+      this.categories = await this.forumService.getAllCategories();
+      this.trendingForums = await this.forumService.getTrendingForums(12);
+      const posts = await this.postService.getTrendingPosts(30);
+
+      // Map forum category details from the loaded forums list to the posts
+      this.trendingPosts = posts.map(post => {
+        const matchingForum = this.forums.find(f => f.forumId === post.forum?.forumId);
+        if (matchingForum) {
+          return {
+            ...post,
+            forum: {
+              ...post.forum,
+              category: matchingForum.category
+            }
+          };
+        }
+        return post;
+      });
     } catch (error) {
       console.error('Failed to load dashboard data', error);
     }
