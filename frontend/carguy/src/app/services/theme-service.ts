@@ -48,8 +48,8 @@ export class ThemeService {
           clipPath: clipPath
         },
         {
-          duration: 400,
-          easing: 'ease-in-out',
+          duration: 300,
+          easing: 'linear',
           pseudoElement: '::view-transition-new(root)'
         }
       );

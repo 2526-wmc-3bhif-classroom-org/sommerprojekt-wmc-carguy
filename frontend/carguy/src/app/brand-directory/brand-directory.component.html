@@ -51,7 +51,7 @@
         <!-- Scrollable Wrapper -->
         <div #postsCarousel class="flex overflow-x-auto gap-6 pb-4 scroll-smooth scrollbar-none snap-x snap-mandatory">
           @for (post of filteredTrendingPosts; track post.pid) {
-          <div [routerLink]="['/post', post.pid]" class="premium-card rounded-3xl group/card cursor-pointer flex flex-col justify-between min-w-[320px] md:min-w-[400px] max-w-[450px] snap-start shrink-0 overflow-hidden shadow-lg border border-base-200/60 hover:border-primary/30 transition-all duration-300">
+          <div [routerLink]="['/post', post.pid]" class="premium-card rounded-3xl group/card cursor-pointer flex flex-col justify-between min-w-[320px] md:min-w-[400px] max-w-[450px] snap-start shrink-0 overflow-hidden shadow-lg border border-base-200/60 hover:border-primary/30 transition-[transform,opacity,box-shadow] duration-300">
             
             @if (post.imageUrls && post.imageUrls.length > 0) {
               <!-- Post Image Header (Full width) -->
@@ -140,7 +140,7 @@
         <div [routerLink]="['/community', forum.forumId]" class="premium-card rounded-3xl group cursor-pointer p-5">
           <h3 class="text-xl font-bold mb-2 group-hover:text-accent transition-colors">{{ forum.name }}</h3>
           <p class="text-sm text-base-content/70 line-clamp-2 mb-4">{{ forum.description }}</p>
-          <a class="text-accent font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+          <a class="text-accent font-semibold flex items-center gap-1 group-hover:gap-2 transition-[transform,opacity,box-shadow]">
             Explore <span class="text-lg">›</span>
           </a>
         </div>

@@ -173,7 +173,7 @@
 
         <!-- Comment list -->
         <ng-template #commentTemplate let-comment="comment" let-depth="depth">
-          <div class="relative transition-all duration-300" [ngClass]="depth > 0 ? 'ml-4 sm:ml-8 mt-4 pl-3 sm:pl-4 border-l-2 border-base-content/10 hover:border-primary/40' : 'mb-6'">
+          <div class="relative transition-[transform,opacity,box-shadow] duration-300" [ngClass]="depth > 0 ? 'ml-4 sm:ml-8 mt-4 pl-3 sm:pl-4 border-l-2 border-base-content/10 hover:border-primary/40' : 'mb-6'">
             
             <div class="premium-card p-6 rounded-2xl flex gap-4">
               <!-- Comment Votes -->
@@ -308,7 +308,7 @@
     <div class="text-center py-20">
       <h2 class="text-2xl font-semibold text-accent mb-2">Post not found</h2>
       <p class="text-base-content/60 mb-6">This post doesn't exist or was removed.</p>
-      <a routerLink="/communities" class="btn px-4 py-2 border border-accent text-accent rounded-md hover:bg-accent hover:text-base-content transition-all duration-300 text-sm">Back to Communities</a>
+      <a routerLink="/communities" class="btn px-4 py-2 border border-accent text-accent rounded-md hover:bg-accent hover:text-base-content transition-[transform,opacity,box-shadow] duration-300 text-sm">Back to Communities</a>
     </div>
   }
 
