@@ -76,7 +76,7 @@
 
 /* Custom CarGuy Spacing and Card Styling */
 .stat-card {
-  @apply p-6 rounded-xl border border-accent/10 flex flex-col justify-center items-center text-center bg-base-100;
+  @apply p-6 rounded-3xl border border-base-content/10 flex flex-col justify-center items-center text-center bg-base-200/40 backdrop-blur-sm transition-all duration-300 hover:border-primary/20 hover:-translate-y-[2px] hover:shadow-lg;
   min-height: 140px;
 }
 
@@ -129,4 +129,13 @@ body {
 }
 [data-theme="light"] .premium-card {
   background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.005) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+/* Premium Glassmorphic Page Headers */
+.premium-header {
+  @apply bg-base-200/50 backdrop-blur-md border border-base-content/10 rounded-3xl p-8 relative overflow-hidden shadow-xl;
+  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 100%);
+}
+[data-theme="light"] .premium-header {
+  background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0) 100%);
 }

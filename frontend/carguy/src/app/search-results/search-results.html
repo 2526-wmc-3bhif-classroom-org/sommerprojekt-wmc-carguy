@@ -1,11 +1,14 @@
 <div class="mx-auto max-w-[1400px] px-8 py-12 bg-base-100 min-h-screen">
   
   <!-- Header Section -->
-  <header class="mb-10 mt-12">
-    <h1 class="text-4xl font-extrabold text-primary mb-2">Search Results</h1>
-    <p class="text-base-content/60 text-lg">
-      Showing results for <span class="text-accent font-semibold">"{{ searchQuery }}"</span>
-    </p>
+  <header class="premium-header mb-10 mt-12">
+    <div class="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent"></div>
+    <div class="relative z-10">
+      <h1 class="text-4xl font-extrabold text-primary mb-2">Search Results</h1>
+      <p class="text-base-content/60 text-lg">
+        Showing results for <span class="text-accent font-semibold">"{{ searchQuery }}"</span>
+      </p>
+    </div>
   </header>
 
   <!-- Tabs Section -->
@@ -46,8 +49,8 @@
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <a *ngFor="let forum of searchResults.communities.slice(0, 3)" [routerLink]="['/community', forum.forumId]" 
-             class="card bg-base-200 border border-base-content/10 hover:border-primary transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer">
-            <div class="card-body p-6 flex flex-row items-center gap-4">
+             class="premium-card rounded-3xl border border-base-content/10 hover:border-primary transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer block overflow-hidden">
+            <div class="p-6 flex flex-row items-center gap-4">
               <div class="w-12 h-12 rounded-xl bg-accent flex items-center justify-center text-white font-extrabold shrink-0">
                 {{ getInitials(forum.name) }}
               </div>
@@ -72,7 +75,7 @@
         </h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           <a *ngFor="let user of searchResults.users.slice(0, 3)" [routerLink]="['/profile', user.uid]"
-             class="card bg-base-200 border border-base-content/10 hover:border-primary transition-all duration-300 p-6 flex flex-row items-center gap-4 cursor-pointer">
+             class="premium-card rounded-3xl border border-base-content/10 hover:border-primary transition-all duration-300 p-6 flex flex-row items-center gap-4 cursor-pointer block">
             <div class="w-12 h-12 rounded-full bg-base-300 flex items-center justify-center text-lg font-bold text-primary border border-base-content/10 shrink-0 overflow-hidden">
               <img *ngIf="user.image" [src]="user.image" class="w-full h-full object-cover">
               <span *ngIf="!user.image">{{ user.publicname.charAt(0) || 'U' }}</span>
@@ -100,7 +103,7 @@
         </h2>
         <div class="space-y-4">
           <a *ngFor="let post of searchResults.posts.slice(0, 3)" [routerLink]="['/post', post.pid]"
-             class="p-6 rounded-xl border border-base-content/10 bg-base-200 hover:border-primary hover:shadow-lg transition-all duration-300 block cursor-pointer">
+             class="p-6 rounded-3xl border border-base-content/10 premium-card hover:border-primary hover:shadow-lg transition-all duration-300 block cursor-pointer">
             <div class="flex gap-4">
               <div class="flex flex-col items-center gap-2 text-base-content/50 min-w-[40px]">
                 <div class="flex flex-col items-center">
@@ -133,7 +136,7 @@
 
       <!-- Global Empty State -->
       <div *ngIf="searchResults.posts.length === 0 && searchResults.users.length === 0 && searchResults.communities.length === 0"
-           class="card bg-base-200 border border-base-content/10 p-12 text-center rounded-2xl min-h-[300px] flex flex-col items-center justify-center shadow-inner">
+           class="premium-card border border-base-content/10 p-12 text-center rounded-3xl min-h-[300px] flex flex-col items-center justify-center shadow-inner">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-base-content/30 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
@@ -146,7 +149,7 @@
     <!-- POSTS TAB -->
     <div *ngIf="activeTab === 'posts'" class="space-y-4">
       <div *ngFor="let post of searchResults.posts" 
-         class="p-8 rounded-xl border border-base-content/10 bg-base-200 hover:border-primary hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 relative overflow-hidden cursor-pointer block">
+         class="p-8 rounded-3xl border border-base-content/10 premium-card hover:border-primary hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 relative overflow-hidden cursor-pointer block">
         <a [routerLink]="['/post', post.pid]" class="flex gap-4">
           <div class="flex flex-col items-center gap-3 text-base-content/50 min-w-[48px]">
             <div class="flex flex-col items-center gap-1">
@@ -185,8 +188,8 @@
     <!-- COMMUNITIES TAB -->
     <div *ngIf="activeTab === 'communities'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <a *ngFor="let forum of searchResults.communities" [routerLink]="['/community', forum.forumId]"
-         class="card bg-base-200 border border-base-content/10 hover:border-primary hover:-translate-y-1 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-xl">
-        <div class="card-body p-6 flex flex-row items-center gap-4">
+         class="premium-card border border-base-content/10 hover:border-primary hover:-translate-y-1 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-xl rounded-3xl block overflow-hidden">
+        <div class="p-6 flex flex-row items-center gap-4">
           <div class="w-16 h-16 rounded-2xl bg-accent flex items-center justify-center text-white text-2xl font-extrabold shrink-0">
             {{ getInitials(forum.name) }}
           </div>
@@ -209,7 +212,7 @@
     <!-- USERS TAB -->
     <div *ngIf="activeTab === 'users'" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       <a *ngFor="let user of searchResults.users" [routerLink]="['/profile', user.uid]"
-         class="card bg-base-200 border border-base-content/10 hover:border-primary hover:-translate-y-1 transition-all duration-300 p-6 flex flex-col items-center text-center cursor-pointer shadow-sm hover:shadow-xl relative overflow-hidden">
+         class="premium-card border border-base-content/10 hover:border-primary hover:-translate-y-1 transition-all duration-300 p-6 flex flex-col items-center text-center cursor-pointer shadow-sm hover:shadow-xl relative overflow-hidden rounded-3xl block">
         <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-primary to-accent"></div>
         <div class="w-20 h-20 rounded-full bg-base-300 flex items-center justify-center text-2xl font-bold text-primary border border-base-content/10 mb-4 overflow-hidden mt-2 shrink-0">
           <img *ngIf="user.image" [src]="user.image" class="w-full h-full object-cover">

@@ -1,30 +1,33 @@
 <div class="mx-auto max-w-[1400px] px-6 py-8 bg-base-100 min-h-screen pt-20">
 
-  <header class="mb-8 mt-4 flex items-start justify-between">
-    <div>
-      <h1 class="mb-2 text-4xl font-semibold text-accent">Communities</h1>
-      <p class="text-accent">Join user-created groups focused on specific interests, topics, and activities</p>
+  <header class="premium-header mb-8 mt-4 flex flex-col md:flex-row items-center md:items-start justify-between gap-6">
+    <div class="absolute inset-0 bg-gradient-to-r from-accent/10 to-transparent"></div>
+    <div class="relative z-10 text-center md:text-left">
+      <h1 class="mb-2 text-4xl font-extrabold text-accent">Communities</h1>
+      <p class="text-accent/80 text-lg max-w-3xl">Join user-created groups focused on specific interests, topics, and activities</p>
     </div>
-    @if (isLoggedIn) {
-      @if (canCreateCommunity) {
-        <button (click)="createCommunity()" class="btn btn-primary gap-2 z-10">
-          <span class="text-xl">+</span>
-          <span>Create Community</span>
-        </button>
-      } @else {
-        <div class="tooltip tooltip-left z-20" data-tip="Requires 100+ Aura">
-          <button class="btn btn-primary gap-2 btn-disabled opacity-50 cursor-not-allowed" disabled>
+    <div class="relative z-10 shrink-0">
+      @if (isLoggedIn) {
+        @if (canCreateCommunity) {
+          <button (click)="createCommunity()" class="btn btn-primary gap-2">
             <span class="text-xl">+</span>
             <span>Create Community</span>
           </button>
-        </div>
+        } @else {
+          <div class="tooltip tooltip-left" data-tip="Requires 100+ Aura">
+            <button class="btn btn-primary gap-2 btn-disabled opacity-50 cursor-not-allowed" disabled>
+              <span class="text-xl">+</span>
+              <span>Create Community</span>
+            </button>
+          </div>
+        }
+      } @else {
+        <button (click)="createCommunity()" class="btn btn-primary gap-2">
+          <span class="text-xl">+</span>
+          <span>Create Community</span>
+        </button>
       }
-    } @else {
-      <button (click)="createCommunity()" class="btn btn-primary gap-2 z-10">
-        <span class="text-xl">+</span>
-        <span>Create Community</span>
-      </button>
-    }
+    </div>
   </header>
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -46,7 +49,7 @@
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
       @for (community of featured; track community.forumId) {
-        <div [routerLink]="['/community', community.forumId]" class="premium-card p-6 rounded-2xl cursor-pointer">
+        <div [routerLink]="['/community', community.forumId]" class="premium-card p-6 rounded-3xl cursor-pointer">
           <div class="flex items-start gap-4">
             <div class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-xl text-2xl font-black text-white shadow-md transition-transform duration-300 group-hover:scale-105"
                  [style.backgroundColor]="getBrandColor(community.name)">
@@ -86,7 +89,7 @@
       </div>
 
       @for (a of filteredForums; track a.forumId) {
-        <div class="premium-card p-6 rounded-2xl group">
+        <div class="premium-card p-6 rounded-3xl group">
           <div class="flex gap-4 items-center">
             <div class="h-12 w-12 rounded-xl flex items-center justify-center text-white font-black shadow-md transition-transform duration-300 group-hover:scale-105"
                  [style.backgroundColor]="getBrandColor(a.name)">
