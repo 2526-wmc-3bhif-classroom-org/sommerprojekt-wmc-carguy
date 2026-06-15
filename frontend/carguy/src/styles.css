@@ -109,20 +109,12 @@ body {
   background: #3f3f46;
 }
 
-/* Custom View Transition circular reveal theme switch */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-::view-transition-old(root) {
-  z-index: 1;
-}
-::view-transition-new(root) {
-  z-index: 9999;
+/* Global Smooth Theme Transition */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-/* Premium Glassmorphic Cards */
+/* Custom CarGuy Spacing and Card Styling */
 .premium-card {
   @apply border border-base-content/10 bg-base-200/40 backdrop-blur-sm transition-all duration-300 hover:border-accent/30 hover:-translate-y-[2px] hover:shadow-lg;
   background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.01) 0%, rgba(255, 255, 255, 0) 100%);
