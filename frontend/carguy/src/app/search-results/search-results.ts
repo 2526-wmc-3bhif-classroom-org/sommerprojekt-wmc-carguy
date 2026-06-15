@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { SearchService, SearchResults } from '../services/search-service';
@@ -18,7 +18,7 @@ export class SearchResultsComponent implements OnInit {
   activeTab: 'all' | 'posts' | 'communities' | 'users' = 'all';
 
   private route = inject(ActivatedRoute);
-  private cdr = inject(ChangeDetectorRef);
+  private searchService = inject(SearchService);
 
   ngOnInit() {
     this.route.queryParamMap.subscribe(async params => {
@@ -29,27 +29,23 @@ export class SearchResultsComponent implements OnInit {
         await this.performSearch();
       } else {
         this.searchResults = { posts: [], users: [], communities: [] };
-        this.cdr.detectChanges();
       }
     });
   }
 
   async performSearch() {
     this.isLoading = true;
-    this.cdr.detectChanges();
     try {
-      this.searchResults = await SearchService.search(this.searchQuery);
+      this.searchResults = await this.searchService.search(this.searchQuery);
     } catch (error) {
       console.error('Failed to retrieve search results:', error);
     } finally {
       this.isLoading = false;
-      this.cdr.detectChanges();
     }
   }
 
   changeTab(tab: 'all' | 'posts' | 'communities' | 'users') {
     this.activeTab = tab;
-    this.cdr.detectChanges();
   }
 
   getInitials(name: string): string {

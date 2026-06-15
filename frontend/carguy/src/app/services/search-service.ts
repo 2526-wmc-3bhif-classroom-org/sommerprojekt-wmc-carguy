@@ -1,6 +1,8 @@
-import { Post, User, Forum } from "../../model";
-
-const API_BASE_URL = "http://localhost:3000/api";
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { Post, User, Forum } from '../../model';
+import { environment } from '../../environments/environment';
 
 export interface SearchResults {
   posts: Post[];
@@ -8,20 +10,18 @@ export interface SearchResults {
   communities: Forum[];
 }
 
-async function handleResponse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || `Request failed with status ${response.status}`);
-  }
-  return response.json();
-}
+@Injectable({
+  providedIn: 'root'
+})
+export class SearchService {
+  private http = inject(HttpClient);
 
-export const SearchService = {
   async search(query: string): Promise<SearchResults> {
     if (!query || query.trim() === "") {
       return { posts: [], users: [], communities: [] };
     }
-    const res = await fetch(`${API_BASE_URL}/search?q=${encodeURIComponent(query)}`);
-    return handleResponse<SearchResults>(res);
+    return firstValueFrom(
+      this.http.get<SearchResults>(`${environment.apiBaseUrl}/search?q=${encodeURIComponent(query)}`)
+    );
   }
-};
+}

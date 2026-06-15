@@ -8,54 +8,6 @@ const dbFileName = path.join(dataDir, "carguy.db");
 // Hold the single shared connection in memory
 let sharedDbInstance: Database | null = null;
 
-export class Unit {
-
-    private readonly db: Database;
-    private completed: boolean;
-
-    public constructor(public readonly readOnly: boolean) {
-        this.completed = false;
-        // Use the shared instance instead of creating a new file connection
-        this.db = DB.getInstance();
-        if (!this.readOnly) {
-            DB.beginTransaction(this.db);
-        }
-    }
-
-    public prepare<TResult, TParams extends Record<string, unknown> = Record<string, unknown>>(
-        sql: string,
-        bindings?: TParams
-    ) {
-        const stmt = this.db.prepare(sql);
-        if (bindings != null) {
-            stmt.bind(bindings as unknown);
-        }
-        return stmt;
-    }
-
-    public getLastRowId(): number {
-        const stmt = this.db.prepare(`SELECT last_insert_rowid() as id`);
-        const result = stmt.get() as { id: number };
-        return result.id;
-    }
-
-    public complete(commit: boolean | null = null): void {
-        if (this.completed) return;
-
-        this.completed = true;
-
-        if (commit !== null) {
-            commit ? DB.commitTransaction(this.db) : DB.rollbackTransaction(this.db);
-        } else if (!this.readOnly) {
-            throw new Error("transaction requires commit or rollback");
-        }
-
-        // CRITICAL: Do NOT call this.db.close() here anymore!
-        // We are sharing one database connection across the app.
-        // Closing it will break all subsequent requests.
-    }
-}
-
 export class DB {
 
     public static getInstance(): Database {
@@ -73,7 +25,7 @@ export class DB {
 
         const db = new DatabaseConstructor(dbFileName, {
             fileMustExist: false,
-            verbose: (s: unknown) => DB.logStatement(s)
+            verbose: process.env.SQL_LOG === 'true' ? (s: unknown) => DB.logStatement(s) : undefined
         });
 
         db.pragma("foreign_keys = ON");
@@ -150,7 +102,10 @@ export class DB {
                 references Forum (ForumID)
                 on delete cascade,
                 constraint FK_Forum_Category foreign key (Forum_Category_id)
-                references Forum_Category (Forum_Category_id)
+                references Forum_Category (Forum_Category_id),
+                constraint FK_Forum_Author foreign key (AuthorID)
+                references User (UID)
+                on delete set null
                 ) strict;
         `);
 
@@ -222,7 +177,7 @@ export class DB {
 
         connection.exec(`
             create table if not exists Guide (
-                GuideID Integer not null,
+                GuideID Integer primary key autoincrement,
                 Title Text not null,
                 Description Text not null,
                 Content Text not null,
@@ -230,7 +185,6 @@ export class DB {
                 PublishedAt Text not null,
                 Likes Integer not null default 0,
                 Dislikes Integer not null default 0,
-                constraint PK_Guide primary key (GuideID),
                 constraint FK_Guide_User foreign key (UID)
                 references User (UID)
                 on delete cascade

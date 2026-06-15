@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -19,11 +19,13 @@ export class CreateCommunityComponent {
   errorMessage: string | null = null;
   isLoading: boolean = false;
 
-  constructor(private router: Router) {}
+  private router = inject(Router);
+  private userService = inject(UserService);
+  private forumService = inject(ForumService);
 
   async createCommunity() {
     this.errorMessage = null;
-    const currentUser: User | null = UserService.getCurrentUser();
+    const currentUser: User | null = this.userService.getCurrentUser();
 
     if (!currentUser) {
       this.errorMessage = 'You must be logged in to create a community.';
@@ -33,7 +35,7 @@ export class CreateCommunityComponent {
     this.isLoading = true;
 
     try {
-      const res = await ForumService.createForum(this.name, currentUser, this.description);
+      const res = await this.forumService.createForum(this.name, currentUser, this.description);
       if (res && res.forumId) {
         this.router.navigate(['/community', res.forumId]);
       } else {

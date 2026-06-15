@@ -3,8 +3,9 @@ import { StatusCodes } from "http-status-codes";
 import { GuideService } from "./guide-service";
 import { GuideRepository } from "./guide-repository";
 import { requireAuth } from "../auth-middleware";
+import { UserRepository } from "../user/user-repository";
 
-const guideService = new GuideService(new GuideRepository());
+const guideService = new GuideService(new GuideRepository(), new UserRepository());
 export const guideRouter = express.Router();
 
 guideRouter.get("/guides", (req, res) => {
@@ -12,6 +13,7 @@ guideRouter.get("/guides", (req, res) => {
         const result = guideService.getAllGuides();
         res.json(result);
     } catch (error) {
+        console.error("Failed to fetch guides:", error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Failed to fetch guides" });
     }
 });
@@ -25,6 +27,7 @@ guideRouter.get("/guides/:id", (req, res) => {
         if (!result) return res.status(StatusCodes.NOT_FOUND).send("Guide not found");
         res.json(result);
     } catch (error) {
+        console.error("Failed to fetch guide:", error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Failed to fetch guide" });
     }
 });
@@ -44,6 +47,7 @@ guideRouter.post("/guide", requireAuth, (req, res) => {
         guideService.createGuide(title, description, content, userClaims.username);
         res.status(StatusCodes.CREATED).json({ message: "Guide created successfully" });
     } catch (error) {
+        console.error("Failed to create guide:", error);
         if (error instanceof Error) {
             res.status(StatusCodes.FORBIDDEN).json({ message: error.message });
         } else {

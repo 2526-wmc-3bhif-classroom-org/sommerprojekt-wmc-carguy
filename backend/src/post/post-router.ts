@@ -2,8 +2,11 @@ import express from "express";
 import { PostService } from "./post-service";
 import { PostRepository } from "./post-repository";
 import { Post } from "../../data/model";
+import { requireAuth } from "../auth-middleware";
+import { UserRepository } from "../user/user-repository";
 
 const postService = new PostService(new PostRepository());
+const userRepository = new UserRepository();
 export const postRouter = express.Router();
 
 postRouter.get("/posts", (req, res) => {
@@ -61,46 +64,56 @@ postRouter.get("/posts/:id/replies", (req, res) => {
     res.json(result);
 });
 
-postRouter.post("/post", (req, res) => {
+postRouter.post("/post", requireAuth, (req, res) => {
+    if (!req.user) return res.status(401).send("Unauthorized");
+    const user = userRepository.findUserByUsername(req.user.username);
+    if (!user) return res.status(401).send("User not found");
+
     const post: Post = req.body;
+    post.author = user;
+
     postService.createPost(post);
     res.status(201).json({ message: "Post created" });
 });
 
-postRouter.patch("/posts/:id/like", (req, res) => {
+postRouter.patch("/posts/:id/like", requireAuth, (req, res) => {
     const id = Number(req.params.id);
     if (isNaN(id)) return res.status(400).send("Invalid id");
     postService.likePost(id);
     res.status(200).json({ message: "Liked" });
 });
 
-postRouter.patch("/posts/:id/unlike", (req, res) => {
+postRouter.patch("/posts/:id/unlike", requireAuth, (req, res) => {
     const id = Number(req.params.id);
     if (isNaN(id)) return res.status(400).send("Invalid id");
     postService.unlikePost(id);
     res.status(200).json({ message: "Unliked" });
 });
 
-postRouter.patch("/posts/:id/dislike", (req, res) => {
+postRouter.patch("/posts/:id/dislike", requireAuth, (req, res) => {
     const id = Number(req.params.id);
     if (isNaN(id)) return res.status(400).send("Invalid id");
     postService.dislikePost(id);
     res.status(200).json({ message: "Disliked" });
 });
 
-postRouter.patch("/posts/:id/undislike", (req, res) => {
+postRouter.patch("/posts/:id/undislike", requireAuth, (req, res) => {
     const id = Number(req.params.id);
     if (isNaN(id)) return res.status(400).send("Invalid id");
     postService.undislikePost(id);
     res.status(200).json({ message: "Undisliked" });
 });
 
-postRouter.post("/posts/:id/replies", (req, res) => {
+postRouter.post("/posts/:id/replies", requireAuth, (req, res) => {
     const id = Number(req.params.id);
     if (isNaN(id)) return res.status(400).send("Invalid id");
+    if (!req.user) return res.status(401).send("Unauthorized");
+    const user = userRepository.findUserByUsername(req.user.username);
+    if (!user) return res.status(401).send("User not found");
 
     const post: Post = req.body;
     post.parentPost = { pid: id } as Post;
+    post.author = user;
 
     postService.createReply(post);
     res.status(201).json({ message: "Reply created" });

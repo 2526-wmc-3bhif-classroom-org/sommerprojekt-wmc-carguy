@@ -8,16 +8,18 @@ import {LoginPage} from './login-page/login-page';
 import { GuidesComponent } from './Guides/Guides';
 import { CreateCommunityComponent } from './create-community/create-community';
 import { SearchResultsComponent } from './search-results/search-results';
+import { authGuard } from './auth.guard';
 
 export const routes: Routes = [
   { path: '', component: BrandDirectoryComponent },
   { path: 'communities', component: CommunitiesRepository },
   { path: 'community/:id', component: CommunityDetailComponent },
   { path: 'post/:id', component: PostDetailComponent },
-  { path: 'profile', component: ProfilePage },
+  { path: 'profile', component: ProfilePage, canActivate: [authGuard] },
   { path: 'profile/:id', component: ProfilePage },
   { path: 'login', component: LoginPage },
   { path: 'guides', component: GuidesComponent },
-  { path: 'create-community', component: CreateCommunityComponent },
+  { path: 'create-community', component: CreateCommunityComponent, canActivate: [authGuard] },
   { path: 'search', component: SearchResultsComponent },
+  { path: '**', redirectTo: '' }
 ];

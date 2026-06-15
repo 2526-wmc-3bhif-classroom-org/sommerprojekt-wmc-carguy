@@ -2,9 +2,14 @@ import { DB } from "../database";
 import { Post, User, Forum } from "../../data/model";
 
 export class SearchRepository {
+    private escapeLike(query: string): string {
+        return query.replace(/\\/g, "\\\\").replace(/%/g, "\\%").replace(/_/g, "\\_");
+    }
+
     public searchPosts(query: string): Post[] {
         const db = DB.getInstance();
-        const likeQuery = `%${query}%`;
+        const escaped = this.escapeLike(query);
+        const likeQuery = `%${escaped}%`;
 
         const rows = db.prepare(`
             SELECT p.PID as pid, p.Title as title, p.Content as content, p.ForumID as forum, 
@@ -18,7 +23,7 @@ export class SearchRepository {
                    (SELECT Name FROM Forum WHERE ForumID = p.ForumID) as forumName
             FROM Post p
             LEFT JOIN User u ON p.UID = u.UID
-            WHERE p.Title LIKE ? OR p.Content LIKE ?
+            WHERE p.Title LIKE ? ESCAPE '\\' OR p.Content LIKE ? ESCAPE '\\'
         `).all(likeQuery, likeQuery) as any[];
 
         return rows.map(row => ({
@@ -43,13 +48,13 @@ export class SearchRepository {
 
     public searchUsers(query: string): User[] {
         const db = DB.getInstance();
-        const likeQuery = `%${query}%`;
+        const escaped = this.escapeLike(query);
+        const likeQuery = `%${escaped}%`;
 
         const result = db.prepare(`
             SELECT 
                 UID as uid, 
                 Username as username, 
-                Password as password, 
                 PublicName as publicname, 
                 Description as description, 
                 Title as title, 
@@ -63,7 +68,7 @@ export class SearchRepository {
                     (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Comment WHERE UID = User.UID)
                 ) as totalAura
             FROM User
-            WHERE Username LIKE ? OR PublicName LIKE ?
+            WHERE (Username LIKE ? ESCAPE '\\' OR PublicName LIKE ? ESCAPE '\\')
         `).all(likeQuery, likeQuery);
 
         return result as unknown as User[];
@@ -71,7 +76,8 @@ export class SearchRepository {
 
     public searchForums(query: string): Forum[] {
         const db = DB.getInstance();
-        const likeQuery = `%${query}%`;
+        const escaped = this.escapeLike(query);
+        const likeQuery = `%${escaped}%`;
 
         const result = db.prepare(`
             SELECT f.ForumID as forumId, f.Name as name, f.Description as description, 
@@ -79,7 +85,7 @@ export class SearchRepository {
                    COUNT(DISTINCT u.UID) as memberCount
             FROM Forum f
             LEFT JOIN User_In_Forum u ON f.ForumID = u.ForumID
-            WHERE f.Name LIKE ? OR f.Description LIKE ?
+            WHERE f.Name LIKE ? ESCAPE '\\' OR f.Description LIKE ? ESCAPE '\\'
             GROUP BY f.ForumID
         `).all(likeQuery, likeQuery) as Forum[];
 

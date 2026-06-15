@@ -15,7 +15,7 @@
       </a>
 
       <!-- Post card -->
-      <div class="rounded-2xl border border-base-content/10 bg-base-200 p-8 mb-8 shadow-xl">
+      <div class="premium-card rounded-3xl p-8 mb-8">
         <div class="flex gap-6">
           <!-- Votes -->
           <div class="flex flex-col items-center gap-3 text-base-content/70 min-w-[48px]">
@@ -32,9 +32,21 @@
           </div>
 
           <div class="flex-1">
-            <div class="text-xs text-base-content/60 mb-3 flex items-center gap-2">
+            <div class="text-xs text-base-content/60 mb-3 flex items-center gap-2 flex-wrap">
+              @if (post.forum?.name) {
+                <a [routerLink]="['/community', post.forum.forumId]" class="font-bold text-accent hover:underline">
+                  c/{{ post.forum.name }}
+                </a>
+                <span>•</span>
+              }
+              <span>Posted by</span>
               @if (post.author) {
-                <a [routerLink]="['/profile', post.author.uid]" class="font-medium text-base-content/80 hover:text-accent transition-colors cursor-pointer flex items-center gap-1">
+                <a [routerLink]="['/profile', post.author.uid]" class="font-medium text-base-content/80 hover:text-accent transition-colors cursor-pointer flex items-center gap-1.5">
+                  @if (post.author.image) {
+                    <img [src]="post.author.image" class="w-5 h-5 rounded-full object-cover border border-base-300" alt="Avatar">
+                  } @else {
+                    <div class="w-5 h-5 rounded-full bg-base-300 flex items-center justify-center font-bold text-[10px]">{{ post.author.username.charAt(0).toUpperCase() }}</div>
+                  }
                   u/{{ post.author.username }}
                   <span *ngIf="(post.author.totalAura || 0) >= 100" class="tooltip tooltip-top" data-tip="Verified User (100+ Aura)">
                     <svg class="text-success inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0 1 12 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 0 1 3.498 1.307 4.491 4.491 0 0 1 1.307 3.497A4.49 4.49 0 0 1 21.75 12a4.49 4.49 0 0 1-1.549 3.397 4.491 4.491 0 0 1-1.307 3.498 4.491 4.491 0 0 1-3.497 1.307A4.49 4.49 0 0 1 12 21.75a4.49 4.49 0 0 1-3.397-1.549 4.49 4.49 0 0 1-3.498-1.306 4.491 4.491 0 0 1-1.307-3.498A4.49 4.49 0 0 1 2.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 0 1 1.307-3.497 4.49 4.49 0 0 1 3.497-1.307Zm7.007 6.387a.75.75 0 0 0-1.06-1.061l-3.879 3.879-1.97-1.97a.75.75 0 1 0-1.06 1.06l2.5 2.5a.75.75 0 0 0 1.06 0l4.41-4.41Z" clip-rule="evenodd"/></svg>
@@ -91,7 +103,7 @@
             <textarea
               [(ngModel)]="newCommentContent"
               placeholder="What are your thoughts?"
-              class="textarea w-full bg-white/5 border border-base-content/10 text-black placeholder-gray-500 focus:border-accent focus:outline-none rounded-md p-3 resize-none mb-4"
+              class="textarea w-full bg-white/5 border border-base-content/10 text-base-content placeholder-gray-500 focus:border-accent focus:outline-none rounded-md p-3 resize-none mb-4"
               rows="4"
             ></textarea>
             
@@ -103,7 +115,7 @@
                   (keyup.enter)="addImageUrl()"
                   type="text"
                   placeholder="Paste image URL here"
-                  class="input input-sm flex-1 bg-white/5 border border-base-content/10 text-black placeholder-gray-500 focus:border-accent focus:outline-none rounded-md"
+                  class="input input-sm flex-1 bg-white/5 border border-base-content/10 text-base-content placeholder-gray-500 focus:border-accent focus:outline-none rounded-md"
                 />
                 <button (click)="addImageUrl()" class="btn btn-sm btn-outline border-base-content/20 hover:border-accent hover:text-accent">Add</button>
               </div>
@@ -163,7 +175,7 @@
         <ng-template #commentTemplate let-comment="comment" let-depth="depth">
           <div class="relative transition-all duration-300" [ngClass]="depth > 0 ? 'ml-4 sm:ml-8 mt-4 pl-3 sm:pl-4 border-l-2 border-base-content/10 hover:border-primary/40' : 'mb-6'">
             
-            <div class="p-6 rounded-xl border border-base-content/10 bg-base-200 shadow-sm hover:border-primary/50 transition-all duration-300 flex gap-4">
+            <div class="premium-card p-6 rounded-2xl flex gap-4">
               <!-- Comment Votes -->
               <div class="flex flex-col items-center gap-2 text-base-content/70 min-w-[32px] pt-1">
                 <button (click)="likeComment(comment)" class="flex flex-col items-center transition-colors hover:text-green-400"
@@ -182,7 +194,12 @@
               <div class="flex-1">
                 <div class="text-xs text-base-content/60 mb-2 flex items-center gap-2 flex-wrap">
                   @if (comment.author) {
-                    <a [routerLink]="['/profile', comment.author.uid]" class="font-medium text-base-content/80 hover:text-accent transition-colors cursor-pointer flex items-center gap-1">
+                    <a [routerLink]="['/profile', comment.author.uid]" class="font-medium text-base-content/80 hover:text-accent transition-colors cursor-pointer flex items-center gap-1.5">
+                      @if (comment.author.image) {
+                        <img [src]="comment.author.image" class="w-5 h-5 rounded-full object-cover border border-base-300" alt="Avatar">
+                      } @else {
+                        <div class="w-5 h-5 rounded-full bg-base-300 flex items-center justify-center font-bold text-[10px]">{{ comment.author.username.charAt(0).toUpperCase() }}</div>
+                      }
                       u/{{ comment.author.username }}
                       <span *ngIf="(comment.author.totalAura || 0) >= 100" class="tooltip tooltip-top" data-tip="Verified User (100+ Aura)">
                         <svg class="text-success inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0 1 12 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 0 1 3.498 1.307 4.491 4.491 0 0 1 1.307 3.497A4.49 4.49 0 0 1 21.75 12a4.49 4.49 0 0 1-1.549 3.397 4.491 4.491 0 0 1-1.307 3.498 4.491 4.491 0 0 1-3.497 1.307A4.49 4.49 0 0 1 12 21.75a4.49 4.49 0 0 1-3.397-1.549 4.49 4.49 0 0 1-3.498-1.306 4.491 4.491 0 0 1-1.307-3.498A4.49 4.49 0 0 1 2.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 0 1 1.307-3.497 4.49 4.49 0 0 1 3.497-1.307Zm7.007 6.387a.75.75 0 0 0-1.06-1.061l-3.879 3.879-1.97-1.97a.75.75 0 1 0-1.06 1.06l2.5 2.5a.75.75 0 0 0 1.06 0l4.41-4.41Z" clip-rule="evenodd"/></svg>
@@ -244,7 +261,7 @@
                 <textarea
                   [(ngModel)]="replyContent"
                   placeholder="Write a supportive reply..."
-                  class="textarea w-full bg-white/5 border border-base-content/10 text-black placeholder-gray-500 focus:border-accent focus:outline-none rounded-md p-3 resize-none"
+                  class="textarea w-full bg-white/5 border border-base-content/10 text-base-content placeholder-gray-500 focus:border-accent focus:outline-none rounded-md p-3 resize-none"
                   rows="3"
                 ></textarea>
                 @if (errorMessage && activeReplyCommentId === comment.cid) {

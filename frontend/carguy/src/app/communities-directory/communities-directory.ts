@@ -1,8 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { ForumService } from '../services/forum-service';
-import { Forum } from '../../model';
+import { UserService } from '../services/user-service';
+import { Forum, ForumCategory } from '../../model';
+import { getBrandColor } from '../brand-colors';
 
 @Component({
   selector: 'app-communities',
@@ -13,25 +15,124 @@ import { Forum } from '../../model';
 export class CommunitiesRepository implements OnInit {
   featured: Forum[] = [];
   all: Forum[] = [];
-  categories: any[] = [];
+  joined: Forum[] = [];
+  categories: ForumCategory[] = [];
   trending: any[] = [];
 
+  activeTab: 'all' | 'joined' = 'all';
+  selectedCategoryId: number | null = null;
   count = 0;
-  private cdr = inject(ChangeDetectorRef);
+
   private router = inject(Router);
+  private userService = inject(UserService);
+  private forumService = inject(ForumService);
 
   async ngOnInit() {
+    await this.refreshUserAura();
     try {
-      this.all = await ForumService.getAllForums();
+      this.all = await this.forumService.getAllForums();
       this.featured = this.all.slice(0, 4); // Just show a few for featured
-      this.categories = this.all; // Maybe mock categories or leave as is
-      this.trending = await ForumService.getTrendingForums(5);
+      this.categories = await this.forumService.getAllCategories();
+      this.trending = await this.forumService.getTrendingForums(5);
       this.count = this.all.length;
-      this.cdr.detectChanges();
+
+      if (this.userService.isLoggedIn()) {
+        this.joined = await this.forumService.getJoinedForums();
+      } else {
+        this.joined = [];
+      }
     } catch (error) {
       console.error('Failed to load forums', error);
     }
   }
+
+  async refreshUserAura() {
+    const loggedInUser = this.userService.getCurrentUser();
+    if (loggedInUser) {
+      try {
+        const updatedUser = await this.userService.getUserById(loggedInUser.uid);
+        localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+      } catch (err) {
+        console.error("Failed to refresh user aura:", err);
+      }
+    }
+  }
+
+  get isLoggedIn(): boolean {
+    return this.userService.isLoggedIn();
+  }
+
+  get canCreateCommunity(): boolean {
+    const user = this.userService.getCurrentUser();
+    return user !== null && ((user.totalAura || 0) >= 100 || user.role === 'admin');
+  }
+
+  get filteredForums(): Forum[] {
+    const list = this.activeTab === 'all' ? this.all : this.joined;
+    if (this.selectedCategoryId === null) {
+      return list;
+    }
+    return list.filter(f => f.category?.forumCategoryId === this.selectedCategoryId);
+  }
+
+  selectCategory(id: number | null) {
+    if (this.selectedCategoryId === id) {
+      this.selectedCategoryId = null;
+    } else {
+      this.selectedCategoryId = id;
+    }
+  }
+
+  isJoined(forumId: number): boolean {
+    return this.joined.some(f => f.forumId === forumId);
+  }
+
+  async joinCommunity(forumId: number) {
+    const currentUser = this.userService.getCurrentUser();
+    if (!currentUser) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    try {
+      await this.forumService.joinForum(forumId, currentUser.uid);
+      
+      // Update member count (shared reference across all/featured/joined lists)
+      const forum = this.all.find(f => f.forumId === forumId);
+      if (forum) {
+        forum.memberCount = (forum.memberCount || 0) + 1;
+        if (!this.joined.some(f => f.forumId === forumId)) {
+          this.joined.push(forum);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to join community', error);
+    }
+  }
+
+  async leaveCommunity(forumId: number) {
+    const currentUser = this.userService.getCurrentUser();
+    if (!currentUser) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    try {
+      await this.forumService.leaveForum(forumId, currentUser.uid);
+      
+      // Update member count (shared reference across all/featured/joined lists)
+      const forum = this.all.find(f => f.forumId === forumId);
+      if (forum) {
+        forum.memberCount = Math.max(0, (forum.memberCount || 0) - 1);
+      }
+
+      // Remove from joined
+      this.joined = this.joined.filter(f => f.forumId !== forumId);
+    } catch (error) {
+      console.error('Failed to leave community', error);
+    }
+  }
+
 
   createCommunity(): void {
     this.router.navigate(['/create-community']);
@@ -44,35 +145,6 @@ export class CommunitiesRepository implements OnInit {
   }
 
   getBrandColor(name: string): string {
-    const brandColors: { [key: string]: string } = {
-      'ferrari': '#D61F27',
-      'lamborghini': '#D4AF37',
-      'porsche': '#222222',
-      'bmw': '#1C69D4',
-      'audi': '#333333',
-      'mercedes': '#555555',
-      'ford': '#003399',
-      'chevrolet': '#E0A800',
-      'toyota': '#EB0A1E',
-      'honda': '#E4002B',
-      'nissan': '#C3002F',
-      'mazda': '#E60012',
-      'subaru': '#0033A0',
-      'mitsubishi': '#E60012',
-    };
-    
-    const key = name.toLowerCase();
-    for (const [brand, color] of Object.entries(brandColors)) {
-      if (key.includes(brand)) {
-        return color;
-      }
-    }
-    
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-      hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
-    return '#' + '00000'.substring(0, 6 - c.length) + c;
+    return getBrandColor(name);
   }
 }
