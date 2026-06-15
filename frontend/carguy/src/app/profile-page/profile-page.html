@@ -55,7 +55,13 @@
         <div class="flex items-center gap-2 mb-2">
           <input [(ngModel)]="editUsername" class="input input-bordered bg-base-200 text-base-content/70 font-medium py-1 h-auto" />
           <span class="text-base-content/70 mx-2">•</span>
-          <span class="text-base-content/70">{{ currentUser?.title || 'Member' }}</span>
+          @if (canEditTitle) {
+            <input [(ngModel)]="editTitle" placeholder="Custom Title (e.g. BMW-Lover)" class="input input-bordered bg-base-200 text-base-content/70 font-medium py-1 h-auto" maxlength="30" />
+          } @else {
+            <div class="tooltip tooltip-bottom" data-tip="Changing custom title requires 100+ Aura">
+              <input [disabled]="true" [value]="editTitle || 'Member'" class="input input-bordered bg-base-200 text-base-content/70 font-medium py-1 h-auto cursor-not-allowed opacity-50" />
+            </div>
+          }
         </div>
         <textarea [(ngModel)]="editDescription" class="textarea textarea-bordered w-full max-w-2xl bg-base-200 text-base-content/70" placeholder="Description"></textarea>
       </div>
