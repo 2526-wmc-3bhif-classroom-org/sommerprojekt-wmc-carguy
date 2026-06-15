@@ -110,8 +110,10 @@
               </div>
               <div class="flex-1 min-w-0">
                 <div class="text-xs text-base-content/50 mb-1 flex items-center gap-1.5 flex-wrap">
-                  <span *ngIf="post.forum.name" class="font-bold text-accent hover:underline">c/{{ post.forum.name }}</span>
-                  <span>•</span>
+                  <a *ngIf="post.forum?.name" [routerLink]="['/community', post.forum.forumId]" (click)="$event.stopPropagation()" class="font-bold text-accent hover:underline">
+                    c/{{ post.forum.name }}
+                  </a>
+                  <span *ngIf="post.forum?.name">•</span>
                   <span>Posted by u/{{ post.author.username }}</span>
                   <span>•</span>
                   <span>{{ post.publishedAt | date:'short' }}</span>
@@ -159,8 +161,10 @@
 
           <div class="flex-1 min-w-0">
             <div class="text-xs text-base-content/60 mb-2 flex items-center gap-2 flex-wrap">
-              <span *ngIf="post.forum.name" class="font-bold text-accent hover:underline">c/{{ post.forum.name }}</span>
-              <span>•</span>
+              <a *ngIf="post.forum?.name" [routerLink]="['/community', post.forum.forumId]" (click)="$event.stopPropagation()" class="font-bold text-accent hover:underline">
+                c/{{ post.forum.name }}
+              </a>
+              <span *ngIf="post.forum?.name">•</span>
               <span class="font-medium text-base-content/80">Posted by u/{{ post.author.username || 'unknown' }}</span>
               <span *ngIf="(post.author.totalAura || 0) >= 100" class="badge badge-success text-[10px] text-white">Verified</span>
               <span>•</span>

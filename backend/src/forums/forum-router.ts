@@ -83,12 +83,10 @@ forumRouter.post("/forum", requireAuth, (req, res) => {
         return res.status(400).send("Name is required");
     }
 
-    // Sub-forum creation requires 100+ Aura or admin role
-    if (parentForumId) {
-        const isVerified = (user.totalAura ?? 0) >= 100 || user.role === "admin";
-        if (!isVerified) {
-            return res.status(403).send("Only verified users with 100+ Aura or admins can create model sub-forums.");
-        }
+    // Forum creation requires 100+ Aura or admin role
+    const isVerified = (user.totalAura ?? 0) >= 100 || user.role === "admin";
+    if (!isVerified) {
+        return res.status(403).send("Only verified users with 100+ Aura or admins can create communities.");
     }
 
     const forum: Forum = {

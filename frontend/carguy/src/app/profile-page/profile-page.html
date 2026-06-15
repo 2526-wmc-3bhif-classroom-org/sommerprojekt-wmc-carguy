@@ -52,10 +52,16 @@
 
       <div *ngIf="isEditing" class="flex flex-col gap-2">
         <input [(ngModel)]="editPublicName" class="input input-bordered w-full max-w-xs bg-base-200 text-primary text-4xl font-bold h-auto py-1 mb-2" />
-        <div class="flex items-center gap-2 mb-2">
+        <div class="flex items-center gap-2 mb-2 flex-wrap">
           <input [(ngModel)]="editUsername" class="input input-bordered bg-base-200 text-base-content/70 font-medium py-1 h-auto" />
           <span class="text-base-content/70 mx-2">•</span>
-          <span class="text-base-content/70">{{ currentUser?.title || 'Member' }}</span>
+          @if (canEditTitle) {
+            <input [(ngModel)]="editTitle" class="input input-bordered bg-base-200 text-base-content/70 font-medium py-1 h-auto max-w-[150px]" placeholder="Title (e.g. Mechanic)" />
+          } @else {
+            <div class="tooltip tooltip-top z-20" data-tip="Requires 100+ Aura">
+              <input [(ngModel)]="editTitle" class="input input-bordered bg-base-200 text-base-content/40 font-medium py-1 h-auto max-w-[150px] cursor-not-allowed opacity-50" placeholder="Title" disabled />
+            </div>
+          }
         </div>
         <textarea [(ngModel)]="editDescription" class="textarea textarea-bordered w-full max-w-2xl bg-base-200 text-base-content/70" placeholder="Description"></textarea>
       </div>
@@ -135,7 +141,13 @@
                 </div>
 
                 <div class="flex-1">
-                  <div class="text-xs text-base-content/60 mb-2 flex items-center gap-2">
+                  <div class="text-xs text-base-content/60 mb-2 flex items-center gap-2 flex-wrap">
+                    @if (post.forum?.name) {
+                      <a [routerLink]="['/community', post.forum.forumId]" (click)="$event.stopPropagation()" class="font-bold text-accent hover:underline">
+                        c/{{ post.forum.name }}
+                      </a>
+                      <span>•</span>
+                    }
                     @if (post.author) {
                       <a [routerLink]="['/profile', post.author.uid]" (click)="$event.stopPropagation()" class="font-medium text-base-content/80 hover:text-accent transition-colors cursor-pointer flex items-center gap-1">
                         Posted by u/{{ post.author.username }}

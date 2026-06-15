@@ -101,16 +101,30 @@ userRouter.post("/update", requireAuth, (req: Request, res: Response) => {
         }
         const realUserName: string = (req as any).user.username;
 
+        const userToUpdate = userRepository.findUserByUsername(realUserName);
+        if (!userToUpdate) {
+            return res.status(StatusCodes.NOT_FOUND).send("User not found");
+        }
+
         const newUserName: string = req.body.newUsername;
         const newPublicName: string = req.body.newPublicName;
         const newDescription: string = req.body.newDescription;
         const newImage: string = req.body.newImage;
+        const newTitle: string = req.body.newTitle;
+
+        if (newTitle !== undefined && newTitle !== (userToUpdate.title || '')) {
+            const isVerified = (userToUpdate.totalAura ?? 0) >= 100 || userToUpdate.role === "admin";
+            if (!isVerified) {
+                return res.status(StatusCodes.FORBIDDEN).send("Only verified users with 100+ Aura or admins can change their title/role.");
+            }
+        }
 
         let user = userService.updateUserInfo(realUserName, {
             username: newUserName,
             publicname: newPublicName,
             description: newDescription,
-            image: newImage
+            image: newImage,
+            title: newTitle
         } as User);
 
         return res.status(StatusCodes.OK).send({

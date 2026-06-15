@@ -7,7 +7,7 @@ export class CommentRepository {
         const db = DB.getInstance();
         const rows = db.prepare(`
             SELECT c.CID as cid, c.Content as content, c.PID as post, c.ParentCID as parentComment, c.PublishedAt as publishedAt, c.ImageUrls as imageUrls, c.Likes as likes, c.Dislikes as dislikes,
-                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname,
+                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname, u.Image as authorImage,
                    (
                        (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Post WHERE UID = u.UID) + 
                        (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Comment WHERE UID = u.UID)
@@ -29,6 +29,7 @@ export class CommentRepository {
                 uid: row.authorUid,
                 username: row.authorUsername,
                 publicname: row.authorPublicname,
+                image: row.authorImage,
                 totalAura: row.authorTotalAura
             } as User
         })) as Comment[];
@@ -38,7 +39,7 @@ export class CommentRepository {
         const db = DB.getInstance();
         const row = db.prepare(`
             SELECT c.CID as cid, c.Content as content, c.PID as post, c.ParentCID as parentComment, c.PublishedAt as publishedAt, c.ImageUrls as imageUrls, c.Likes as likes, c.Dislikes as dislikes,
-                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname,
+                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname, u.Image as authorImage,
                    (
                        (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Post WHERE UID = u.UID) + 
                        (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Comment WHERE UID = u.UID)
@@ -63,6 +64,7 @@ export class CommentRepository {
                 uid: row.authorUid,
                 username: row.authorUsername,
                 publicname: row.authorPublicname,
+                image: row.authorImage,
                 totalAura: row.authorTotalAura
             } as User
         } as Comment;
@@ -72,7 +74,7 @@ export class CommentRepository {
         const db = DB.getInstance();
         const rows = db.prepare(`
             SELECT c.CID as cid, c.Content as content, c.PID as post, c.ParentCID as parentComment, c.PublishedAt as publishedAt, c.ImageUrls as imageUrls, c.Likes as likes, c.Dislikes as dislikes,
-                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname,
+                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname, u.Image as authorImage,
                    (
                        (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Post WHERE UID = u.UID) + 
                        (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Comment WHERE UID = u.UID)
@@ -95,6 +97,7 @@ export class CommentRepository {
                 uid: row.authorUid,
                 username: row.authorUsername,
                 publicname: row.authorPublicname,
+                image: row.authorImage,
                 totalAura: row.authorTotalAura
             } as User
         })) as Comment[];
@@ -104,7 +107,7 @@ export class CommentRepository {
         const db = DB.getInstance();
         const rows = db.prepare(`
             SELECT c.CID as cid, c.Content as content, c.PID as post, c.ParentCID as parentComment, c.PublishedAt as publishedAt, c.ImageUrls as imageUrls, c.Likes as likes, c.Dislikes as dislikes,
-                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname,
+                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname, u.Image as authorImage,
                    (
                        (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Post WHERE UID = u.UID) + 
                        (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Comment WHERE UID = u.UID)
@@ -127,6 +130,7 @@ export class CommentRepository {
                 uid: row.authorUid,
                 username: row.authorUsername,
                 publicname: row.authorPublicname,
+                image: row.authorImage,
                 totalAura: row.authorTotalAura
             } as User
         })) as Comment[];
@@ -136,7 +140,7 @@ export class CommentRepository {
         const db = DB.getInstance();
         const rows = db.prepare(`
             SELECT c.CID as cid, c.Content as content, c.PID as post, c.ParentCID as parentComment, c.PublishedAt as publishedAt, c.ImageUrls as imageUrls, c.Likes as likes, c.Dislikes as dislikes,
-                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname,
+                   u.UID as authorUid, u.Username as authorUsername, u.PublicName as authorPublicname, u.Image as authorImage,
                    (
                        (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Post WHERE UID = u.UID) + 
                        (SELECT IFNULL(SUM(Likes - Dislikes), 0) FROM Comment WHERE UID = u.UID)
@@ -159,6 +163,7 @@ export class CommentRepository {
                 uid: row.authorUid,
                 username: row.authorUsername,
                 publicname: row.authorPublicname,
+                image: row.authorImage,
                 totalAura: row.authorTotalAura
             } as User
         })) as Comment[];

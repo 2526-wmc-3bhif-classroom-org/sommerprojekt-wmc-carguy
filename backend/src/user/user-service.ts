@@ -72,6 +72,7 @@ export class UserService {
         if (newUserData.publicname) realUser.publicname = newUserData.publicname;
         if (newUserData.description !== undefined) realUser.description = newUserData.description;
         if (newUserData.image !== undefined) realUser.image = newUserData.image;
+        if (newUserData.title !== undefined) realUser.title = newUserData.title;
 
         this.userRepository.updateUser(realUser);
 
