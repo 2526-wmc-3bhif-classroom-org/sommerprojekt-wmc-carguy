@@ -108,13 +108,14 @@ export class UserRepository {
         const db = DB.getInstance();
         db.prepare(`
             UPDATE User
-            SET Username = ?, PublicName = ?, Description = ?, Image = ?
+            SET Username = ?, PublicName = ?, Description = ?, Image = ?, Title = ?
             WHERE UID = ?
         `).run(
             user.username,
             user.publicname,
             user.description,
             user.image,
+            user.title,
             user.uid
         );
     }
