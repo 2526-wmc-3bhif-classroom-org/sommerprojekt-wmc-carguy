@@ -33,7 +33,21 @@
       "Bash(node -e \"const d=require\\('fs'\\).readFileSync\\('/dev/stdin','utf8'\\); const g=JSON.parse\\(d\\); g.sort\\(\\(a,b\\)=>a.id-b.id\\).forEach\\(x=>console.log\\('ID',x.id,':',x.title\\)\\)\")",
       "Bash(node -e \"const g=JSON.parse\\(require\\('fs'\\).readFileSync\\('/tmp/guides.json','utf8'\\)\\); g.sort\\(\\(a,b\\)=>a.id-b.id\\).forEach\\(x=>console.log\\('ID',x.id,':',x.title\\)\\)\")",
       "Read(//c/3WMC/CarGuy/frontend/carguy/**)",
-      "Bash(echo \"Frontend PID: $!\")"
+      "Bash(echo \"Frontend PID: $!\")",
+      "Skill(run)",
+      "PowerShell(Start-Process -FilePath \"cmd.exe\" -ArgumentList \"/c cd C:\\\\3WMC\\\\CarGuy\\\\frontend\\\\carguy && npm start > C:\\\\Temp\\\\frontend.log 2>&1\" -WindowStyle Hidden; Write-Host \"Frontend starting...\")",
+      "WebFetch(domain:localhost)",
+      "PowerShell(curl *)",
+      "PowerShell(Invoke-RestMethod -Uri \"http://localhost:3000/api/forums\" -Method Get | ConvertTo-Json -Depth 2 | Select-Object -First 20)",
+      "PowerShell(Stop-Process *)",
+      "PowerShell(Invoke-RestMethod -Uri \"http://localhost:3000/api/forums\" -Method Get | Measure-Object | Select-Object Count)",
+      "PowerShell(Invoke-RestMethod -Uri \"http://localhost:3000/api/forums\" -Method Get | ConvertTo-Json -Depth 2 | Select-Object -First 30)",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=100\" -TimeoutSec 5; Write-Host \"OK: $\\($r.StatusCode\\)\" } catch { Write-Host \"FAIL: $_\" })",
+      "PowerShell($ProgressPreference = 'SilentlyContinue'; try { $r = Invoke-WebRequest -Uri \"https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=100\" -TimeoutSec 8 -UseBasicParsing; Write-Host \"OK: $\\($r.StatusCode\\) size=$\\($r.Content.Length\\)\" } catch { Write-Host \"FAIL: $\\($_.Exception.Message\\)\" })",
+      "WebFetch(domain:images.unsplash.com)",
+      "PowerShell(Start-Sleep 3; Invoke-WebRequest -Uri \"http://localhost:3000/api/posts/trending\" -UseBasicParsing | Select-Object -ExpandProperty StatusCode)",
+      "PowerShell($r = Invoke-WebRequest -Uri \"http://localhost:3000/api/posts/trending\" -UseBasicParsing | ConvertFrom-Json; $r | Where-Object { $_.forumId -eq 1 } | Select-Object -First 3 | ForEach-Object { Write-Host \"Post $\\($_.pid\\): $\\($_.title\\)\"; Write-Host \"  Images: $\\($_.imageUrls -join ', '\\)\"; Write-Host \"\" })",
+      "PowerShell($response = Invoke-WebRequest -Uri \"http://localhost:3000/api/posts/trending\" -UseBasicParsing; $json = $response.Content | ConvertFrom-Json; Write-Host \"Total posts: $\\($json.Count\\)\"; $json | Select-Object -First 5 | ForEach-Object { Write-Host \"ForumID=$\\($_.forumId\\) Title=$\\($_.title\\) Images=$\\($_.imageUrls\\)\" })"
     ]
   }
 }
