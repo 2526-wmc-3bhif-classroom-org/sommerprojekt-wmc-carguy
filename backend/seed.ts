@@ -147,8 +147,11 @@ const postsData = [
         "I've owned both the E46 M3 with the S54 inline-six and the E92 M3 with the S65 V8. The E46 feels nimble and mechanical, while the E92 V8 screams all the way to 8,300 RPM. Here are photos of both from my garage! What do you think is the best daily driver sports car?",
         1, 1, 1, "2025-02-01T10:00:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800",
-            "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=800"
+
+            "/sample/e46_m3_track.png",
+            "/sample/e46_m3_brakes.png",
+            "/sample/csl_airbox.png"
+
         ]), 42, 3
     ],
     [
@@ -164,8 +167,10 @@ const postsData = [
         "The upcoming M5 hybrid reportedly weighs over 5,300 lbs. While it has 717 hp, the sheer mass seems to defy the physics of a track sedan. Take a look at these spy shots and weight distribution spec sheets. Will this change the agility profile of BMW M permanently?",
         9, 1, 3, "2025-02-10T09:15:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800",
-            "https://images.unsplash.com/photo-1601362840469-51e4d8d58785?w=800"
+
+            "/sample/e46_m3_brakes.png",
+            "/sample/e46_m3_track.png"
+
         ]), 64, 12
     ],
     [
@@ -184,8 +189,10 @@ const postsData = [
         "There will never be another engine like the M156. The roar of a C63 Black Series or an SLS AMG is absolute thunder. With turbocharging and hybrid setups taking over, let's share our favorite cold start photos. Here is mine plus my W204 C63 wagon.",
         3, 2, 1, "2025-02-15T11:00:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800",
-            "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800"
+
+            "/sample/ls3_engine.png",
+            "/sample/ls3_engine.png"
+
         ]), 87, 2
     ],
     [
@@ -193,8 +200,10 @@ const postsData = [
         "After 1,000 miles, the GT R Pro has exceeded all my expectations. The coilover suspension is harsh on city streets, but on track, the front-end bite is unbelievable. Check out these trackside pictures of my beast! Ask me anything about the car's driving dynamics or running costs.",
         2, 2, 2, "2025-02-18T16:45:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800",
-            "https://images.unsplash.com/photo-1553440569-bcc63803a83d?w=800"
+
+            "/sample/ls3_engine.png",
+            "/sample/porsche_997.png"
+
         ]), 51, 1
     ],
     [
@@ -213,8 +222,10 @@ const postsData = [
         "Perfect styling, 591 hp twin-turbo V8, and enough space in the trunk to fit a set of racing wheels and luggage. Is there any car that does the double duty of family-hauler and performance weapon better than the RS6? Here is mine on road trips.",
         8, 3, 2, "2025-02-22T12:00:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1616422285623-13ff0162193c?w=800",
-            "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=800"
+
+            "/sample/supra_mk4.png",
+            "/sample/r32_vs_r33.png"
+
         ]), 93, 1
     ],
     [
@@ -230,8 +241,10 @@ const postsData = [
         "With the naturally aspirated V10 discontinued, the R8 is going to skyrocket in collector value. The sound of that engine at 8,700 RPM is unmatched. Here are some photos of my Decennium edition #42 in matte bronze.",
         6, 3, 5, "2025-02-26T15:20:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=800",
-            "https://images.unsplash.com/photo-1567808291548-fc3ee04dbcf0?w=800"
+
+            "/sample/porsche_997.png",
+            "/sample/supra_mk4.png"
+
         ]), 112, 2
     ],
 
@@ -257,8 +270,10 @@ const postsData = [
         "How will the Leclerc-Hamilton pairing work? Ferrari is known for having a clear driver priority, but neither of these two will want to play second fiddle. Will this be a championship-winning duo or team drama?",
         9, 4, 1, "2025-03-05T14:15:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1614200187524-dc4b892acf16?w=800",
-            "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800"
+
+            "/sample/supra_mk4.png",
+            "/sample/ls3_engine.png"
+
         ]), 89, 4
     ],
 
@@ -275,17 +290,19 @@ const postsData = [
         15, "Is a used Porsche Macan a reliable daily commuter?",
         "I'm considering a 2018 Macan S with 60k miles. The price is tempting (under 30k$), but I'm worried about PDK issues, oil leaks, and Porsche maintenance pricing. Any owners here who can share their repair bills?",
         1, 5, 4, "2025-03-10T10:45:00.000Z",
-        JSON.stringify([
-            "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=800",
-            "https://images.unsplash.com/photo-1632245889029-e406faaa34cd?w=800"
-        ]), 27, 2
+
+        JSON.stringify(["/sample/r32_vs_r33.png"]), 27, 2
+
     ],
     [
         16, "Hot hatch battle: Civic Type R FL5 vs Golf R Mk8",
         "Fwd mechanical driver's car vs Awd daily driver rocket. The Type R has the best shifter in the world, but the Golf R is much easier to live with in the winter. What are your buying factors?",
         7, 5, 2, "2025-03-12T09:00:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800"
+
+            "/sample/porsche_997.png",
+            "/sample/porsche_997.png"
+
         ]), 48, 3
     ],
 
@@ -295,8 +312,10 @@ const postsData = [
         "Starting a full frame-up restoration and overland build of my 1996 FZJ80 Land Cruiser. Plan: 3-inch OME lift, 35-inch Nitto tires, custom rear bumper with swing-outs, and a roof-top tent. Here are the starting shots of the rig!",
         5, 6, 5, "2025-03-14T09:00:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800",
-            "https://images.unsplash.com/photo-1547245324-d777c6f05e80?w=800"
+
+            "/sample/csl_airbox.png",
+            "/sample/e46_m3_track.png"
+
         ]), 125, 0
     ],
     [
@@ -322,8 +341,10 @@ const postsData = [
         "Finally pulled the 13B-REW engine out of my FD RX-7 to do a street port rebuild and upgrade to a single Garrett G30-770 turbo. Goal is a reliable 450 hp. Here are the teardown photos from the garage.",
         7, 7, 5, "2025-03-20T09:00:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800",
-            "https://images.unsplash.com/photo-1567808291548-fc3ee04dbcf0?w=800"
+
+            "/sample/porsche_997.png",
+            "/sample/porsche_997.png"
+
         ]), 143, 4
     ],
     [
@@ -339,8 +360,10 @@ const postsData = [
         "Just finished a full DIY wrap of my Audi RS3. Took me about 45 hours over two weekends. The satin green contrast with carbon fiber mirror caps looks amazing under sunlight.",
         8, 7, 5, "2025-03-24T16:20:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1616422285623-13ff0162193c?w=800",
-            "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=800"
+
+            "/sample/porsche_997.png",
+            "/sample/supra_mk4.png"
+
         ]), 98, 2
     ],
 
@@ -368,9 +391,11 @@ const postsData = [
         "The active front wing and rear wing DRS on the 992 GT3 RS are a masterpiece of engineering. Having clocked a few laps at the Ring, the downforce in fast sweepers is mindblowing. Check out these shots of the DRS active. Let's talk drag vs downforce setups.",
         11, 9, 2, "2025-04-01T10:00:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=800",
-            "https://images.unsplash.com/photo-1632245889029-e406faaa34cd?w=800",
-            "https://images.unsplash.com/photo-1588258219511-64eb629cb833?w=800"
+
+            "/sample/ls3_engine.png",
+            "/sample/r32_vs_r33.png",
+            "/sample/r32_vs_r33.png"
+
         ]), 154, 1
     ],
     [
@@ -398,8 +423,10 @@ const postsData = [
         "Starting a full paint restoration and mechanical refresh on my R34 GT-R V-Spec II. The Midnight Purple paint has some minor swirl marks that need professional paint correction. Here are the before, during, and after correction shots.",
         12, 10, 5, "2025-04-07T09:00:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800",
-            "https://images.unsplash.com/photo-1619682817481-e994891cd1f5?w=800"
+
+            "/sample/supra_mk4.png",
+            "/sample/supra_mk4.png"
+
         ]), 192, 0
     ],
     [
@@ -407,8 +434,10 @@ const postsData = [
         "My 2JZ engine is officially on the stand. Plan: forged pistons, single HKS T51R turbo, and a standalone Haltech ECU. Take a look at the custom exhaust manifold and the turbocharger mockups! What fuel pump setup are you running for E85?",
         7, 10, 5, "2025-04-10T12:00:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800",
-            "https://images.unsplash.com/photo-1567808291548-fc3ee04dbcf0?w=800"
+
+            "/sample/csl_airbox.png",
+            "/sample/porsche_997.png"
+
         ]), 120, 2
     ],
     [
@@ -426,8 +455,10 @@ const postsData = [
         "If you are starting to work on your own car, don't buy cheap sockets. Here is my list of 10 essential tools: low-profile jack, high-quality jack stands, digital torque wrench, and impact wrench reviews. Here are photos of my tool cabinet and shadow boards.",
         11, 11, 4, "2025-04-14T09:00:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1591278169757-deac26e49555?w=800",
-            "https://images.unsplash.com/photo-1567808291548-fc3ee04dbcf0?w=800"
+
+            "/sample/ls3_engine.png",
+            "/sample/ls3_engine.png"
+
         ]), 88, 0
     ],
     [
@@ -453,8 +484,10 @@ const postsData = [
         "Capturing the perfect reflection on metallic paint requires a Circular Polarizer (CPL) filter. Here are my favorite settings for a 50mm f/1.8 lens during sunset. Feel free to share your shots! Here is my shootout with two different filters.",
         12, 12, 5, "2025-04-20T17:00:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=800",
-            "https://images.unsplash.com/photo-1614200187524-dc4b892acf16?w=800"
+
+            "/sample/e46_m3_track.png",
+            "/sample/ls3_engine.png"
+
         ]), 110, 2
     ],
     [
@@ -505,8 +538,10 @@ const postsData = [
         "A ceramic coating creates a hydrophobic layer that repels dirt and makes washing your car incredibly easy. Did a dual-stage paint correction and applied Gtechniq Crystal Serum Light. The shine is unreal. Here are some wash panels.",
         13, 7, 5, "2025-05-01T10:00:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=800",
-            "https://images.unsplash.com/photo-1632245889029-e406faaa34cd?w=800"
+
+            "/sample/ls3_engine.png",
+            "/sample/e46_m3_track.png"
+
         ]), 78, 1
     ],
 
@@ -527,8 +562,10 @@ const postsData = [
         "Twin-turbo, active suspension, sequential turbocharging, and variable AWD in 1986! The 959 set the template for modern supercars. Share your favorite photos of this historic masterpiece.",
         11, 9, 1, "2025-05-05T09:00:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1588258219511-64eb629cb833?w=800",
-            "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=800"
+
+            "/sample/r32_vs_r33.png",
+            "/sample/ls3_engine.png"
+
         ]), 95, 0
     ],
 
@@ -538,8 +575,10 @@ const postsData = [
         "The F22C engine is a masterpiece. VTEC engaging at 6,000 RPM feels like a secondary engine kicking in. Added a Spoon exhaust and Ohlins coilovers. Here is my weekend mountain pass shot.",
         15, 10, 5, "2025-05-08T08:00:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1619682817481-e994891cd1f5?w=800",
-            "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800"
+
+            "/sample/porsche_997.png",
+            "/sample/csl_airbox.png"
+
         ]), 105, 0
     ],
 
@@ -600,8 +639,8 @@ const postsData = [
         "With rear-wheel steering, wide body, and 450 hp twin-turbo flat-six, the GTS offers 90% of the GT3's capability on track while being much more comfortable on long road trips. My review.",
         11, 9, 2, "2025-05-20T09:00:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=800",
-            "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800"
+            "/sample/r32_vs_r33.png",
+            "/sample/ls3_engine.png"
         ]), 67, 1
     ],
 
@@ -611,8 +650,10 @@ const postsData = [
         "The 4G63 engine paired with the active center differential makes the Evo IX feel like it cheats physics on gravel roads. Just finished installing a fresh set of tarmac spec coilovers. Drive report.",
         12, 10, 2, "2025-05-22T13:00:00.000Z",
         JSON.stringify([
-            "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800",
-            "https://images.unsplash.com/photo-1619682817481-e994891cd1f5?w=800"
+
+            "/sample/porsche_997.png",
+            "/sample/supra_mk4.png"
+
         ]), 89, 0
     ],
 
@@ -630,10 +671,9 @@ const postsData = [
         51, "M3 Competition G80: Is the grille growing on you?",
         "After one year of ownership of the G80 M3 Competition, I have to admit the controversial front grille has completely grown on me. The performance of the S58 engine and the xDrive system is absolutely mindblowing. Track day shots inside!",
         1, 1, 1, "2025-05-24T12:00:00.000Z",
-        JSON.stringify([
-            "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800",
-            "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=800"
-        ]), 40, 2
+
+        JSON.stringify(["/sample/e46_m3_track.png"]), 40, 2
+
     ],
     [
         52, "E46 M3 subframe reinforcement guide",
@@ -667,10 +707,9 @@ const postsData = [
         55, "RS3 5-Cylinder: The best sounding hot hatch?",
         "The 2.5 TFSI engine has a unique 1-2-4-5-3 firing order that sounds like a mini V10. Installed a Milltek exhaust. Cold start video clip.",
         8, 3, 1, "2025-05-24T15:00:00.000Z",
-        JSON.stringify([
-            "https://images.unsplash.com/photo-1616422285623-13ff0162193c?w=800",
-            "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=800"
-        ]), 62, 1
+
+        JSON.stringify(["/sample/supra_mk4.png"]), 62, 1
+
     ],
     [
         56, "Audi Quattro UR-Quattro restoration journey",
@@ -694,10 +733,9 @@ const postsData = [
         58, "Top 10 F1 livery designs of all time",
         "From the Jordan 191 to the JPS Lotus and Marlboro McLaren. What is your favorite F1 paint scheme ever designed?",
         14, 4, 1, "2025-05-24T16:30:00.000Z",
-        JSON.stringify([
-            "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=800",
-            "https://images.unsplash.com/photo-1614200187524-dc4b892acf16?w=800"
-        ]), 48, 2
+
+        JSON.stringify(["/sample/supra_mk4.png"]), 48, 2
+
     ],
     // --- New Car Buying Advice Posts (ForumID 5) ---
     [
@@ -722,10 +760,9 @@ const postsData = [
         61, "Suzuki Jimny overland build: Tiny but capable",
         "Fitting my Jimny with a custom drawer system, 2-inch lift, and roof rack. Who says you need a massive rig to explore the wilderness?",
         5, 6, 5, "2025-05-24T18:00:00.000Z",
-        JSON.stringify([
-            "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800",
-            "https://images.unsplash.com/photo-1547245324-d777c6f05e80?w=800"
-        ]), 73, 1
+
+        JSON.stringify(["/sample/csl_airbox.png"]), 73, 1
+
     ],
     [
         62, "Recovery tracks: MaxTrax vs cheaper alternatives",
@@ -776,10 +813,9 @@ const postsData = [
         67, "Porsche 996: The most undervalued 911?",
         "With the headlights and IMS issues driving prices down, a clean manual 996 Carrera under 20k$ seems like the ultimate entry point to 911 ownership.",
         11, 9, 1, "2025-05-24T21:00:00.000Z",
-        JSON.stringify([
-            "https://images.unsplash.com/photo-1588258219511-64eb629cb833?w=800",
-            "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=800"
-        ]), 49, 2
+
+        JSON.stringify(["/sample/r32_vs_r33.png"]), 49, 2
+
     ],
     [
         68, "Porsche 928 GTS restoration: Mechanical nightmare",
@@ -804,10 +840,9 @@ const postsData = [
         70, "Honda Civic Type R EK9: The high-revving hatch",
         "There is something magical about a naturally aspirated 1.6L B16B engine screaming all the way to 8,200 RPM in a chassis that weighs under 2,400 lbs.",
         12, 10, 1, "2025-05-24T22:30:00.000Z",
-        JSON.stringify([
-            "https://images.unsplash.com/photo-1619682817481-e994891cd1f5?w=800",
-            "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800"
-        ]), 85, 0
+
+        JSON.stringify(["/sample/csl_airbox.png"]), 85, 0
+
     ],
     // --- New Garage DIY & Maintenance Posts (ForumID 11) ---
     [
@@ -831,10 +866,9 @@ const postsData = [
         73, "Panning shots tutorial: Capturing motion at 1/30s",
         "How to track a moving car with your camera to blur the background while keeping the vehicle razor sharp. Settings, lens choice, and technique tips.",
         12, 12, 4, "2025-05-25T00:00:00.000Z",
-        JSON.stringify([
-            "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=800",
-            "https://images.unsplash.com/photo-1614200187524-dc4b892acf16?w=800"
-        ]), 92, 1
+
+        JSON.stringify(["/sample/e46_m3_track.png"]), 92, 1
+
     ],
     [
         74, "Best lenses for car shows: 35mm vs 50mm vs 85mm",
@@ -850,10 +884,9 @@ const postsData = [
         75, "1969 Dodge Charger restoration: Barn find build",
         "Starting a restoration on a Charger found in a barn. Rusted floor pans need replacing, and the 440 Magnum engine needs a full rebuild. Teardown photos!",
         6, 13, 5, "2025-05-25T01:00:00.000Z",
-        JSON.stringify([
-            "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800",
-            "https://images.unsplash.com/photo-1591278169757-deac26e49555?w=800"
-        ]), 115, 0
+
+        JSON.stringify(["/sample/porsche_997.png"]), 115, 0
+
     ],
     [
         76, "Classic Ford Mustang: Restomod vs Original spec",
@@ -878,10 +911,9 @@ const postsData = [
         78, "Sim Racing rig setup: Aluminum extrusion guide",
         "Why building a custom rig using 8020 aluminum extrusion is the most cost-effective and rigid solution for direct-drive wheelbases.",
         14, 14, 5, "2025-05-25T02:30:00.000Z",
-        JSON.stringify([
-            "https://images.unsplash.com/photo-1614200187524-dc4b892acf16?w=800",
-            "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800"
-        ]), 83, 1
+
+        JSON.stringify(["/sample/porsche_997.png"]), 83, 1
+
     ],
     [
         79, "Assetto Corsa vs iRacing: Physics comparison",

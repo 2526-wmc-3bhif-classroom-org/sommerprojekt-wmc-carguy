@@ -1,18 +1,27 @@
 <div class="mx-auto max-w-[1400px] px-6 py-8 min-h-screen pt-20 relative">
 
-  <header class="mb-8 flex items-start justify-between flex-wrap gap-4">
-    <div class="header text-left">
+  <header class="premium-header mb-8 flex items-start justify-between flex-wrap gap-4 relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent"></div>
+    <div class="header text-left relative z-10">
       <h1 class="text-4xl font-semibold mb-2">Platform Guides</h1>
       <p class="text-lg opacity-80">Explore our comprehensive guides and tutorials to get the most out of CarGuy.</p>
     </div>
-    @if (canPostGuides) {
-      <button (click)="openCreateForm()" class="btn btn-primary">Create Guide</button>
-    }
+    <div class="relative z-10 flex items-center">
+      @if (isLoggedIn) {
+        @if (canPostGuides) {
+          <button (click)="openCreateForm()" class="btn btn-primary">Create Guide</button>
+        } @else {
+          <div class="tooltip tooltip-left" data-tip="Requires 100+ Aura">
+            <button class="btn btn-primary btn-disabled opacity-50 cursor-not-allowed" disabled>Create Guide</button>
+          </div>
+        }
+      }
+    </div>
   </header>
 
   <div class="guides-grid">
     @for (guide of guides; track guide.id) {
-      <div class="guide-card premium-card rounded-2xl">
+      <div class="guide-card premium-card rounded-3xl">
         <div class="card-body">
           <div class="text-xs opacity-60 mb-2 flex items-center gap-1.5 flex-wrap">
             @if (guide.author) {
@@ -27,12 +36,12 @@
             }
           </div>
           <h2 class="card-title text-accent">{{ guide.title }}</h2>
-          <p class="guide-description">{{ guide.description }}</p>
+          <p class="guide-description text-base-content/70">{{ guide.description }}</p>
 
           <div class="card-actions justify-between items-center mt-4">
             <button
               (click)="openGuide(guide)"
-              class="btn btn-outline border-accent text-accent hover:bg-accent hover:border-accent hover:text-base-content btn-sm">
+              class="btn btn-outline border-accent text-accent hover:bg-accent hover:border-accent hover:text-base-content btn-sm rounded-xl">
               Read Guide
             </button>
           </div>
@@ -44,7 +53,7 @@
   <!-- Modal / Overlay for the selected guide -->
   @if (selectedGuide) {
     <div class="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in p-4 sm:p-8">
-      <div class="modal-box bg-base-100 border border-accent shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto relative animate-slide-up rounded-2xl">
+      <div class="modal-box bg-base-100/80 backdrop-blur-md border border-accent/30 shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto relative animate-slide-up rounded-3xl p-8">
 
         <!-- Close button (top right) -->
         <button
@@ -80,7 +89,7 @@
           <div class="space-y-6">
             @for (step of selectedGuide.content; track $index) {
               <div class="flex gap-4 items-start">
-                <div class="shrink-0 w-8 h-8 rounded-full bg-accent/20 border border-accent text-accent flex items-center justify-center font-bold">
+                <div class="shrink-0 w-8 h-8 rounded-full bg-accent/20 border border-accent/40 text-accent flex items-center justify-center font-bold">
                   {{ $index + 1 }}
                 </div>
                 <p class="text-lg leading-relaxed pt-1">
@@ -92,7 +101,7 @@
         </div>
 
         <div class="modal-action mt-8 pt-4 border-t border-white/10">
-          <button (click)="closeGuide()" class="btn bg-accent text-base-content hover:bg-opacity-90 border-none">Got it, thanks!</button>
+          <button (click)="closeGuide()" class="btn bg-accent text-base-content hover:bg-opacity-90 border-none rounded-xl">Got it, thanks!</button>
         </div>
       </div>
     </div>
@@ -101,7 +110,7 @@
   <!-- Modal for Creating a Guide -->
   @if (showCreateForm) {
     <div class="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-8">
-      <div class="modal-box bg-base-100 border border-primary shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative rounded-2xl p-8">
+      <div class="modal-box bg-base-100/80 backdrop-blur-md border border-primary/30 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative rounded-3xl p-8">
 
         <button
           (click)="closeCreateForm()"
@@ -118,7 +127,7 @@
               [(ngModel)]="newGuideTitle"
               type="text"
               placeholder="e.g. How to replace spark plugs"
-              class="input input-bordered w-full bg-white/5 text-base-content focus:border-primary"
+              class="input input-bordered w-full bg-white/5 text-base-content focus:border-primary rounded-xl"
             />
           </div>
 
@@ -127,7 +136,7 @@
             <textarea
               [(ngModel)]="newGuideDescription"
               placeholder="Provide a brief summary of what this guide covers..."
-              class="textarea textarea-bordered w-full bg-white/5 text-base-content focus:border-primary"
+              class="textarea textarea-bordered w-full bg-white/5 text-base-content focus:border-primary rounded-xl"
               rows="3"
             ></textarea>
           </div>
@@ -137,42 +146,42 @@
             <div class="space-y-3">
               @for (step of newGuideSteps; track $index) {
                 <div class="flex gap-2 items-start">
-                  <div class="shrink-0 w-8 h-8 rounded-full bg-primary/20 border border-primary text-primary flex items-center justify-center font-bold text-sm mt-1">
+                  <div class="shrink-0 w-8 h-8 rounded-full bg-primary/20 border border-primary/40 text-primary flex items-center justify-center font-bold text-sm mt-1">
                     {{ $index + 1 }}
                   </div>
                   <input
                     [(ngModel)]="newGuideSteps[$index]"
                     type="text"
                     placeholder="Describe this step..."
-                    class="input input-bordered flex-1 bg-white/5 text-base-content focus:border-primary"
+                    class="input input-bordered flex-1 bg-white/5 text-base-content focus:border-primary rounded-xl"
                   />
                   <button
                     (click)="removeStep($index)"
                     [disabled]="newGuideSteps.length <= 1"
-                    class="btn btn-error btn-square btn-sm mt-1"
+                    class="btn btn-error btn-square btn-sm mt-1 rounded-lg"
                   >
                     ✕
                   </button>
                 </div>
               }
             </div>
-            <button (click)="addStep()" class="btn btn-outline btn-sm btn-primary w-fit mt-4">
+            <button (click)="addStep()" class="btn btn-outline btn-sm btn-primary w-fit mt-4 rounded-xl">
               + Add Step
             </button>
           </div>
 
           @if (errorMessage) {
-            <div class="alert alert-error text-sm py-2 px-4 mt-4">
+            <div class="alert alert-error text-sm py-2 px-4 mt-4 rounded-xl">
               <span>{{ errorMessage }}</span>
             </div>
           }
 
           <div class="modal-action mt-8 pt-4 border-t border-base-content/10 flex justify-end gap-3">
-            <button (click)="closeCreateForm()" class="btn btn-ghost">Cancel</button>
+            <button (click)="closeCreateForm()" class="btn btn-ghost rounded-xl">Cancel</button>
             <button
               (click)="submitGuide()"
               [disabled]="isSubmitting || !newGuideTitle.trim() || !newGuideDescription.trim()"
-              class="btn btn-primary"
+              class="btn btn-primary rounded-xl"
             >
               @if (isSubmitting) {
                 <span class="loading loading-spinner loading-sm"></span>

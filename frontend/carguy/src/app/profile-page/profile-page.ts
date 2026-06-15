@@ -28,6 +28,7 @@ export class ProfilePage implements OnInit {
   public editUsername: string = '';
   public editDescription: string = '';
   public editImage: string = '';
+  public editTitle: string = '';
 
   loadedUser: User | null = null;
 
@@ -55,6 +56,11 @@ export class ProfilePage implements OnInit {
   get isOwnProfile(): boolean {
       const loggedInUser = this.userService.getCurrentUser();
       return loggedInUser !== null && this.currentUser !== null && loggedInUser.uid === this.currentUser.uid;
+  }
+
+  get canEditTitle(): boolean {
+    const user = this.userService.getCurrentUser();
+    return user !== null && ((user.totalAura || 0) >= 100 || user.role === 'admin');
   }
 
   async ngOnInit() {
@@ -105,6 +111,7 @@ export class ProfilePage implements OnInit {
       this.editUsername = loggedInUser.username;
       this.editDescription = loggedInUser.description || '';
       this.editImage = loggedInUser.image || '';
+      this.editTitle = loggedInUser.title || '';
     }
     this.isEditing = true;
   }
@@ -121,6 +128,7 @@ export class ProfilePage implements OnInit {
         username: this.editUsername,
         description: this.editDescription,
         image: this.editImage,
+        title: this.editTitle,
       }
 
       try {
@@ -145,6 +153,7 @@ export class ProfilePage implements OnInit {
       this.editUsername = loggedInUser.username;
       this.editDescription = loggedInUser.description || '';
       this.editImage = loggedInUser.image || '';
+      this.editTitle = loggedInUser.title || '';
     }
     this.isEditing = false;
   }
