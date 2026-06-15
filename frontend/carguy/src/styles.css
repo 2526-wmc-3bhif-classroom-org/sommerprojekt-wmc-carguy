@@ -6,7 +6,7 @@
 
 @plugin "daisyui/theme" {
   name: "light";
-  default: false;
+  default: true;
   prefersdark: false;
   color-scheme: "light";
   --color-base-100: oklch(100% 0 0);
@@ -40,7 +40,7 @@
 }
 
 @plugin "daisyui/theme" {
-  name: "dark";
+  name: "carguy";
   default: false;
   prefersdark: false;
   color-scheme: "dark";
@@ -76,7 +76,7 @@
 
 /* Custom CarGuy Spacing and Card Styling */
 .stat-card {
-  @apply p-8 rounded-xl border border-accent/5 flex flex-col justify-center;
+  @apply p-6 rounded-3xl border border-base-content/10 flex flex-col justify-center items-center text-center bg-base-200/40 backdrop-blur-sm transition-[transform,box-shadow,border-color] duration-300 hover:border-primary/20 hover:-translate-y-[2px] hover:shadow-lg;
   min-height: 140px;
 }
 
@@ -87,7 +87,7 @@
 
 /* Background Smoothness */
 body {
-  background-color: #09090b;
+  background-color: var(--color-base-100);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -107,4 +107,46 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #3f3f46;
+}
+
+/* Disable expensive blur layers during theme transition for smoother capture */
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transition: none !important;
+}
+
+/* Custom View Transition circular reveal theme switch */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+  display: block;
+}
+::view-transition-old(root) {
+  z-index: 1;
+}
+::view-transition-new(root) {
+  z-index: 9999;
+  will-change: clip-path;
+}
+
+/* Premium Glassmorphic Cards */
+.premium-card {
+  @apply border border-base-content/10 bg-base-200/40 backdrop-blur-sm transition-[transform,box-shadow] duration-300 hover:border-accent/30 hover:-translate-y-[2px] hover:shadow-lg;
+  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.01) 0%, rgba(255, 255, 255, 0) 100%);
+}
+[data-theme="light"] .premium-card {
+  background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.005) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+/* Premium Glassmorphic Page Headers */
+.premium-header {
+  @apply bg-base-200/50 backdrop-blur-md border border-base-content/10 rounded-3xl p-8 relative overflow-hidden shadow-xl;
+  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 100%);
+}
+[data-theme="light"] .premium-header {
+  background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0) 100%);
 }

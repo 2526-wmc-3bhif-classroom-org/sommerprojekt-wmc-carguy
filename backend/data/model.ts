@@ -32,6 +32,9 @@ export interface User {
   image?: string;
   createdAt: Date;
   posts?: Post[];
+  totalPosts?: number;
+  totalComments?: number;
+  totalAura?: number;
 }
 
 export interface Post {
@@ -43,6 +46,7 @@ export interface Post {
   parentPost?: Post;
   replies?: Post[];
   publishedAt: Date;
+  imageUrls?: string[];
   likes: number;
   dislikes: number;
   category?: PostCategory;
@@ -57,6 +61,21 @@ export interface Forum {
   posts?: Post[];
   createdAt: Date;
   category?: ForumCategory;
+  memberCount?: number;
+  authorId?: number;
+}
+
+export interface Comment {
+  cid: number;
+  content: string;
+  author: User;
+  post: Post;
+  parentComment?: Comment;
+  replies?: Comment[];
+  publishedAt: Date;
+  imageUrls?: string[];
+  likes: number;
+  dislikes: number;
 }
 
 export interface PostCategory {
@@ -67,4 +86,20 @@ export interface PostCategory {
 export interface ForumCategory {
   forumCategoryId: number;
   forumCategoryName: string;
+}
+
+export interface UserInForum {
+  uid: number;
+  forumId: number;
+}
+
+export interface Guide {
+  id: number;
+  title: string;
+  description: string;
+  content: string[];
+  author: User;
+  publishedAt: string;
+  likes: number;
+  dislikes: number;
 }

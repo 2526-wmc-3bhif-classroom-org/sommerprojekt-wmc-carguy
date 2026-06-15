@@ -1,56 +1,135 @@
-import { Component } from '@angular/core';
-
-export interface Guide {
-  id: number;
-  title: string;
-  description: string;
-  readTime: string;
-}
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { GuideService } from '../services/guide-service';
+import { UserService } from '../services/user-service';
+import { Guide } from '../../model';
 
 @Component({
   selector: 'app-guides',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './Guides.html',
   styleUrl: './Guides.css'
 })
-export class GuidesComponent {
-  guides: Guide[] = [
-    {
-      id: 1,
-      title: 'Getting Started with CarGuy',
-      description: 'Learn the basics of our platform, how to set up your profile, and start exploring car brands.',
-      readTime: '5 min'
-    },
-    {
-      id: 2,
-      title: 'Finding the Right Community',
-      description: 'Discover how to search, filter, and join the best car communities that match your interests.',
-      readTime: '8 min'
-    },
-    {
-      id: 3,
-      title: 'Advanced Search Tips',
-      description: 'Take your search skills to the next level with our advanced filtering and sorting options.',
-      readTime: '6 min'
-    },
-    {
-      id: 4,
-      title: 'Managing Your Garage',
-      description: 'A comprehensive guide on how to add, edit, and showcase your vehicles in your virtual garage.',
-      readTime: '10 min'
-    },
-    {
-      id: 5,
-      title: 'Connecting with Enthusiasts',
-      description: 'Tips and etiquette for messaging and connecting with other car enthusiasts on the platform.',
-      readTime: '4 min'
-    },
-    {
-      id: 6,
-      title: 'Troubleshooting Common Issues',
-      description: 'Quick fixes and solutions for the most commonly encountered issues on the platform.',
-      readTime: '7 min'
+export class GuidesComponent implements OnInit, OnDestroy {
+  selectedGuide: Guide | null = null;
+  guides: Guide[] = [];
+
+  // Form State
+  showCreateForm = false;
+  newGuideTitle = '';
+  newGuideDescription = '';
+  newGuideSteps: string[] = [''];
+  isSubmitting = false;
+  errorMessage = '';
+
+  private userService = inject(UserService);
+  private guideService = inject(GuideService);
+
+  get isLoggedIn(): boolean {
+    return this.userService.isLoggedIn();
+  }
+
+  get canPostGuides(): boolean {
+    const user = this.userService.getCurrentUser();
+    return user !== null && ((user.totalAura || 0) >= 100 || user.role === 'admin');
+  }
+
+  async ngOnInit() {
+    await this.refreshUserAura();
+    await this.loadGuides();
+  }
+
+  async refreshUserAura() {
+    const loggedInUser = this.userService.getCurrentUser();
+    if (loggedInUser) {
+      try {
+        const updatedUser = await this.userService.getUserById(loggedInUser.uid);
+        localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+      } catch (err) {
+        console.error("Failed to refresh user aura:", err);
+      }
     }
-  ];
+  }
+
+  async loadGuides() {
+    try {
+      this.guides = await this.guideService.getGuides();
+    } catch (err) {
+      console.error("Failed to load guides:", err);
+    }
+  }
+
+  openGuide(guide: Guide): void {
+    this.selectedGuide = guide;
+    // Prevent scrolling on the background when modal is open
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeGuide(): void {
+    this.selectedGuide = null;
+    // Restore scrolling
+    document.body.style.overflow = 'auto';
+  }
+
+  openCreateForm() {
+    this.showCreateForm = true;
+    this.newGuideTitle = '';
+    this.newGuideDescription = '';
+    this.newGuideSteps = [''];
+    this.errorMessage = '';
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeCreateForm() {
+    this.showCreateForm = false;
+    document.body.style.overflow = 'auto';
+  }
+
+  addStep() {
+    this.newGuideSteps.push('');
+  }
+
+  removeStep(index: number) {
+    if (this.newGuideSteps.length > 1) {
+      this.newGuideSteps.splice(index, 1);
+    } else {
+      this.newGuideSteps[0] = '';
+    }
+  }
+
+  async submitGuide() {
+    const title = this.newGuideTitle.trim();
+    const description = this.newGuideDescription.trim();
+    const steps = this.newGuideSteps.map(s => s.trim()).filter(s => s !== '');
+
+    if (!title || !description || steps.length === 0) {
+      this.errorMessage = 'Please fill out all fields and add at least one step.';
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.errorMessage = '';
+
+    try {
+      await this.guideService.createGuide(title, description, steps);
+      this.closeCreateForm();
+      await this.loadGuides();
+    } catch (err) {
+      if (err instanceof Error) {
+        this.errorMessage = err.message;
+      } else {
+        this.errorMessage = 'An unexpected error occurred.';
+      }
+    } finally {
+      this.isSubmitting = false;
+    }
+  }
+
+  // Ensure we restore scrolling if the user navigates away while the modal is open
+  ngOnDestroy(): void {
+    document.body.style.overflow = 'auto';
+  }
 }

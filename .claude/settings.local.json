@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git pull *)",
+      "Bash(git checkout *)",
+      "Bash(git push *)",
+      "Read(//mnt/c/3WMC/CarGuy/**)",
+      "Bash(npx tsc *)",
+      "Bash(npx ts-node *)",
+      "PowerShell(Get-Process *)",
+      "PowerShell(Receive-Job *)",
+      "PowerShell(Get-Job *)",
+      "PowerShell(Invoke-RestMethod -Uri \"http://localhost:3000/api/users\" -Method GET -ErrorAction SilentlyContinue | Select-Object -First 3)",
+      "PowerShell($body = '{\"username\": \"max_mustermann\", \"password\": \"password123\"}'; $response = Invoke-RestMethod -Uri \"http://localhost:3000/api/login\" -Method POST -ContentType \"application/json\" -Body $body -ErrorAction Stop; Write-Output \"accessToken: $\\($response.accessToken.Substring\\(0,30\\)\\)...\"; Write-Output \"expiresAt: $\\($response.expiresAt\\)\"; Write-Output \"user: $\\($response.user.username\\)\")",
+      "PowerShell($ts = [DateTimeOffset]::UtcNow.ToString\\(\"o\"\\); Write-Output \"Current UTC: $ts\"; $expires = [DateTimeOffset]::Parse\\(\"2026-05-12T06:47:57.957Z\"\\); $diff = $expires - [DateTimeOffset]::UtcNow; Write-Output \"Token läuft ab in: $\\([math]::Round\\($diff.TotalMinutes\\)\\) Minuten\")",
+      "PowerShell(netstat *)",
+      "PowerShell(Start-Sleep 5; try { Invoke-RestMethod -Uri \"http://localhost:3000/api/users\" -Method GET -TimeoutSec 3 | Select-Object -First 1 } catch { Write-Output \"Server nicht erreichbar: $_\" })",
+      "PowerShell($body = '{\"username\": \"max_mustermann\", \"password\": \"password123\"}'; $r = Invoke-RestMethod -Uri \"http://localhost:3000/api/login\" -Method POST -ContentType \"application/json\" -Body $body; $expires = [DateTimeOffset]::Parse\\($r.expiresAt\\); $diff = $expires - [DateTimeOffset]::UtcNow; Write-Output \"Token laeuft ab in: $\\([math]::Round\\($diff.TotalHours, 1\\)\\) Stunden\"; Write-Output \"User: $\\($r.user.username\\)\")",
+      "PowerShell($ts = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds\\(\\); $body = \"{`\"publicname`\": `\"TestUser`\", `\"username`\": `\"testuser_$ts`\", `\"password`\": `\"test1234`\"}\"; $r = Invoke-RestMethod -Uri \"http://localhost:3000/api/register\" -Method POST -ContentType \"application/json\" -Body $body; Write-Output \"accessToken: $\\(if \\($r.accessToken\\) { $r.accessToken.Substring\\(0,30\\) + '...' } else { 'FEHLT!' }\\)\"; $expires = [DateTimeOffset]::Parse\\($r.expiresAt\\); $diff = $expires - [DateTimeOffset]::UtcNow; Write-Output \"Token laeuft ab in: $\\([math]::Round\\($diff.TotalHours, 1\\)\\) Stunden\"; Write-Output \"User: $\\($r.user.username\\)\")",
+      "PowerShell(Start-Sleep 5; try { $r = Invoke-RestMethod -Uri \"http://localhost:3000/api/posts/comments/1\" -Method GET -TimeoutSec 3; Write-Output \"Backend OK - Comments geladen: $\\($r.Count\\)\" } catch { Write-Output \"Fehler: $_\" })",
+      "PowerShell(Start-Sleep 8; try { $r = Invoke-RestMethod -Uri \"http://localhost:3000/api/posts/comments/1\" -Method GET -TimeoutSec 5; Write-Output \"Backend OK\" } catch { Write-Output \"Fehler: $_\" })",
+      "PowerShell($body = '{\"content\":\"Test Kommentar\",\"author\":{\"uid\":1,\"username\":\"max_mustermann\",\"publicname\":\"Max M.\",\"password\":\"\",\"role\":\"user\",\"createdAt\":\"2025-01-15\"},\"post\":{\"pid\":1,\"title\":\"Test\",\"content\":\"Test\",\"publishedAt\":\"2025-01-15\",\"likes\":0,\"dislikes\":0}}'; try { $r = Invoke-RestMethod -Uri \"http://localhost:3000/api/comment\" -Method POST -ContentType \"application/json\" -Body $body -TimeoutSec 5; Write-Output \"Comment erstellt: $\\($r.message\\)\" } catch { Write-Output \"Fehler: $_\" })",
+      "PowerShell(Start-Sleep 8; try { Invoke-RestMethod -Uri \"http://localhost:3000/api/posts/forum/1\" -TimeoutSec 5 | Select-Object pid, likes, commentCount | Select-Object -First 3 } catch { Write-Output \"Fehler: $_\" })",
+      "PowerShell(try { $r = Invoke-RestMethod -Uri \"http://localhost:3000/api/posts/forum/1\" -TimeoutSec 5; $r | Select-Object pid, likes, commentCount | Select-Object -First 3 } catch { Write-Output \"Fehler: $_\" })",
+      "PowerShell($r = Invoke-RestMethod -Uri \"http://localhost:3000/api/posts/forum/1\" -TimeoutSec 5; Write-Output \"Posts: $\\($r.Count\\)\"; $r | ForEach-Object { Write-Output \"pid=$\\($_.pid\\) likes=$\\($_.likes\\) commentCount=$\\($_.commentCount\\)\" })",
+      "PowerShell($r = Invoke-RestMethod -Uri \"http://localhost:3000/api/posts/1/like\" -Method PATCH; Write-Output \"like: $\\($r.message\\)\"; $r2 = Invoke-RestMethod -Uri \"http://localhost:3000/api/posts/1/unlike\" -Method PATCH; Write-Output \"unlike: $\\($r2.message\\)\")"
+    ]
+  }
+}

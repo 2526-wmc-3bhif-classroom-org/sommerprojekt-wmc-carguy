@@ -1,15 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { UserService } from '../services/user-service';
 
 @Component({
   selector: 'app-login-page',
-  imports: [FormsModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './login-page.html',
   styleUrl: './login-page.css',
 })
+
 export class LoginPage {
+  @ViewChild('registerForm') registerForm!: NgForm;
+  @ViewChild('loginForm') loginForm!: NgForm;
+
   public activeTab: 'login' | 'register' = 'login';
   public username = '';
   public password = '';
@@ -17,6 +22,8 @@ export class LoginPage {
   public isLoading = false;
   public errorMessage = '';
   protected publicname = '';
+
+  private userService = inject(UserService);
 
   constructor(private router: Router) {}
 
@@ -26,11 +33,20 @@ export class LoginPage {
   }
 
   public async login() {
-    this.isLoading = true;
     this.errorMessage = '';
 
+    if (!this.loginForm.valid) {
+      this.errorMessage = 'Please fill out all required fields.';
+      Object.keys(this.loginForm.controls).forEach(field => {
+        const control = this.loginForm.controls[field];
+        control.markAsTouched({ onlySelf: true });
+      });
+      return;
+    }
+
+    this.isLoading = true;
     try {
-      await UserService.login(this.username, this.password);
+      await this.userService.login(this.username, this.password);
       this.router.navigate(['/profile']);
     } catch (e) {
       this.errorMessage = e instanceof Error ? e.message : 'Login failed. Please try again.';
@@ -40,19 +56,25 @@ export class LoginPage {
   }
 
   public async register() {
-    this.isLoading = true;
     this.errorMessage = '';
 
-    if (this.password !== this.confirmPassword) {
-      this.errorMessage = 'Passwords do not match.';
-      this.isLoading = false;
+    if (!this.registerForm.valid) {
+      this.errorMessage = 'Please fill out all required fields correctly.';
+      Object.keys(this.registerForm.controls).forEach(field => {
+        const control = this.registerForm.controls[field];
+        control.markAsTouched({ onlySelf: true });
+      });
       return;
     }
 
+    if (this.password !== this.confirmPassword) {
+      this.errorMessage = 'Passwords do not match.';
+      return;
+    }
+
+    this.isLoading = true;
     try {
-      await UserService.register(this.publicname, this.username, this.password);
-      // Auto-login after successful registration
-      await UserService.login(this.username, this.password);
+      await this.userService.register(this.publicname, this.username, this.password);
       this.router.navigate(['/profile']);
     } catch (e) {
       this.errorMessage = e instanceof Error ? e.message : 'Registration failed. Please try again.';

@@ -1,43 +1,8 @@
-import {User} from '../../model';
-
-const API_BASE_URL = "http://localhost:3000/api";
-
-/*async getCurrentUserProfile(): Promise<User | null> {
-  const token = this.getToken();
-  if (!token) return null;
-
-  try {
-      const currentUser = this.getCurrentUser();
-      if (!currentUser) return null;
-
-      const response = await fetch(`${API_BASE_URL}/profile`, {
-          headers: { "Authorization": `Bearer ${token}` },
-      });
-      return await handleResponse<User>(response);
-
-  } catch (error) {
-      console.error("Failed to fetch user profile:", error);
-      return null;
-      }
-  }
-}*/
-
-let curUser: User | null;
-
-async function handleResponse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    let errorMessage: string;
-    try {
-      const errorBody = await response.json();
-      errorMessage = errorBody.message || `Request failed with status ${response.status}`;
-    } catch {
-      errorMessage = await response.text() || `Request failed with status ${response.status}`;
-    }
-    throw new Error(errorMessage);
-  }
-  if (response.status === 204) return {} as T;
-  return response.json();
-}
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { User } from '../../model';
+import { environment } from '../../environments/environment';
 
 export interface LoginResponse {
   userClaims: { username: string; role: string };
@@ -46,39 +11,43 @@ export interface LoginResponse {
   user: User;
 }
 
-export const UserService = {
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+  private http = inject(HttpClient);
+  private curUser: User | null = null;
 
   async login(username: string, password: string): Promise<LoginResponse> {
-    const response = await fetch(`${API_BASE_URL}/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
-
-    const data = await handleResponse<LoginResponse>(response);
+    const data = await firstValueFrom(
+      this.http.post<LoginResponse>(`${environment.apiBaseUrl}/login`, { username, password })
+    );
 
     // Store auth data in localStorage
     localStorage.setItem("accessToken", data.accessToken);
     localStorage.setItem("userClaims", JSON.stringify(data.userClaims));
     localStorage.setItem("expiresAt", data.expiresAt);
     localStorage.setItem("userName", data.userClaims.username);
+    localStorage.setItem("currentUser", JSON.stringify(data.user));
 
-    curUser = data.user;
+    this.curUser = data.user;
 
     return data;
-  },
+  }
 
   async register(publicname: string, username: string, password: string): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({publicname, username, password }),
-    });
+    const data = await firstValueFrom(
+      this.http.post<LoginResponse>(`${environment.apiBaseUrl}/register`, { publicname, username, password })
+    );
 
-    const data : LoginResponse = await handleResponse<LoginResponse>(response);
+    localStorage.setItem("accessToken", data.accessToken);
+    localStorage.setItem("userClaims", JSON.stringify(data.userClaims));
+    localStorage.setItem("expiresAt", data.expiresAt);
+    localStorage.setItem("userName", data.userClaims.username);
+    localStorage.setItem("currentUser", JSON.stringify(data.user));
 
-    curUser = data.user;
-  },
+    this.curUser = data.user;
+  }
 
   getToken(): string | null {
     const token = localStorage.getItem("accessToken");
@@ -93,21 +62,71 @@ export const UserService = {
     }
 
     return token;
-  },
+  }
 
   isLoggedIn(): boolean {
     return this.getToken() !== null;
-  },
+  }
 
   getCurrentUser(): User | null {
-    if (!this.isLoggedIn()) return null;
-    return curUser
-  },
+    if (!this.isLoggedIn()) {
+      this.curUser = null; // Explicitly set curUser to null if not logged in
+      return null;
+    }
+    if (!this.curUser) {
+      const stored = localStorage.getItem("currentUser");
+      if (stored) {
+        try {
+          this.curUser = JSON.parse(stored);
+        } catch (e) {
+          console.error("Failed to parse currentUser from localStorage", e);
+          this.curUser = null; // Ensure curUser is null on parsing error
+        }
+      }
+    }
+    return this.curUser;
+  }
+
+  async getUserById(id: number): Promise<User> {
+    return firstValueFrom(
+      this.http.get<User>(`${environment.apiBaseUrl}/user/${id}`)
+    );
+  }
 
   logout(): void {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("userClaims");
     localStorage.removeItem("expiresAt");
     localStorage.removeItem("userName");
-  },
-};
+    localStorage.removeItem("currentUser");
+    this.curUser = null;
+  }
+
+  async editUserInfo(oldUser: User, newUser: User): Promise<User> {
+    const response = await firstValueFrom(
+      this.http.post<{ user: User, accessToken?: string, userClaims?: any, expiresAt?: string }>(`${environment.apiBaseUrl}/update`, {
+        username: oldUser.username,
+        newUsername: newUser.username,
+        newPublicName: newUser.publicname,
+        newDescription: newUser.description,
+        newImage: newUser.image,
+        newTitle: newUser.title
+      })
+    );
+
+    if (response.accessToken) {
+      localStorage.setItem("accessToken", response.accessToken);
+    }
+    if (response.userClaims) {
+      localStorage.setItem("userClaims", JSON.stringify(response.userClaims));
+      localStorage.setItem("userName", response.userClaims.username);
+    }
+    if (response.expiresAt) {
+      localStorage.setItem("expiresAt", response.expiresAt);
+    }
+
+    localStorage.setItem("currentUser", JSON.stringify(response.user));
+    this.curUser = response.user;
+    return response.user;
+  }
+}

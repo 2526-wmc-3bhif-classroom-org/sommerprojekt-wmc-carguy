@@ -39,6 +39,11 @@
   animation: fade-in 0.2s ease;
 }
 
+.input-error {
+  border-color: var(--color-error) !important; /* Use DaisyUI error color */
+  box-shadow: 0 0 0 2px oklch(from var(--color-error) l c h / 0.2); /* Add a subtle glow */
+}
+
 @keyframes fade-in {
   from { opacity: 0; }
   to   { opacity: 1; }
