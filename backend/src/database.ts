@@ -262,6 +262,41 @@ export class DB {
                             'For exact matches, wrap your search query in quotes. For example: "Porsche 911 GT3".',
                             'Use keywords like "help" or "build" alongside your car model to find relevant project threads.'
                         ]
+                    },
+                    {
+                        id: 7,
+                        title: 'E46 M3 S54 Valve Clearance Adjustment',
+                        description: 'A critical maintenance item for the S54 engine every 30,000 miles. Do not ignore this, or you risk rocker arm failure.',
+                        content: [
+                            'Remove the ignition coils, spark plugs, and the valve cover.',
+                            'Rotate the engine manually to TDC for each cylinder.',
+                            'Measure the gap between the cam lobe and the rocker arm using feeler gauges.',
+                            'If the gap is out of spec, use a magnetic tool to remove the old shim and insert a new one of the correct thickness.',
+                            'Reassemble everything, ensuring the valve cover gasket is seated properly with RTV at the half-moons.'
+                        ]
+                    },
+                    {
+                        id: 8,
+                        title: 'LS3 Engine Swap - Wiring Harness Basics',
+                        description: 'Swapping an LS3 into your project car? Here is a breakdown of the essential sensors and how to thin out a factory harness.',
+                        content: [
+                            'Identify the core sensors: MAP (Manifold Absolute Pressure), MAF (Mass Airflow), Crank Position, and Cam Position.',
+                            'Remove unnecessary circuits like the rear O2 sensors (if running without cats), EVAP, and automatic transmission wiring if using a manual.',
+                            'Route your grounds properly to the back of the cylinder heads to avoid ECU issues.',
+                            'Connect the standalone fuse box to a switched 12V ignition source, constant 12V battery power, and a solid chassis ground.'
+                        ]
+                    },
+                    {
+                        id: 9,
+                        title: 'Porsche 997 Carrera IMS Bearing Guide',
+                        description: 'Is the IMS bearing failure real on the 997.1? Yes. Here is a definitive guide on how to identify which engine you have and retrofit it.',
+                        content: [
+                            'First, check your engine serial number. Early 997.1 models (2005) often have the smaller, replaceable bearing.',
+                            'Listen for a metallic rattle at idle, especially near the bottom rear of the engine block.',
+                            'To replace it, the transmission and clutch/flywheel assembly must be removed.',
+                            'Lock the camshafts in place before removing the IMS flange to prevent engine timing failure.',
+                            'Extract the old bearing and install a new ceramic dual-row bearing (like the LN Engineering retrofit) for peace of mind.'
+                        ]
                     }
                 ];
 
