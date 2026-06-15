@@ -49,6 +49,11 @@ export class CommunitiesRepository implements OnInit {
     return this.userService.isLoggedIn();
   }
 
+  get canCreateCommunity(): boolean {
+    const user = this.userService.getCurrentUser();
+    return user !== null && ((user.totalAura || 0) >= 100 || user.role === 'admin');
+  }
+
   get filteredForums(): Forum[] {
     const list = this.activeTab === 'all' ? this.all : this.joined;
     if (this.selectedCategoryId === null) {
