@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -23,7 +23,9 @@ export class LoginPage {
   public errorMessage = '';
   protected publicname = '';
 
-  constructor(private router: Router, private cdr: ChangeDetectorRef) {}
+  private userService = inject(UserService);
+
+  constructor(private router: Router) {}
 
   public switchTab(tab: 'login' | 'register') {
     this.activeTab = tab;
@@ -39,20 +41,17 @@ export class LoginPage {
         const control = this.loginForm.controls[field];
         control.markAsTouched({ onlySelf: true });
       });
-      this.cdr.detectChanges();
       return;
     }
 
     this.isLoading = true;
     try {
-      await UserService.login(this.username, this.password);
+      await this.userService.login(this.username, this.password);
       this.router.navigate(['/profile']);
     } catch (e) {
       this.errorMessage = e instanceof Error ? e.message : 'Login failed. Please try again.';
-      this.cdr.detectChanges();
     } finally {
       this.isLoading = false;
-      this.cdr.detectChanges();
     }
   }
 
@@ -65,7 +64,6 @@ export class LoginPage {
         const control = this.registerForm.controls[field];
         control.markAsTouched({ onlySelf: true });
       });
-      this.cdr.detectChanges();
       return;
     }
 
@@ -76,16 +74,12 @@ export class LoginPage {
 
     this.isLoading = true;
     try {
-      await UserService.register(this.publicname, this.username, this.password);
-      // Auto-login after successful registration
-      await UserService.login(this.username, this.password);
+      await this.userService.register(this.publicname, this.username, this.password);
       this.router.navigate(['/profile']);
     } catch (e) {
       this.errorMessage = e instanceof Error ? e.message : 'Registration failed. Please try again.';
-      this.cdr.detectChanges();
     } finally {
       this.isLoading = false;
-      this.cdr.detectChanges();
     }
   }
 }

@@ -1,9 +1,10 @@
-import { Component, OnDestroy, OnInit, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { GuideService, Guide } from '../services/guide-service';
+import { GuideService } from '../services/guide-service';
 import { UserService } from '../services/user-service';
+import { Guide } from '../../model';
 
 @Component({
   selector: 'app-guides',
@@ -13,7 +14,6 @@ import { UserService } from '../services/user-service';
   styleUrl: './Guides.css'
 })
 export class GuidesComponent implements OnInit, OnDestroy {
-  private cdr = inject(ChangeDetectorRef);
   selectedGuide: Guide | null = null;
   guides: Guide[] = [];
 
@@ -25,12 +25,15 @@ export class GuidesComponent implements OnInit, OnDestroy {
   isSubmitting = false;
   errorMessage = '';
 
+  private userService = inject(UserService);
+  private guideService = inject(GuideService);
+
   get isLoggedIn(): boolean {
-    return UserService.isLoggedIn();
+    return this.userService.isLoggedIn();
   }
 
   get canPostGuides(): boolean {
-    const user = UserService.getCurrentUser();
+    const user = this.userService.getCurrentUser();
     return user !== null && ((user.totalAura || 0) >= 100 || user.role === 'admin');
   }
 
@@ -40,12 +43,11 @@ export class GuidesComponent implements OnInit, OnDestroy {
   }
 
   async refreshUserAura() {
-    const loggedInUser = UserService.getCurrentUser();
+    const loggedInUser = this.userService.getCurrentUser();
     if (loggedInUser) {
       try {
-        const updatedUser = await UserService.getUserById(loggedInUser.uid);
+        const updatedUser = await this.userService.getUserById(loggedInUser.uid);
         localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-        this.cdr.detectChanges();
       } catch (err) {
         console.error("Failed to refresh user aura:", err);
       }
@@ -54,8 +56,7 @@ export class GuidesComponent implements OnInit, OnDestroy {
 
   async loadGuides() {
     try {
-      this.guides = await GuideService.getGuides();
-      this.cdr.detectChanges();
+      this.guides = await this.guideService.getGuides();
     } catch (err) {
       console.error("Failed to load guides:", err);
     }
@@ -65,14 +66,12 @@ export class GuidesComponent implements OnInit, OnDestroy {
     this.selectedGuide = guide;
     // Prevent scrolling on the background when modal is open
     document.body.style.overflow = 'hidden';
-    this.cdr.detectChanges();
   }
 
   closeGuide(): void {
     this.selectedGuide = null;
     // Restore scrolling
     document.body.style.overflow = 'auto';
-    this.cdr.detectChanges();
   }
 
   openCreateForm() {
@@ -82,18 +81,15 @@ export class GuidesComponent implements OnInit, OnDestroy {
     this.newGuideSteps = [''];
     this.errorMessage = '';
     document.body.style.overflow = 'hidden';
-    this.cdr.detectChanges();
   }
 
   closeCreateForm() {
     this.showCreateForm = false;
     document.body.style.overflow = 'auto';
-    this.cdr.detectChanges();
   }
 
   addStep() {
     this.newGuideSteps.push('');
-    this.cdr.detectChanges();
   }
 
   removeStep(index: number) {
@@ -102,7 +98,6 @@ export class GuidesComponent implements OnInit, OnDestroy {
     } else {
       this.newGuideSteps[0] = '';
     }
-    this.cdr.detectChanges();
   }
 
   async submitGuide() {
@@ -112,16 +107,14 @@ export class GuidesComponent implements OnInit, OnDestroy {
 
     if (!title || !description || steps.length === 0) {
       this.errorMessage = 'Please fill out all fields and add at least one step.';
-      this.cdr.detectChanges();
       return;
     }
 
     this.isSubmitting = true;
     this.errorMessage = '';
-    this.cdr.detectChanges();
 
     try {
-      await GuideService.createGuide(title, description, steps);
+      await this.guideService.createGuide(title, description, steps);
       this.closeCreateForm();
       await this.loadGuides();
     } catch (err) {
@@ -130,10 +123,8 @@ export class GuidesComponent implements OnInit, OnDestroy {
       } else {
         this.errorMessage = 'An unexpected error occurred.';
       }
-      this.cdr.detectChanges();
     } finally {
       this.isSubmitting = false;
-      this.cdr.detectChanges();
     }
   }
 

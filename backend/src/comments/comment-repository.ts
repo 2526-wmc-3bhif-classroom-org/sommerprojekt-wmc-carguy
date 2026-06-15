@@ -205,7 +205,7 @@ export class CommentRepository {
 
     public unlikeComment(id: number): void {
         const db = DB.getInstance();
-        db.prepare('UPDATE Comment SET Likes = Likes - 1 WHERE CID = ?').run(id);
+        db.prepare('UPDATE Comment SET Likes = MAX(0, Likes - 1) WHERE CID = ?').run(id);
     }
 
     public dislikeComment(id: number): void {
@@ -215,6 +215,6 @@ export class CommentRepository {
 
     public undislikeComment(id: number): void {
         const db = DB.getInstance();
-        db.prepare('UPDATE Comment SET Dislikes = Dislikes - 1 WHERE CID = ?').run(id);
+        db.prepare('UPDATE Comment SET Dislikes = MAX(0, Dislikes - 1) WHERE CID = ?').run(id);
     }
 }

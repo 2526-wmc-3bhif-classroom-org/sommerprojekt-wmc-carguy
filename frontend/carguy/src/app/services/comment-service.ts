@@ -1,99 +1,95 @@
-import { Comment, Post, User } from "../../model";
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { Comment, Post, User } from '../../model';
+import { environment } from '../../environments/environment';
 
-const API_BASE_URL = "http://localhost:3000/api";
-
-async function handleResponse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || `Request failed with status ${response.status}`);
-  }
-  // For POST requests that might return 201 Created with no body
-  if (response.status === 201 || response.status === 204) return {} as T;
-  return response.json();
-}
-
-export const CommentService = {
+@Injectable({
+  providedIn: 'root'
+})
+export class CommentService {
+  private http = inject(HttpClient);
 
   /** Get all comments */
   async getAllComments(): Promise<Comment[]> {
-    const res = await fetch(`${API_BASE_URL}/comments`);
-    return handleResponse<Comment[]>(res);
-  },
+    return firstValueFrom(
+      this.http.get<Comment[]>(`${environment.apiBaseUrl}/comments`)
+    );
+  }
 
   /** Get comments for a user */
   async getCommentsByUser(userId: number): Promise<Comment[]> {
-    const res = await fetch(`${API_BASE_URL}/comments/user/${userId}`);
-    return handleResponse<Comment[]>(res);
-  },
+    return firstValueFrom(
+      this.http.get<Comment[]>(`${environment.apiBaseUrl}/comments/user/${userId}`)
+    );
+  }
 
   /** Get a single comment */
   async getCommentById(id: number): Promise<Comment> {
-    const res = await fetch(`${API_BASE_URL}/comment/${id}`);
-    return handleResponse<Comment>(res);
-  },
+    return firstValueFrom(
+      this.http.get<Comment>(`${environment.apiBaseUrl}/comment/${id}`)
+    );
+  }
 
   /** Get comments for a specific post */
   async getCommentsByPostId(postId: number): Promise<Comment[]> {
-    // Note: If your backend uses :postId, ensure this matches!
-    const res = await fetch(`${API_BASE_URL}/posts/comments/${postId}`);
-    return handleResponse<Comment[]>(res);
-  },
+    return firstValueFrom(
+      this.http.get<Comment[]>(`${environment.apiBaseUrl}/posts/comments/${postId}`)
+    );
+  }
 
   /** Get nested replies for a comment */
   async getReplies(parentCommentId: number): Promise<Comment[]> {
-    const res = await fetch(`${API_BASE_URL}/comment/comments/${parentCommentId}`);
-    return handleResponse<Comment[]>(res);
-  },
+    return firstValueFrom(
+      this.http.get<Comment[]>(`${environment.apiBaseUrl}/comment/comments/${parentCommentId}`)
+    );
+  }
 
-  /** * Create a new top-level comment
-   */
+  /** Create a new top-level comment */
   async createComment(content: string, author: User, post: Post, imageUrls?: string[]): Promise<void> {
-    const res = await fetch(`${API_BASE_URL}/comment`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content, author, post, imageUrls }),
-    });
-    return handleResponse<void>(res);
-  },
+    return firstValueFrom(
+      this.http.post<void>(`${environment.apiBaseUrl}/comment`, { content, author, post, imageUrls })
+    );
+  }
 
-  /** * Create a reply to another comment
-   */
+  /** Create a reply to another comment */
   async createReply(content: string, author: User, post: Post, parentComment: Comment, imageUrls?: string[]): Promise<void> {
-    const res = await fetch(`${API_BASE_URL}/posts/comments`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    return firstValueFrom(
+      this.http.post<void>(`${environment.apiBaseUrl}/posts/comments`, {
         content,
         author,
         post,
         comment: parentComment,
         imageUrls
-      }),
-    });
-    return handleResponse<void>(res);
-  },
+      })
+    );
+  }
 
   /** Like a comment */
   async likeComment(id: number): Promise<void> {
-    const res = await fetch(`${API_BASE_URL}/comments/${id}/like`, { method: "PATCH" });
-    return handleResponse<void>(res);
-  },
+    return firstValueFrom(
+      this.http.patch<void>(`${environment.apiBaseUrl}/comments/${id}/like`, {})
+    );
+  }
 
   /** Unlike a comment */
   async unlikeComment(id: number): Promise<void> {
-    const res = await fetch(`${API_BASE_URL}/comments/${id}/unlike`, { method: "PATCH" });
-    return handleResponse<void>(res);
-  },
+    return firstValueFrom(
+      this.http.patch<void>(`${environment.apiBaseUrl}/comments/${id}/unlike`, {})
+    );
+  }
 
   /** Dislike a comment */
   async dislikeComment(id: number): Promise<void> {
-    const res = await fetch(`${API_BASE_URL}/comments/${id}/dislike`, { method: "PATCH" });
-    return handleResponse<void>(res);
-  },
+    return firstValueFrom(
+      this.http.patch<void>(`${environment.apiBaseUrl}/comments/${id}/dislike`, {})
+    );
+  }
 
   /** Undislike a comment */
   async undislikeComment(id: number): Promise<void> {
-    const res = await fetch(`${API_BASE_URL}/comments/${id}/undislike`, { method: "PATCH" });
-    return handleResponse<void>(res);
+    return firstValueFrom(
+      this.http.patch<void>(`${environment.apiBaseUrl}/comments/${id}/undislike`, {})
+    );
   }
-};
+}

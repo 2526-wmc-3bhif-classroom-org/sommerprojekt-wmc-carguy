@@ -120,10 +120,10 @@
   @if (isLoggedIn){
     <a class="flex items-center gap-2" [routerLink]="['profile']">
       <div class="rounded-4xl h-10 w-10 hover:rounded-sm duration-300 ease-in overflow-hidden bg-base-300 flex items-center justify-center border border-white/10 shrink-0">
-        @if (UserService.getCurrentUser()?.image) {
-          <img [src]="UserService.getCurrentUser()?.image" class="w-full h-full object-cover">
+        @if (userService.getCurrentUser()?.image) {
+          <img [src]="userService.getCurrentUser()?.image" class="w-full h-full object-cover">
         } @else {
-          <span class="text-primary font-bold text-sm select-none">{{ UserService.getCurrentUser()?.publicname?.charAt(0) || 'U' }}</span>
+          <span class="text-primary font-bold text-sm select-none">{{ userService.getCurrentUser()?.publicname?.charAt(0) || 'U' }}</span>
         }
       </div>
       <span class="text-primary font-medium">Profile</span>

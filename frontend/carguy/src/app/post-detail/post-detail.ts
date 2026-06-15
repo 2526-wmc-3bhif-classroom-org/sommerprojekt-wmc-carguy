@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -6,6 +6,7 @@ import { Post, Comment } from '../../model';
 import { PostService } from '../services/post-service';
 import { CommentService } from '../services/comment-service';
 import { UserService } from '../services/user-service';
+import { openImageModal, scrollToSlide } from '../image-modal';
 
 @Component({
   selector: 'app-post-detail',
@@ -30,27 +31,21 @@ export class PostDetailComponent implements OnInit {
   commentVoteStates: Record<number, 'like' | 'dislike' | null> = {};
   sortMode: 'newest' | 'oldest' | 'most_liked' = 'newest';
   selectedImage: string | null = null;
-  private cdr = inject(ChangeDetectorRef);
+
+  private userService = inject(UserService);
+  private postService = inject(PostService);
+  private commentService = inject(CommentService);
 
   openImageModal(url: string, event: Event) {
-    event.stopPropagation();
-    event.preventDefault();
-    this.selectedImage = url;
-    const modal = document.getElementById('image_modal') as HTMLDialogElement;
-    if (modal) {
-      modal.showModal();
-    }
+    this.selectedImage = openImageModal(url, event);
   }
 
   scrollToSlide(id: string) {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-    }
+    scrollToSlide(id);
   }
 
   private get voteKey(): string {
-    const user = UserService.getCurrentUser();
+    const user = this.userService.getCurrentUser();
     return `vote_post_${this.post?.pid}_user_${user?.uid}`;
   }
 
@@ -67,7 +62,7 @@ export class PostDetailComponent implements OnInit {
   }
 
   private getCommentVoteKey(cid: number): string {
-    const user = UserService.getCurrentUser();
+    const user = this.userService.getCurrentUser();
     return `vote_comment_${cid}_user_${user?.uid}`;
   }
 
@@ -80,7 +75,7 @@ export class PostDetailComponent implements OnInit {
   constructor(private route: ActivatedRoute) {}
 
   get isLoggedIn(): boolean {
-    return UserService.isLoggedIn();
+    return this.userService.isLoggedIn();
   }
 
   get sortedComments(): Comment[] {
@@ -132,23 +127,25 @@ export class PostDetailComponent implements OnInit {
   }
 
   async ngOnInit() {
-    const idParam = this.route.snapshot.paramMap.get('id');
-    if (!idParam) {
-      this.isLoading = false;
-      return;
-    }
-    try {
-      const id = Number(idParam);
-      this.post = await PostService.getPostById(id);
-      this.comments = await CommentService.getCommentsByPostId(id);
-      this.rootComments = this.buildCommentTree(this.comments);
-      this.loadVoteState();
-    } catch (error) {
-      console.error('Failed to load post', error);
-    } finally {
-      this.isLoading = false;
-      this.cdr.detectChanges();
-    }
+    this.route.paramMap.subscribe(async params => {
+      const idParam = params.get('id');
+      this.isLoading = true;
+      if (!idParam) {
+        this.isLoading = false;
+        return;
+      }
+      try {
+        const id = Number(idParam);
+        this.post = await this.postService.getPostById(id);
+        this.comments = await this.commentService.getCommentsByPostId(id);
+        this.rootComments = this.buildCommentTree(this.comments);
+        this.loadVoteState();
+      } catch (error) {
+        console.error('Failed to load post', error);
+      } finally {
+        this.isLoading = false;
+      }
+    });
   }
 
   addImageUrl() {
@@ -193,7 +190,6 @@ export class PostDetailComponent implements OnInit {
         reader.onload = (e) => {
           if (e.target?.result) {
             this.newCommentImageUrls.push(e.target.result as string);
-            this.cdr.detectChanges();
           }
         };
         reader.readAsDataURL(file);
@@ -203,20 +199,19 @@ export class PostDetailComponent implements OnInit {
 
   async submitComment() {
     if (!this.newCommentContent.trim() || !this.post) return;
-    const user = UserService.getCurrentUser();
+    const user = this.userService.getCurrentUser();
     if (!user) return;
 
     this.isSubmitting = true;
     this.errorMessage = '';
     try {
-      await CommentService.createComment(this.newCommentContent.trim(), user, this.post, this.newCommentImageUrls);
+      await this.commentService.createComment(this.newCommentContent.trim(), user, this.post, this.newCommentImageUrls);
       this.newCommentContent = '';
       this.newCommentImageUrls = [];
       this.imageUrlInput = '';
-      this.comments = await CommentService.getCommentsByPostId(this.post.pid);
+      this.comments = await this.commentService.getCommentsByPostId(this.post.pid);
       this.rootComments = this.buildCommentTree(this.comments);
       this.loadVoteState();
-      this.cdr.detectChanges();
     } catch (e) {
       this.errorMessage = e instanceof Error ? e.message : 'Failed to post comment.';
     } finally {
@@ -262,7 +257,7 @@ export class PostDetailComponent implements OnInit {
   }
 
   toggleReplyForm(cid: number) {
-    if (!UserService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn()) return;
     if (this.activeReplyCommentId === cid) {
       this.activeReplyCommentId = null;
       this.replyContent = '';
@@ -270,30 +265,27 @@ export class PostDetailComponent implements OnInit {
       this.activeReplyCommentId = cid;
       this.replyContent = '';
     }
-    this.cdr.detectChanges();
   }
 
   cancelReply() {
     this.activeReplyCommentId = null;
     this.replyContent = '';
-    this.cdr.detectChanges();
   }
 
   async submitReply(parentComment: Comment) {
     if (!this.replyContent.trim() || !this.post) return;
-    const user = UserService.getCurrentUser();
+    const user = this.userService.getCurrentUser();
     if (!user) return;
 
     this.isSubmitting = true;
     this.errorMessage = '';
     try {
-      await CommentService.createReply(this.replyContent.trim(), user, this.post, parentComment);
+      await this.commentService.createReply(this.replyContent.trim(), user, this.post, parentComment);
       this.replyContent = '';
       this.activeReplyCommentId = null;
-      this.comments = await CommentService.getCommentsByPostId(this.post.pid);
+      this.comments = await this.commentService.getCommentsByPostId(this.post.pid);
       this.rootComments = this.buildCommentTree(this.comments);
       this.loadVoteState();
-      this.cdr.detectChanges();
     } catch (e) {
       this.errorMessage = e instanceof Error ? e.message : 'Failed to post reply.';
     } finally {
@@ -302,18 +294,18 @@ export class PostDetailComponent implements OnInit {
   }
 
   async likePost() {
-    if (!this.post || !UserService.isLoggedIn()) return;
+    if (!this.post || !this.userService.isLoggedIn()) return;
     try {
       if (this.voteState === 'like') {
-        await PostService.unlikePost(this.post.pid);
+        await this.postService.unlikePost(this.post.pid);
         this.post.likes--;
         this.voteState = null;
       } else {
         if (this.voteState === 'dislike') {
-          await PostService.undislikePost(this.post.pid);
+          await this.postService.undislikePost(this.post.pid);
           this.post.dislikes--;
         }
-        await PostService.likePost(this.post.pid);
+        await this.postService.likePost(this.post.pid);
         this.post.likes++;
         this.voteState = 'like';
       }
@@ -321,22 +313,21 @@ export class PostDetailComponent implements OnInit {
     } catch (e) {
       console.error('Failed to like post', e);
     }
-    this.cdr.detectChanges();
   }
 
   async dislikePost() {
-    if (!this.post || !UserService.isLoggedIn()) return;
+    if (!this.post || !this.userService.isLoggedIn()) return;
     try {
       if (this.voteState === 'dislike') {
-        await PostService.undislikePost(this.post.pid);
+        await this.postService.undislikePost(this.post.pid);
         this.post.dislikes--;
         this.voteState = null;
       } else {
         if (this.voteState === 'like') {
-          await PostService.unlikePost(this.post.pid);
+          await this.postService.unlikePost(this.post.pid);
           this.post.likes--;
         }
-        await PostService.dislikePost(this.post.pid);
+        await this.postService.dislikePost(this.post.pid);
         this.post.dislikes++;
         this.voteState = 'dislike';
       }
@@ -344,23 +335,22 @@ export class PostDetailComponent implements OnInit {
     } catch (e) {
       console.error('Failed to dislike post', e);
     }
-    this.cdr.detectChanges();
   }
 
   async likeComment(comment: Comment) {
-    if (!UserService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn()) return;
     const currentState = this.commentVoteStates[comment.cid];
     try {
       if (currentState === 'like') {
-        await CommentService.unlikeComment(comment.cid);
+        await this.commentService.unlikeComment(comment.cid);
         comment.likes--;
         this.commentVoteStates[comment.cid] = null;
       } else {
         if (currentState === 'dislike') {
-          await CommentService.undislikeComment(comment.cid);
+          await this.commentService.undislikeComment(comment.cid);
           comment.dislikes--;
         }
-        await CommentService.likeComment(comment.cid);
+        await this.commentService.likeComment(comment.cid);
         comment.likes++;
         this.commentVoteStates[comment.cid] = 'like';
       }
@@ -368,23 +358,22 @@ export class PostDetailComponent implements OnInit {
     } catch (e) {
       console.error('Failed to like comment', e);
     }
-    this.cdr.detectChanges();
   }
 
   async dislikeComment(comment: Comment) {
-    if (!UserService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn()) return;
     const currentState = this.commentVoteStates[comment.cid];
     try {
       if (currentState === 'dislike') {
-        await CommentService.undislikeComment(comment.cid);
+        await this.commentService.undislikeComment(comment.cid);
         comment.dislikes--;
         this.commentVoteStates[comment.cid] = null;
       } else {
         if (currentState === 'like') {
-          await CommentService.unlikeComment(comment.cid);
+          await this.commentService.unlikeComment(comment.cid);
           comment.likes--;
         }
-        await CommentService.dislikeComment(comment.cid);
+        await this.commentService.dislikeComment(comment.cid);
         comment.dislikes++;
         this.commentVoteStates[comment.cid] = 'dislike';
       }
@@ -392,6 +381,5 @@ export class PostDetailComponent implements OnInit {
     } catch (e) {
       console.error('Failed to dislike comment', e);
     }
-    this.cdr.detectChanges();
   }
 }

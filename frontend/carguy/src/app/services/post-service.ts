@@ -1,42 +1,42 @@
-import { Post, User, Forum } from "../../model";
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { Post, User, Forum } from '../../model';
+import { environment } from '../../environments/environment';
 
-const API_BASE_URL = "http://localhost:3000/api";
+@Injectable({
+  providedIn: 'root'
+})
+export class PostService {
+  private http = inject(HttpClient);
 
-async function handleResponse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || `Request failed with status ${response.status}`);
-  }
-  if (response.status === 201 || response.status === 204) return {} as T;
-  return response.json();
-}
-
-export const PostService = {
   async getPostsByForum(forumId: number): Promise<Post[]> {
-    const res = await fetch(`${API_BASE_URL}/posts/forum/${forumId}`);
-    return handleResponse<Post[]>(res);
-  },
+    return firstValueFrom(
+      this.http.get<Post[]>(`${environment.apiBaseUrl}/posts/forum/${forumId}`)
+    );
+  }
 
   async getTrendingPosts(limit: number = 10): Promise<Post[]> {
-    const res = await fetch(`${API_BASE_URL}/posts/trending?limit=${limit}`);
-    return handleResponse<Post[]>(res);
-  },
+    return firstValueFrom(
+      this.http.get<Post[]>(`${environment.apiBaseUrl}/posts/trending?limit=${limit}`)
+    );
+  }
 
   async getPostById(id: number): Promise<Post> {
-    const res = await fetch(`${API_BASE_URL}/posts/${id}`);
-    return handleResponse<Post>(res);
-  },
+    return firstValueFrom(
+      this.http.get<Post>(`${environment.apiBaseUrl}/posts/${id}`)
+    );
+  }
 
   async getPostsByUser(userId: number): Promise<Post[]> {
-    const res = await fetch(`${API_BASE_URL}/posts/user/${userId}`);
-    return handleResponse<Post[]>(res);
-  },
+    return firstValueFrom(
+      this.http.get<Post[]>(`${environment.apiBaseUrl}/posts/user/${userId}`)
+    );
+  }
 
   async createPost(title: string, content: string, author: User, forum: Forum, imageUrls?: string[]): Promise<void> {
-    const res = await fetch(`${API_BASE_URL}/post`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    return firstValueFrom(
+      this.http.post<void>(`${environment.apiBaseUrl}/post`, {
         title,
         content,
         author,
@@ -45,28 +45,31 @@ export const PostService = {
         publishedAt: new Date().toISOString(),
         likes: 0,
         dislikes: 0,
-      }),
-    });
-    return handleResponse<void>(res);
-  },
+      })
+    );
+  }
 
   async likePost(id: number): Promise<void> {
-    const res = await fetch(`${API_BASE_URL}/posts/${id}/like`, { method: "PATCH" });
-    return handleResponse<void>(res);
-  },
+    return firstValueFrom(
+      this.http.patch<void>(`${environment.apiBaseUrl}/posts/${id}/like`, {})
+    );
+  }
 
   async unlikePost(id: number): Promise<void> {
-    const res = await fetch(`${API_BASE_URL}/posts/${id}/unlike`, { method: "PATCH" });
-    return handleResponse<void>(res);
-  },
+    return firstValueFrom(
+      this.http.patch<void>(`${environment.apiBaseUrl}/posts/${id}/unlike`, {})
+    );
+  }
 
   async dislikePost(id: number): Promise<void> {
-    const res = await fetch(`${API_BASE_URL}/posts/${id}/dislike`, { method: "PATCH" });
-    return handleResponse<void>(res);
-  },
+    return firstValueFrom(
+      this.http.patch<void>(`${environment.apiBaseUrl}/posts/${id}/dislike`, {})
+    );
+  }
 
   async undislikePost(id: number): Promise<void> {
-    const res = await fetch(`${API_BASE_URL}/posts/${id}/undislike`, { method: "PATCH" });
-    return handleResponse<void>(res);
-  },
-};
+    return firstValueFrom(
+      this.http.patch<void>(`${environment.apiBaseUrl}/posts/${id}/undislike`, {})
+    );
+  }
+}

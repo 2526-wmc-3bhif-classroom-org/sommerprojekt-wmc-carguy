@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy, inject, HostListener, ElementRef } from '@angular/core';
-import { NavLink } from './nav-link.model';
 import { RouterLink, Router } from '@angular/router';
 import { UserService } from '../services/user-service';
 import { SearchService, SearchResults } from '../services/search-service';
@@ -32,6 +31,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private elementRef = inject(ElementRef);
   protected themeService = inject(ThemeService);
+  protected userService = inject(UserService);
+  private searchService = inject(SearchService);
 
   public ngOnInit(): void {
     this.searchSubscription = this.searchSubject.pipe(
@@ -39,7 +40,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
       distinctUntilChanged()
     ).subscribe(async (query) => {
       try {
-        this.suggestions = await SearchService.search(query);
+        this.suggestions = await this.searchService.search(query);
       } catch (err) {
         console.error("Failed to load search suggestions:", err);
       }
@@ -145,16 +146,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   get isLoggedIn(): boolean {
-    return this.UserService.isLoggedIn();
+    return this.userService.isLoggedIn();
   }
-
-  // Typed array of links
-  public navLinks: NavLink[] = [
-    { label: 'Brands', path: '/' },
-    { label: 'Communities', path: '/communities' },
-    { label: 'Guides', path: '/guides' },
-    { label: 'Profile', path: '/profile' }
-  ];
 
   public toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
@@ -167,6 +160,4 @@ export class NavbarComponent implements OnInit, OnDestroy {
   public toggleTheme(event: MouseEvent): void {
     this.themeService.toggleTheme(event);
   }
-
-  protected readonly UserService = UserService;
 }

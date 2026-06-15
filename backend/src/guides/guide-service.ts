@@ -3,7 +3,10 @@ import { GuideRepository } from "./guide-repository";
 import { UserRepository } from "../user/user-repository";
 
 export class GuideService {
-    constructor(private guideRepository: GuideRepository) {}
+    constructor(
+        private guideRepository: GuideRepository,
+        private userRepository: UserRepository
+    ) {}
 
     public getAllGuides(): Guide[] {
         return this.guideRepository.findAllGuides();
@@ -14,7 +17,7 @@ export class GuideService {
     }
 
     public createGuide(title: string, description: string, content: string[], authorUsername: string): void {
-        const user = UserRepository.findUserByUsername(authorUsername);
+        const user = this.userRepository.findUserByUsername(authorUsername);
         if (!user) {
             throw new Error("User not found");
         }

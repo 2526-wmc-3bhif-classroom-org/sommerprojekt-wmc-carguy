@@ -91,7 +91,7 @@
             <textarea
               [(ngModel)]="newCommentContent"
               placeholder="What are your thoughts?"
-              class="textarea w-full bg-white/5 border border-base-content/10 text-black placeholder-gray-500 focus:border-accent focus:outline-none rounded-md p-3 resize-none mb-4"
+              class="textarea w-full bg-white/5 border border-base-content/10 text-base-content placeholder-gray-500 focus:border-accent focus:outline-none rounded-md p-3 resize-none mb-4"
               rows="4"
             ></textarea>
             
@@ -103,7 +103,7 @@
                   (keyup.enter)="addImageUrl()"
                   type="text"
                   placeholder="Paste image URL here"
-                  class="input input-sm flex-1 bg-white/5 border border-base-content/10 text-black placeholder-gray-500 focus:border-accent focus:outline-none rounded-md"
+                  class="input input-sm flex-1 bg-white/5 border border-base-content/10 text-base-content placeholder-gray-500 focus:border-accent focus:outline-none rounded-md"
                 />
                 <button (click)="addImageUrl()" class="btn btn-sm btn-outline border-base-content/20 hover:border-accent hover:text-accent">Add</button>
               </div>
@@ -244,7 +244,7 @@
                 <textarea
                   [(ngModel)]="replyContent"
                   placeholder="Write a supportive reply..."
-                  class="textarea w-full bg-white/5 border border-base-content/10 text-black placeholder-gray-500 focus:border-accent focus:outline-none rounded-md p-3 resize-none"
+                  class="textarea w-full bg-white/5 border border-base-content/10 text-base-content placeholder-gray-500 focus:border-accent focus:outline-none rounded-md p-3 resize-none"
                   rows="3"
                 ></textarea>
                 @if (errorMessage && activeReplyCommentId === comment.cid) {

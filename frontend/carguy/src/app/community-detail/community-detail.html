@@ -77,12 +77,12 @@
                 [(ngModel)]="newPostTitle"
                 type="text"
                 placeholder="Title"
-                class="input w-full bg-white/5 border border-base-content/10 text-black placeholder-gray-500 focus:border-accent focus:outline-none rounded-md"
+                class="input w-full bg-white/5 border border-base-content/10 text-base-content placeholder-gray-500 focus:border-accent focus:outline-none rounded-md"
               />
               <textarea
                 [(ngModel)]="newPostContent"
                 placeholder="What do you want to share?"
-                class="textarea w-full bg-white/5 border border-base-content/10 text-black placeholder-gray-500 focus:border-accent focus:outline-none resize-none rounded-md"
+                class="textarea w-full bg-white/5 border border-base-content/10 text-base-content placeholder-gray-500 focus:border-accent focus:outline-none resize-none rounded-md"
                 rows="5"
               ></textarea>
 
@@ -94,7 +94,7 @@
                     (keyup.enter)="addImageUrl()"
                     type="text"
                     placeholder="Paste image URL here"
-                    class="input input-sm flex-1 bg-white/5 border border-base-content/10 text-black placeholder-gray-500 focus:border-accent focus:outline-none rounded-md"
+                    class="input input-sm flex-1 bg-white/5 border border-base-content/10 text-base-content placeholder-gray-500 focus:border-accent focus:outline-none rounded-md"
                   />
                   <button (click)="addImageUrl()" class="btn btn-sm btn-outline border-base-content/20 hover:border-accent hover:text-accent">Add</button>
                 </div>

@@ -2,8 +2,11 @@ import express from "express";
 import { CommentService } from "./comment-service";
 import { CommentRepository } from "./comment-repository";
 import { Comment } from "../../data/model";
+import { requireAuth } from "../auth-middleware";
+import { UserRepository } from "../user/user-repository";
 
 const commentService = new CommentService(new CommentRepository());
+const userRepository = new UserRepository();
 export const commentRouter = express.Router();
 
 commentRouter.get("/comments", (req, res) => {
@@ -45,12 +48,16 @@ commentRouter.get("/comment/:id", (req, res) => {
     res.json(result);
 });
 
-commentRouter.post("/comment", (req, res) => {
-    const { content, author, post, imageUrls } = req.body;
+commentRouter.post("/comment", requireAuth, (req, res) => {
+    if (!req.user) return res.status(401).send("Unauthorized");
+    const user = userRepository.findUserByUsername(req.user.username);
+    if (!user) return res.status(401).send("User not found");
+
+    const { content, post, imageUrls } = req.body;
     const comment: Comment = {
         cid: 0,
         content,
-        author,
+        author: user,
         post,
         imageUrls,
         publishedAt: new Date().toISOString() as any,
@@ -61,12 +68,16 @@ commentRouter.post("/comment", (req, res) => {
     res.status(201).json({ message: "Comment created" });
 });
 
-commentRouter.post("/posts/comments", (req, res) => {
-    const { content, author, post, comment: parentComment, imageUrls } = req.body;
+commentRouter.post("/posts/comments", requireAuth, (req, res) => {
+    if (!req.user) return res.status(401).send("Unauthorized");
+    const user = userRepository.findUserByUsername(req.user.username);
+    if (!user) return res.status(401).send("User not found");
+
+    const { content, post, comment: parentComment, imageUrls } = req.body;
     const reply: Comment = {
         cid: 0,
         content,
-        author,
+        author: user,
         post,
         parentComment,
         imageUrls,
@@ -78,28 +89,28 @@ commentRouter.post("/posts/comments", (req, res) => {
     res.status(201).json({ message: "Reply created" });
 });
 
-commentRouter.patch("/comments/:id/like", (req, res) => {
+commentRouter.patch("/comments/:id/like", requireAuth, (req, res) => {
     const id = Number(req.params.id);
     if (isNaN(id)) return res.status(400).send("Invalid comment ID");
     commentService.likeComment(id);
     res.json({ message: "Comment liked" });
 });
 
-commentRouter.patch("/comments/:id/unlike", (req, res) => {
+commentRouter.patch("/comments/:id/unlike", requireAuth, (req, res) => {
     const id = Number(req.params.id);
     if (isNaN(id)) return res.status(400).send("Invalid comment ID");
     commentService.unlikeComment(id);
     res.json({ message: "Comment unliked" });
 });
 
-commentRouter.patch("/comments/:id/dislike", (req, res) => {
+commentRouter.patch("/comments/:id/dislike", requireAuth, (req, res) => {
     const id = Number(req.params.id);
     if (isNaN(id)) return res.status(400).send("Invalid comment ID");
     commentService.dislikeComment(id);
     res.json({ message: "Comment disliked" });
 });
 
-commentRouter.patch("/comments/:id/undislike", (req, res) => {
+commentRouter.patch("/comments/:id/undislike", requireAuth, (req, res) => {
     const id = Number(req.params.id);
     if (isNaN(id)) return res.status(400).send("Invalid comment ID");
     commentService.undislikeComment(id);

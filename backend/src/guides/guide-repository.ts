@@ -71,15 +71,10 @@ export class GuideRepository {
     public createGuide(guide: Omit<Guide, "id" | "likes" | "dislikes" | "publishedAt">): void {
         const db = DB.getInstance();
 
-        // Simple autoincrement for GuideID since we did not define it as AUTOINCREMENT in database.ts (we can just query max ID + 1 or let SQLite handle it if it was AUTOINCREMENT, but it's not. Let's do max + 1)
-        const maxIdRow = db.prepare("SELECT MAX(GuideID) as maxId FROM Guide").get() as { maxId: number | null };
-        const nextId = (maxIdRow.maxId ?? 0) + 1;
-
         db.prepare(`
-            INSERT INTO Guide (GuideID, Title, Description, Content, UID, PublishedAt, Likes, Dislikes)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO Guide (Title, Description, Content, UID, PublishedAt, Likes, Dislikes)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         `).run(
-            nextId,
             guide.title,
             guide.description,
             JSON.stringify(guide.content),

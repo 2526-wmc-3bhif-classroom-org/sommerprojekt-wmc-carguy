@@ -4,11 +4,16 @@ import { UserService } from "./user-service";
 import { UserRepository } from "./user-repository";
 import {User, UserClaims, UserInput} from "../../data/model";
 import * as jwt from "jsonwebtoken";
+import { requireAuth } from "../auth-middleware";
+import { JWT_SECRET } from "../config";
+
+const userRepository = new UserRepository();
+const userService = new UserService(userRepository);
 
 export const userRouter = express.Router();
 
 userRouter.get("/users", (req, res) => {
-    const result = UserService.getAllUsers();
+    const result = userService.getAllUsers();
     res.json(result);
 });
 
@@ -19,7 +24,7 @@ userRouter.get("/user/:id", (req, res) => {
         return res.status(400).send("Invalid id");
     }
 
-    const result = UserService.getUserById(id);
+    const result = userService.getUserById(id);
 
     if (!result) {
         return res.status(404).send("User not found");
@@ -28,12 +33,10 @@ userRouter.get("/user/:id", (req, res) => {
     res.json(result);
 });
 
-import { requireAuth } from "../auth-middleware";
-
 userRouter.post("/user", requireAuth, (req, res) => {
     const user: User = req.body;
 
-    UserService.createUser(user);
+    userService.createUser(user);
 
     res.status(201).json({ message: "User created" });
 });
@@ -44,7 +47,7 @@ userRouter.post("/login", async (req: Request, res: Response) => {
         return res.status(StatusCodes.BAD_REQUEST).send("Body not in correct format");
     }
     try {
-        const claims: UserClaims | undefined=UserService.checkUserCredentials(user);
+        const claims: UserClaims | undefined = userService.checkUserCredentials(user);
         if(claims === undefined) throw new Error("User credentials not found");
         const minutes = 15;
         const expiresAt = new Date(Date.now() + minutes * 60000);
@@ -53,12 +56,12 @@ userRouter.post("/login", async (req: Request, res: Response) => {
                 user: claims,
                 exp: expiresAt.getTime() / 1000,
             },
-            process.env.SECRET_KEY || "12345",
+            JWT_SECRET,
         )
         return res.status(StatusCodes.OK).send({userClaims: claims,
             expiresAt: expiresAt,
             accessToken: token,
-            user: UserService.getUserByUsername(user.username)
+            user: userService.getUserByUsername(user.username)
         });
     }catch(err) {
         if(err instanceof Error) {
@@ -70,13 +73,13 @@ userRouter.post("/login", async (req: Request, res: Response) => {
 userRouter.post("/register", (req: Request, res: Response) => {
     try {
         const body: UserInput = req.body as UserInput;
-        let user = UserService.createNewUser(body);
+        let user = userService.createNewUser(body);
         const claims: UserClaims = { username: user.username, role: user.role };
         const minutes = 15;
         const expiresAt = new Date(Date.now() + minutes * 60000);
         const token = jwt.sign(
             { user: claims, exp: expiresAt.getTime() / 1000 },
-            process.env.SECRET_KEY || "12345",
+            JWT_SECRET,
         );
         return res.status(StatusCodes.CREATED).send({
             userClaims: claims,
@@ -91,17 +94,19 @@ userRouter.post("/register", (req: Request, res: Response) => {
     }
 })
 
-userRouter.post("/update", (req: Request, res: Response) => {
+userRouter.post("/update", requireAuth, (req: Request, res: Response) => {
     try {
-        console.log(req.body);
-        const realUserName: string = req.body.username;
+        if (!(req as any).user) {
+            return res.status(StatusCodes.UNAUTHORIZED).send("Unauthorized");
+        }
+        const realUserName: string = (req as any).user.username;
 
         const newUserName: string = req.body.newUsername;
         const newPublicName: string = req.body.newPublicName;
         const newDescription: string = req.body.newDescription;
         const newImage: string = req.body.newImage;
 
-        let user = UserService.updateUserInfo(realUserName, {
+        let user = userService.updateUserInfo(realUserName, {
             username: newUserName,
             publicname: newPublicName,
             description: newDescription,
@@ -110,7 +115,7 @@ userRouter.post("/update", (req: Request, res: Response) => {
 
         return res.status(StatusCodes.OK).send({
             message: "User updated successfully",
-            user: UserService.getUserByUsername(user.username)
+            user: userService.getUserByUsername(user.username)
         });
     } catch (err) {
         if (err instanceof Error) {
