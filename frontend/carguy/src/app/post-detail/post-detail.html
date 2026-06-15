@@ -15,7 +15,7 @@
       </a>
 
       <!-- Post card -->
-      <div class="rounded-2xl border border-base-content/10 bg-base-200 p-8 mb-8 shadow-xl">
+      <div class="premium-card rounded-3xl p-8 mb-8">
         <div class="flex gap-6">
           <!-- Votes -->
           <div class="flex flex-col items-center gap-3 text-base-content/70 min-w-[48px]">
@@ -175,7 +175,7 @@
         <ng-template #commentTemplate let-comment="comment" let-depth="depth">
           <div class="relative transition-all duration-300" [ngClass]="depth > 0 ? 'ml-4 sm:ml-8 mt-4 pl-3 sm:pl-4 border-l-2 border-base-content/10 hover:border-primary/40' : 'mb-6'">
             
-            <div class="p-6 rounded-xl border border-base-content/10 bg-base-200 shadow-sm hover:border-primary/50 transition-all duration-300 flex gap-4">
+            <div class="premium-card p-6 rounded-2xl flex gap-4">
               <!-- Comment Votes -->
               <div class="flex flex-col items-center gap-2 text-base-content/70 min-w-[32px] pt-1">
                 <button (click)="likeComment(comment)" class="flex flex-col items-center transition-colors hover:text-green-400"
