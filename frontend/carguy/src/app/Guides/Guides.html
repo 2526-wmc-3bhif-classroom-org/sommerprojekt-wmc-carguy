@@ -5,8 +5,14 @@
       <h1 class="text-4xl font-semibold mb-2">Platform Guides</h1>
       <p class="text-lg opacity-80">Explore our comprehensive guides and tutorials to get the most out of CarGuy.</p>
     </div>
-    @if (canPostGuides) {
-      <button (click)="openCreateForm()" class="btn btn-primary">Create Guide</button>
+    @if (isLoggedIn) {
+      @if (canPostGuides) {
+        <button (click)="openCreateForm()" class="btn btn-primary">Create Guide</button>
+      } @else {
+        <div class="tooltip tooltip-bottom" data-tip="Creating a guide requires 100+ Aura">
+          <button class="btn btn-primary opacity-50 cursor-not-allowed" disabled>Create Guide</button>
+        </div>
+      }
     }
   </header>
 
