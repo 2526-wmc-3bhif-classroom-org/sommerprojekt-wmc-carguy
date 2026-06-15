@@ -949,7 +949,165 @@ const commentsData = [
     [111, "Mustang restomods are beautiful if done right. A modern suspension makes them actually handle corners.", 6, 76, null, "2025-05-25T01:45:00.000Z", 14, 2],
     [112, "LS swaps are cheap power, but they ruin the soul of vintage Mustangs/Chargers. Keep it brand loyal!", 3, 77, null, "2025-05-25T02:15:00.000Z", 21, 5],
     [113, "iRacing has the best online competitive structure, but Assetto Corsa has the best mods and cruising servers.", 14, 79, null, "2025-05-25T03:15:00.000Z", 12, 0],
-    [114, "Quest 3 is the sweet spot for VR. Great lenses and easy setup, though Pimax has better FOV if you have the budget.", 14, 80, null, "2025-05-25T03:45:00.000Z", 9, 0]
+    [114, "Quest 3 is the sweet spot for VR. Great lenses and easy setup, though Pimax has better FOV if you have the budget.", 14, 80, null, "2025-05-25T03:45:00.000Z", 9, 0],
+
+    // Post 4 - Air-cooled flat-six swap into BMW 2002
+    [115, "Sacrilege or not, a flat-six 2002 would be an absolute canyon weapon. The weight shifts slightly rearward which could actually help balance.", 6, 4, null, "2025-02-12T16:30:00.000Z", 18, 2],
+    [116, "You'd need to fabricate a custom engine mount cradle and a bellhousing adapter. The 901 gearbox could actually fit with some tunnel massaging.", 11, 4, 115, "2025-02-12T17:00:00.000Z", 14, 0],
+    [117, "I'd rather do a full original restoration. A 2002tii with the Kugelfischer injection is already a masterpiece. Don't touch it.", 1, 4, null, "2025-02-12T17:30:00.000Z", 21, 3],
+
+    // Post 7 - EQS AMG electric debate
+    [118, "Performance without soul is still performance. The EQS 53 does 0-60 in 3.4 seconds. That is faster than any old AMG V8.", 4, 7, null, "2025-02-20T10:30:00.000Z", 12, 9],
+    [119, "0-60 times mean nothing if the experience is sterile. An AMG is supposed to assault your senses, not glide silently past them.", 3, 7, 118, "2025-02-20T11:00:00.000Z", 34, 1],
+    [120, "AMG should have kept the badge exclusive to combustion cars. The EQS needs its own performance sub-brand.", 9, 7, null, "2025-02-20T11:30:00.000Z", 27, 4],
+
+    // Post 9 - Quattro understeer
+    [121, "The torque vectoring rear diff on the RS3 and RS5 completely transforms the handling. No understeer whatsoever when properly set up.", 8, 9, null, "2025-02-24T09:00:00.000Z", 22, 0],
+    [122, "Rear sway bar stiffening is the easiest fix. Switching to a 25mm solid unit from the stock hollow bar made my B8 RS5 rotate perfectly.", 7, 9, 121, "2025-02-24T09:30:00.000Z", 18, 0],
+    [123, "Also, softer front springs relative to rear helps weight transfer. Don't overlook alignment — increase rear toe-in slightly.", 2, 9, 122, "2025-02-24T10:00:00.000Z", 15, 0],
+
+    // Post 10 - Audi R8 V10 Decennium
+    [124, "The R8 V10 will be remembered as the last great naturally aspirated mid-engine supercar from a mainstream brand. Ferrari and Lambo went hybrid. This was the last holdout.", 8, 10, null, "2025-02-26T15:45:00.000Z", 48, 0],
+    [125, "I drove the Performante version and the intake sound behind your head at full throttle is once-in-a-lifetime. Nothing electric will ever replace that.", 11, 10, 124, "2025-02-26T16:00:00.000Z", 39, 0],
+    [126, "Values are already climbing. Low-mileage Plus variants are up 15% from two years ago. People are waking up to what they're losing.", 6, 10, null, "2025-02-26T16:30:00.000Z", 31, 0],
+
+    // Post 12 - F1 pre-season testing
+    [127, "McLaren's top speed gains are significant. They seem to have found something with the floor edge geometry. Watch their Baku pace.", 2, 12, null, "2025-03-03T18:30:00.000Z", 19, 0],
+    [128, "Red Bull's tire delta is always misleading at testing. They sandbag fuel loads deliberately. Don't read too much into long-run times.", 14, 12, 127, "2025-03-03T19:00:00.000Z", 25, 2],
+
+    // Post 13 - Hamilton to Ferrari (heated)
+    [129, "History shows that when two alpha drivers share a garage, one inevitably gets the upper hand. Hamilton is 7x champion. Leclerc will not accept #2.", 2, 13, null, "2025-03-05T14:45:00.000Z", 52, 0],
+    [130, "Ferrari always has a power struggle. Remember Prost vs Mansell? Alonso vs Massa? The board will pick a favourite by mid-season.", 14, 13, 129, "2025-03-05T15:00:00.000Z", 38, 0],
+    [131, "Hamilton brings incredible data engineering feedback and sponsorship. Even if he's not fastest, his presence elevates the entire team.", 9, 13, null, "2025-03-05T15:30:00.000Z", 27, 3],
+    [132, "Leclerc has been waiting his entire career for this moment. He won't let Hamilton walk into his team and take over quietly.", 2, 13, 131, "2025-03-05T16:00:00.000Z", 44, 1],
+
+    // Post 15 - Porsche Macan reliability
+    [133, "2018 Macan S is the sweet spot year. The PDK had a software update that resolved most early shift-hunting issues. Buy it.", 11, 15, null, "2025-03-10T11:00:00.000Z", 31, 0],
+    [134, "Avoid the base 2.0T if you want longevity. The V6 S engine is more robust under load and maintenance costs are comparable.", 9, 15, 133, "2025-03-10T11:30:00.000Z", 24, 0],
+    [135, "Annual Porsche OPC service is around $800-1200 depending on mileage interval. Budget 10-15% of car value per year for maintenance.", 1, 15, null, "2025-03-10T12:00:00.000Z", 19, 1],
+
+    // Post 16 - Civic Type R vs Golf R (heated)
+    [136, "Type R FL5 has the best steering feel in the hot hatch segment, period. The Golf R is more refined but feels distant and clinical.", 15, 16, null, "2025-03-12T09:30:00.000Z", 37, 2],
+    [137, "Golf R wins on versatility. AWD in winter, comfortable on long trips, and the Akrapovic exhaust option sounds incredible.", 8, 16, 136, "2025-03-12T10:00:00.000Z", 28, 3],
+    [138, "The Type R's rev-match downshift function is a masterclass in engineering. Makes you feel like a better driver than you are.", 15, 16, null, "2025-03-12T10:30:00.000Z", 22, 0],
+    [139, "If you live in a snowy region the Golf R is the obvious answer. FWD Type R in the snow is genuinely dangerous.", 3, 16, 138, "2025-03-12T11:00:00.000Z", 33, 1],
+
+    // Post 18 - Rooftop tents vs ground tents
+    [140, "Rooftop tents completely changed overlanding for me. No more tent stakes in rocky terrain, and the mattress comfort is unmatched.", 5, 18, null, "2025-03-16T11:30:00.000Z", 28, 0],
+    [141, "The fuel economy hit is real though. My Land Cruiser drops about 3 MPG with a roof tent mounted even when folded.", 5, 18, 140, "2025-03-16T12:00:00.000Z", 21, 0],
+
+    // Post 19 - Recovery gear
+    [142, "A kinetic recovery rope is essential for solo trips. A winch is useless without an anchor when you're alone. Rope first.", 5, 19, null, "2025-03-18T16:00:00.000Z", 35, 0],
+    [143, "Pair the rope with a MaxTrax and a Hi-Lift jack. That trio covers 90% of solo recovery situations without needing another vehicle.", 6, 19, 142, "2025-03-18T16:30:00.000Z", 29, 0],
+
+    // Post 21 - Wheel offsets
+    [144, "Great guide! The scrub radius change with negative offset spacers is something most people ignore until their steering wanders.", 7, 21, null, "2025-03-22T13:30:00.000Z", 24, 0],
+    [145, "One thing to add: wider wheels increase rotational inertia. A 10mm wider rim is measurably slower to accelerate. Lightweight wheels matter.", 13, 21, 144, "2025-03-22T14:00:00.000Z", 19, 0],
+
+    // Post 22 - Audi RS3 wrap
+    [146, "DIY wraps look amazing if you have patience. Did you use a heat gun on the door edges or just stretch the vinyl?", 13, 22, null, "2025-03-24T16:45:00.000Z", 17, 0],
+    [147, "Both. Heat gun at around 60°C on curves, gentle stretch on flat panels. The hood took me four attempts to get right.", 8, 22, 146, "2025-03-24T17:15:00.000Z", 22, 0],
+
+    // Post 24 - Road trip non-Tesla EV
+    [148, "CCS reliability has improved in the last year, but you're right that dead chargers still happen regularly. Always plan a backup station.", 4, 24, null, "2025-03-28T11:00:00.000Z", 28, 0],
+    [149, "This is exactly why Tesla's Supercharger network is worth paying a premium for. 99.9% uptime versus 70-80% for third-party CCS.", 1, 24, 148, "2025-03-28T11:30:00.000Z", 19, 6],
+    [150, "Ioniq 5 with NACS adapter is the ideal setup right now. Best non-Tesla EV for road trips on any budget.", 4, 24, 149, "2025-03-28T12:00:00.000Z", 24, 1],
+
+    // Post 27 - Cayman GT4 RS vs 911
+    [151, "Mid-engine balance is fundamentally superior for circuit driving. The GT4 RS has the engine where it belongs, unlike the tail-heavy 911.", 2, 27, null, "2025-04-05T14:30:00.000Z", 29, 4],
+    [152, "The 911's rear weight bias is its advantage in traction out of slow corners though. Mid vs rear engine is the oldest Porsche debate.", 11, 27, 151, "2025-04-05T15:00:00.000Z", 38, 0],
+    [153, "Drove both back to back at Spa. The GT4 RS is more pointy but less forgiving. The 911 GTS is easier to drive fast consistently.", 6, 27, null, "2025-04-05T15:30:00.000Z", 22, 0],
+
+    // Post 30 - MX-5 NA weight reduction
+    [154, "Weight reduction is the most underrated mod. You feel every kilogram removed. An MX-5 NA below 2,000 lbs must be incredible.", 7, 30, null, "2025-04-12T16:00:00.000Z", 26, 0],
+    [155, "Running a similar setup. Removed the spare tire too and replaced with a plug kit. Another 25 lbs gone for free.", 15, 30, 154, "2025-04-12T16:30:00.000Z", 19, 0],
+
+    // Post 38 - Wrangler vs Bronco (debate)
+    [156, "Solid axle on the Jeep is the key differentiator for serious rock crawling. The Bronco's IFS is better on highway but hits limits on technical trails.", 5, 38, null, "2025-04-28T14:30:00.000Z", 41, 0],
+    [157, "Bronco's modular bumpers and Ford parts availability are a huge advantage for overlanders who don't want to source custom parts.", 6, 38, 156, "2025-04-28T15:00:00.000Z", 27, 2],
+    [158, "Jeep has 25 years of Rubicon aftermarket support vs 3 years of Bronco parts. No contest for serious builds.", 5, 38, 157, "2025-04-28T15:30:00.000Z", 33, 1],
+
+    // Post 52 - E46 subframe reinforcement
+    [159, "Essential repair for any track-driven E46. The factory welds are undersized for sustained lateral loads. Do it before it becomes an emergency.", 1, 52, null, "2025-05-24T13:15:00.000Z", 28, 0],
+    [160, "Superpro reinforcement plates welded by a certified welder, sprayed with rubberized undercoating. Job done right lasts forever.", 7, 52, 159, "2025-05-24T13:30:00.000Z", 22, 0],
+
+    // Post 54 - AMG ONE hypercar
+    [161, "The idle emissions issues during development were legendary, but they solved it. An F1 engine that passes road legal emissions is a genuine engineering miracle.", 2, 54, null, "2025-05-24T14:45:00.000Z", 34, 0],
+    [162, "275 km/h top speed in road trim and it corners completely flat. I'd rather have one of those than any LaFerrari.", 3, 54, 161, "2025-05-24T15:00:00.000Z", 41, 0],
+
+    // Post 56 - Ur-Quattro restoration
+    [163, "The early 10V WR engine parts are basically unobtanium. Your best bet is the Audi Heritage network in Germany or specialist breakers in the UK.", 6, 56, null, "2025-05-24T15:45:00.000Z", 19, 0],
+    [164, "Check with Classic Audi parts suppliers in Stuttgart. They sometimes have new-old-stock body panels from dealer surplus.", 8, 56, 163, "2025-05-24T16:00:00.000Z", 14, 0],
+
+    // Post 57 - F1 2026 engine rules
+    [165, "Tripling electric power while dropping the MGU-H is a brave choice. The energy harvest zones will define strategy more than ever.", 2, 57, null, "2025-05-24T16:15:00.000Z", 22, 0],
+    [166, "The concern is overtake button abuse. If every car has a massive electric overtake mode, DRS becomes redundant and racing gets artificial.", 14, 57, 165, "2025-05-24T16:30:00.000Z", 17, 3],
+
+    // Post 58 - Top 10 F1 liveries
+    [167, "Jordan 191 is the correct answer. Camel yellow on a debut car at Spa. Nothing before or since has had that energy.", 14, 58, null, "2025-05-24T16:45:00.000Z", 43, 0],
+    [168, "JPS Lotus is the most iconic. Simple, elegant, absolutely sinister in black and gold. It defined an entire era of F1.", 2, 58, 167, "2025-05-24T17:00:00.000Z", 35, 2],
+    [169, "Underrated: the Rothmans Williams FW11. Blue, white, and red with that gold swoosh. It looks modern even today.", 9, 58, null, "2025-05-24T17:15:00.000Z", 27, 0],
+
+    // Post 59 - High mileage Cayman 987
+    [170, "IMS without retrofit at 120k miles is a calculated gamble. Get a pre-purchase inspection by an independent Porsche specialist, not a dealer.", 11, 59, null, "2025-05-24T17:15:00.000Z", 38, 0],
+    [171, "Budget 3,000-4,000 for an immediate IMS Pro retrofit plus RMS seal and coolant refresh. Factor that into your offer price.", 9, 59, 170, "2025-05-24T17:30:00.000Z", 32, 0],
+
+    // Post 60 - Winter daily driver
+    [172, "Subaru Impreza with winter tires outperforms any AWD crossover in real winter conditions. The symmetrical AWD and low center of gravity are unbeatable.", 5, 60, null, "2025-05-24T17:45:00.000Z", 28, 0],
+    [173, "Rust is the Achilles heel of the Impreza. Spray the undercarriage with Fluid Film every autumn and it will last 20 years.", 9, 60, 172, "2025-05-24T18:00:00.000Z", 21, 0],
+
+    // Post 62 - MaxTrax vs alternatives
+    [174, "The cheap boards snap when you bury the front diff and get aggressive. MaxTrax are expensive but they flex and grip instead of breaking.", 5, 62, null, "2025-05-24T18:45:00.000Z", 31, 0],
+    [175, "TRED Pro boards are a credible alternative at half the price. Still way better than the $80 versions from Amazon.", 6, 62, 174, "2025-05-24T19:00:00.000Z", 24, 1],
+
+    // Post 63 - Stage 2 VAG TSI
+    [176, "Don't forget upgraded motor mounts. Stage 2 torque will destroy the stock rubber mounts within 10,000 miles. Solid or poly inserts are mandatory.", 7, 63, null, "2025-05-24T19:15:00.000Z", 27, 0],
+    [177, "Clutch rating is the number one concern on Stage 2. A standard Sachs plate will slip at the first aggressive launch above 350 lb-ft.", 8, 63, 176, "2025-05-24T19:30:00.000Z", 23, 0],
+
+    // Post 64 - Tein vs BC coilovers
+    [178, "BC Racing are a strong budget choice for daily driving but spring rates are soft for track use. You'll bottom out mid-corner on bumpy circuits.", 7, 64, null, "2025-05-24T19:45:00.000Z", 19, 0],
+    [179, "Tein Flex Z has better damper adjustment range in my experience. The rebound click is more linear and easier to fine-tune.", 15, 64, 178, "2025-05-24T20:00:00.000Z", 16, 0],
+
+    // Post 66 - Solid state batteries
+    [180, "Toyota's solid state timeline has slipped three times already. The manufacturing yield rate is still below commercial viability. 2028 is more realistic.", 4, 66, null, "2025-05-24T20:45:00.000Z", 33, 0],
+    [181, "Even if production is 2027, real-world durability data won't exist until 2030+. Early adopter risk on solid state is enormous.", 9, 66, 180, "2025-05-24T21:00:00.000Z", 26, 0],
+
+    // Post 67 - Porsche 996 undervalued
+    [182, "The 996.2 post-2002 facelift fixed most IMS issues with an upgraded bearing. It is genuinely the best value entry into 911 ownership right now.", 11, 67, null, "2025-05-24T21:15:00.000Z", 44, 0],
+    [183, "IMS and bore scoring are manageable with a pre-purchase inspection and proactive preventive work. A properly maintained 3.4L Carrera is bulletproof.", 6, 67, 182, "2025-05-24T21:30:00.000Z", 33, 0],
+
+    // Post 68 - Porsche 928 restoration
+    [184, "The 928's wiring harness insulation hardens and cracks at this age. A full harness replacement is often the only permanent cure for phantom electrical gremlins.", 6, 68, null, "2025-05-24T21:45:00.000Z", 22, 0],
+    [185, "The GTS engine is spectacular when it's healthy though. A sorted 928 is one of the finest grand touring experiences from that era.", 11, 68, 184, "2025-05-24T22:00:00.000Z", 18, 0],
+
+    // Post 69 - WRX STI EJ25 safety
+    [186, "The cylinder 4 cooling mod is absolutely worth the effort. Drilling the coolant passage takes 30 minutes and could save your entire engine.", 12, 69, null, "2025-05-24T22:15:00.000Z", 36, 0],
+    [187, "Add an aftermarket oil cooler and an AOS air-oil separator at the same time. Crankcase pressure is the silent killer on the EJ25.", 7, 69, 186, "2025-05-24T22:30:00.000Z", 30, 0],
+
+    // Post 72 - Stripped thread repair
+    [188, "Time-Sert is unquestionably better for critical threads like spark plugs or head bolts. Heli-Coil works for non-critical fasteners but can unthread under vibration.", 11, 72, null, "2025-05-25T00:00:00.000Z", 28, 0],
+    [189, "Loctite thread repair kits are another option for very shallow stripped holes. Not as strong but no drilling required.", 1, 72, 188, "2025-05-25T00:15:00.000Z", 15, 0],
+
+    // Post 73 - Panning shots tutorial
+    [190, "1/30s to 1/60s is the sweet spot for most cars. Go slower for classic cars at shows, faster for highway action shots.", 12, 73, null, "2025-05-25T00:15:00.000Z", 31, 0],
+    [191, "Use continuous AF tracking, not single point. A mirrorless camera with subject tracking is a massive advantage for panning.", 13, 73, 190, "2025-05-25T00:30:00.000Z", 24, 0],
+
+    // Post 74 - Best lenses car shows
+    [192, "85mm f/1.8 is the queen of car show photography. Beautiful compression, creamy background blur, and sharp enough to read brake caliper logos.", 12, 74, null, "2025-05-25T00:45:00.000Z", 37, 0],
+    [193, "35mm is more flexible in tight indoor spaces. A compact 35mm f/2 on a mirrorless is the most versatile option for crowded show floors.", 13, 74, 192, "2025-05-25T01:00:00.000Z", 28, 1],
+    [194, "Don't sleep on the 70-200mm f/2.8. It lets you compress perspective from a distance and isolate cars without disturbing the scene.", 8, 74, null, "2025-05-25T01:15:00.000Z", 22, 0],
+
+    // Post 1 - BMW M3 debate extra
+    [195, "The real answer is the CSL. If you want to talk about the true M3 benchmark, it starts and ends with the E46 CSL. 1,385 kg and the most refined S54 ever built.", 11, 1, null, "2025-02-02T09:00:00.000Z", 52, 0],
+    [196, "CSL is a collector piece, not a daily driver comparison. We're talking standard M3s here. But yes, CSL is the undisputed pinnacle of that generation.", 1, 1, 195, "2025-02-02T09:30:00.000Z", 33, 0],
+
+    // Post 5 - AMG V8 tribute extra
+    [197, "M156 in the SLS is the best version of that engine. The dry-sump setup lets you take corners at sustained high g without oil starvation.", 2, 5, null, "2025-02-15T13:00:00.000Z", 29, 0],
+    [198, "SLS AMG with Meisterschaft exhaust is one of the best sounds ever recorded in an automotive context. Full stop.", 3, 5, 197, "2025-02-15T13:30:00.000Z", 38, 0],
+
+    // Post 17 - Land Cruiser 80 series extra
+    [199, "What color is the FZJ80? White is the most rust-resistant but Freeborn Red or dark green are the most iconic colors for the 80 series.", 6, 17, null, "2025-03-14T11:00:00.000Z", 16, 0],
+    [200, "It's the factory dark green. One of the best colors they ever offered on a Land Cruiser. Going to keep it original on the exterior.", 5, 17, 199, "2025-03-14T11:30:00.000Z", 23, 0]
 ];
 
 const insertComment = db.prepare(`
@@ -968,5 +1126,5 @@ console.log("  Forums: 14 active forums loaded");
 console.log("  Users: 15 active profiles loaded (passwords: 'password123', admin: 'admin123')");
 console.log("  Subscribers: 58 memberships mapped");
 console.log("  Posts: 80 media-rich posts loaded");
-console.log("  Comments: 114 detailed replies and sub-threads loaded");
-console.log("Total entries in database: ~300+ entries populated.");
+console.log("  Comments: 200 detailed replies and sub-threads loaded");
+console.log("Total entries in database: ~385+ entries populated.");
