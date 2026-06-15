@@ -105,12 +105,14 @@ userRouter.post("/update", requireAuth, (req: Request, res: Response) => {
         const newPublicName: string = req.body.newPublicName;
         const newDescription: string = req.body.newDescription;
         const newImage: string = req.body.newImage;
+        const newTitle: string | undefined = req.body.newTitle;
 
         let user = userService.updateUserInfo(realUserName, {
             username: newUserName,
             publicname: newPublicName,
             description: newDescription,
-            image: newImage
+            image: newImage,
+            title: newTitle
         } as User);
 
         return res.status(StatusCodes.OK).send({
