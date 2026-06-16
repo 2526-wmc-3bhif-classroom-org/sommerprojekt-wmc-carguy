@@ -1371,6 +1371,6 @@ console.log("  Categories: 10 categories loaded");
 console.log("  Forums: 14 active forums loaded");
 console.log("  Users: 15 active profiles loaded (passwords: 'password123', admin: 'admin123')");
 console.log("  Subscribers: 58 memberships mapped");
-console.log("  Posts: 80 media-rich posts loaded");
+console.log("  Posts: 86 media-rich posts loaded");
 console.log("  Comments: 200 detailed replies and sub-threads loaded");
 console.log("Total entries in database: ~385+ entries populated.");

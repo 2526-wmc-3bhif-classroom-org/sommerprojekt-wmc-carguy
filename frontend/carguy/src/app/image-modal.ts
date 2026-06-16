@@ -11,6 +11,6 @@ export function openImageModal(url: string, event: Event): string {
 export function scrollToSlide(id: string): void {
   const el = document.getElementById(id);
   if (el) {
-    el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    el.parentElement?.scrollTo({ left: el.offsetLeft, behavior: 'smooth' });
   }
 }
