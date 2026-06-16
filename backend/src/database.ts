@@ -191,6 +191,24 @@ export class DB {
             ) strict;
         `);
 
+        // Auto-seed database if empty (no users exist)
+        try {
+            const userCountRow = connection.prepare("SELECT COUNT(*) as count FROM User").get() as { count: number } | undefined;
+            if (!userCountRow || userCountRow.count === 0) {
+                console.log("Database is empty. Automatically seeding initial data...");
+                const seedPath = path.resolve(__dirname, "../seed.ts");
+                if (fs.existsSync(seedPath)) {
+                    const { execSync } = require("child_process");
+                    execSync(`npx tsx "${seedPath}"`, { cwd: path.resolve(__dirname, "..") });
+                    console.log("Database seeded successfully via auto-execution!");
+                } else {
+                    console.warn("seed.ts not found at:", seedPath);
+                }
+            }
+        } catch (autoSeedErr) {
+            console.error("Error during automatic database seeding:", autoSeedErr);
+        }
+
         // Seed default guides if they don't exist
         try {
             const countRow = connection.prepare("SELECT COUNT(*) as count FROM Guide").get() as { count: number } | undefined;
