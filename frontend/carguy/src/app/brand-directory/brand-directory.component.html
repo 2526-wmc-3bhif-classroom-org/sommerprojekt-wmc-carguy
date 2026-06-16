@@ -82,7 +82,7 @@
             <!-- Text Content -->
             <div class="p-6 flex flex-col justify-between flex-grow">
               <div class="mb-4">
-                @if (post.forum?.name) {
+                @if (post.forum.name) {
                   <div class="mb-2">
                     <a [routerLink]="['/community', post.forum.forumId]" (click)="$event.stopPropagation()" class="text-xs font-bold text-accent hover:underline">
                       c/{{ post.forum.name }}

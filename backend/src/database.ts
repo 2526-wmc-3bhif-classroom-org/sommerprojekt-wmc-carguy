@@ -335,5 +335,107 @@ export class DB {
         } catch (err) {
             console.error("Error seeding default guides:", err);
         }
+
+        // Seed additional car-specific guides if they don't exist yet
+        try {
+            const carGuides = [
+                {
+                    id: 7,
+                    title: 'How to Prepare for Your First Track Day',
+                    description: 'A step-by-step checklist to get your car and yourself ready for a safe and fun track day experience.',
+                    content: [
+                        'Book a Novice or Open Lapping session with a reputable organizer — most include a classroom briefing for first-timers.',
+                        'Inspect your brakes thoroughly: fresh pads (at least 70% remaining), bled fluid (ATE Type 200 or Motul RBF600 recommended), and no warped rotors.',
+                        'Set your tire pressures slightly higher than street settings — 36–38 psi hot is a good starting point, but ask experienced drivers at the event.',
+                        'Remove all loose items from the interior: floor mats, sunglasses, water bottles — anything that can become a projectile under hard braking.',
+                        'Bring a Snell SA2020-rated helmet, sunscreen, plenty of water, and comfortable driving shoes. Your first session goal is learning the track layout, not lap times.'
+                    ]
+                },
+                {
+                    id: 8,
+                    title: 'Wheel & Tire Fitment Guide',
+                    description: 'Understand offset, width, and tire sizing so you can achieve perfect fitment without rubbing or handling issues.',
+                    content: [
+                        'Tire size is written as Width/Aspect Ratio/Rim Diameter — for example, 255/35/R19 means 255mm wide, 35% sidewall height, on a 19-inch rim.',
+                        'Wheel offset (ET) measures how far the mounting face sits from the wheel center. A higher ET pushes the wheel inward (tucked); a lower ET pushes it outward (poked).',
+                        'Use an online fitment calculator to compare specs before buying — it simulates exactly how new wheels will sit versus stock.',
+                        'After installing, check for rubbing at full steering lock and over bumps. Common contact points are the inner fender liner, strut housing, and brake caliper.',
+                        'Staggered setups (wider rear) suit RWD performance cars but prevent tire rotation — factor in higher rear tire wear costs before committing.'
+                    ]
+                },
+                {
+                    id: 9,
+                    title: 'Essential Car Detailing Guide',
+                    description: 'Learn the fundamentals of proper car care to keep your paint looking showroom-fresh for years.',
+                    content: [
+                        'Always wash with the two-bucket method: one bucket of soapy water, one of clean rinse water — never drag a dirty mitt across your paint.',
+                        'After washing, run your hand across a panel. If it feels rough or gritty, use a clay bar to decontaminate the surface before any polishing.',
+                        'Use a dual-action (DA) polisher to remove light swirl marks. Start with the least aggressive pad and compound, then step up only if needed.',
+                        'Protect your finish with a ceramic coating (Gyeon, CarPro, Gtechniq) or paint sealant — this makes future washes much easier and water beads off beautifully.',
+                        'Always clean your wheels last. Brake dust is caustic and can transfer to your paintwork if you use the same tools on wheels first.'
+                    ]
+                },
+                {
+                    id: 10,
+                    title: 'How to Read a Dyno Chart',
+                    description: 'Understand what power and torque curves tell you about your engine\'s character and tuning potential.',
+                    content: [
+                        'A dyno chart plots Horsepower (HP) and Torque (Nm or lb-ft) against RPM. Wheel horsepower (WHP) is always lower than crank HP due to drivetrain losses — typically 15–20%.',
+                        'A flat, wide torque curve means strong low-RPM pull — great for street driving. A peaky curve climbing sharply near redline is typical of high-revving naturally aspirated engines.',
+                        'Look for a smooth, progressive curve without dips or hesitations — these can indicate lean spots, cam timing problems, or boost pressure fluctuations.',
+                        'The area under the power curve — the powerband — matters more than peak numbers. Two 400hp engines can feel completely different depending on how broad that power is.',
+                        'After a tune, overlay before and after curves to see exactly which RPM range gained the most. This tells you whether the tune was truly optimized for your driving style.'
+                    ]
+                },
+                {
+                    id: 11,
+                    title: 'Buying a Used Performance Car: What to Check',
+                    description: 'A practical pre-purchase checklist so you don\'t accidentally buy someone else\'s expensive problem.',
+                    content: [
+                        'Always request a full service history. Look for evidence of regular oil changes, timing belt or chain replacements, and brake fluid flushes at the correct intervals.',
+                        'Book a pre-purchase inspection (PPI) with a brand specialist — a BMW specialist will catch M-car-specific issues that a general mechanic will miss entirely.',
+                        'Look for signs of heavy track use: excessive brake dust on inner rims, a worn undertray, heat discoloration on calipers, and signs of freshly replaced brake lines.',
+                        'Cross-check every VIN plate: dashboard, door jamb, engine bay, and floor pan. Mismatched numbers strongly suggest a repaired write-off.',
+                        'Research model-specific failure points on dedicated forums before viewing the car. For example, the E92 M3 is known for throttle actuator failures and rod bearing wear at high mileage.'
+                    ]
+                }
+            ];
+
+            const insertCarGuideStmt = connection.prepare(`
+                INSERT INTO Guide (GuideID, Title, Description, Content, UID, PublishedAt, Likes, Dislikes)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            `);
+
+            let carGuideAuthorUid: number | null = null;
+            try {
+                const userRow = connection.prepare("SELECT UID FROM User WHERE UID = 4 OR Role = 'admin' LIMIT 1").get() as { UID: number } | undefined;
+                if (userRow) {
+                    carGuideAuthorUid = userRow.UID;
+                } else {
+                    const anyUser = connection.prepare("SELECT UID FROM User LIMIT 1").get() as { UID: number } | undefined;
+                    if (anyUser) carGuideAuthorUid = anyUser.UID;
+                }
+            } catch (_) {}
+
+            if (carGuideAuthorUid === null) return;
+
+            for (const g of carGuides) {
+                const existing = connection.prepare("SELECT GuideID FROM Guide WHERE GuideID = ?").get(g.id);
+                if (!existing) {
+                    insertCarGuideStmt.run(
+                        g.id,
+                        g.title,
+                        g.description,
+                        JSON.stringify(g.content),
+                        carGuideAuthorUid,
+                        new Date().toISOString(),
+                        0,
+                        0
+                    );
+                }
+            }
+        } catch (err) {
+            console.error("Error seeding car-specific guides:", err);
+        }
     }
 }
