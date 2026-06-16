@@ -28,6 +28,7 @@ export class CommunitiesRepository implements OnInit {
   private forumService = inject(ForumService);
 
   async ngOnInit() {
+    await this.refreshUserAura();
     try {
       this.all = await this.forumService.getAllForums();
       this.featured = this.all.slice(0, 4); // Just show a few for featured
@@ -42,6 +43,18 @@ export class CommunitiesRepository implements OnInit {
       }
     } catch (error) {
       console.error('Failed to load forums', error);
+    }
+  }
+
+  async refreshUserAura() {
+    const loggedInUser = this.userService.getCurrentUser();
+    if (loggedInUser) {
+      try {
+        const updatedUser = await this.userService.getUserById(loggedInUser.uid);
+        localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+      } catch (err) {
+        console.error("Failed to refresh user aura:", err);
+      }
     }
   }
 

@@ -72,13 +72,7 @@ export class UserService {
         if (newUserData.publicname) realUser.publicname = newUserData.publicname;
         if (newUserData.description !== undefined) realUser.description = newUserData.description;
         if (newUserData.image !== undefined) realUser.image = newUserData.image;
-        if (newUserData.title !== undefined) {
-            const isVerified = (realUser.totalAura ?? 0) >= 100 || realUser.role === "admin";
-            if (!isVerified) {
-                throw new Error("Only verified users with 100+ Aura or admins can set a custom title.");
-            }
-            realUser.title = newUserData.title;
-        }
+        if (newUserData.title !== undefined) realUser.title = newUserData.title;
 
         this.userRepository.updateUser(realUser);
 

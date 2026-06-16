@@ -36,6 +36,7 @@ export class ThemeService {
 
     const transition = doc.startViewTransition(() => {
       this.darkModeSignal.set(nextMode);
+      document.documentElement.classList.add('theme-transitioning');
     });
 
     transition.ready.then(() => {
@@ -44,15 +45,17 @@ export class ThemeService {
         `circle(${endRadius}px at ${x}px ${y}px)`
       ];
       document.documentElement.animate(
-        {
-          clipPath: clipPath
-        },
+        { clipPath },
         {
           duration: 400,
-          easing: 'ease-in-out',
+          easing: 'ease-out',
           pseudoElement: '::view-transition-new(root)'
         }
       );
+    });
+
+    transition.finished.then(() => {
+      document.documentElement.classList.remove('theme-transitioning');
     });
   }
 }

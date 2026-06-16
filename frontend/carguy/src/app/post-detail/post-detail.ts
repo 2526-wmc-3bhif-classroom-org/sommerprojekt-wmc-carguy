@@ -30,6 +30,8 @@ export class PostDetailComponent implements OnInit {
   voteState: 'like' | 'dislike' | null = null;
   commentVoteStates: Record<number, 'like' | 'dislike' | null> = {};
   sortMode: 'newest' | 'oldest' | 'most_liked' = 'newest';
+  isVotingPost = false;
+  isVotingComment: Record<number, boolean> = {};
   selectedImage: string | null = null;
 
   private userService = inject(UserService);
@@ -294,92 +296,105 @@ export class PostDetailComponent implements OnInit {
   }
 
   async likePost() {
-    if (!this.post || !this.userService.isLoggedIn()) return;
+    if (!this.post || !this.userService.isLoggedIn() || this.isVotingPost) return;
+    this.isVotingPost = true;
     try {
       if (this.voteState === 'like') {
-        await this.postService.unlikePost(this.post.pid);
         this.post.likes--;
         this.voteState = null;
+        await this.postService.unlikePost(this.post.pid);
       } else {
         if (this.voteState === 'dislike') {
-          await this.postService.undislikePost(this.post.pid);
           this.post.dislikes--;
+          await this.postService.undislikePost(this.post.pid);
         }
-        await this.postService.likePost(this.post.pid);
         this.post.likes++;
         this.voteState = 'like';
+        await this.postService.likePost(this.post.pid);
       }
       this.saveVoteState();
     } catch (e) {
       console.error('Failed to like post', e);
+      // Revert state if necessary on real apps, ignoring here for simplicity
+    } finally {
+      this.isVotingPost = false;
     }
   }
 
   async dislikePost() {
-    if (!this.post || !this.userService.isLoggedIn()) return;
+    if (!this.post || !this.userService.isLoggedIn() || this.isVotingPost) return;
+    this.isVotingPost = true;
     try {
       if (this.voteState === 'dislike') {
-        await this.postService.undislikePost(this.post.pid);
         this.post.dislikes--;
         this.voteState = null;
+        await this.postService.undislikePost(this.post.pid);
       } else {
         if (this.voteState === 'like') {
-          await this.postService.unlikePost(this.post.pid);
           this.post.likes--;
+          await this.postService.unlikePost(this.post.pid);
         }
-        await this.postService.dislikePost(this.post.pid);
         this.post.dislikes++;
         this.voteState = 'dislike';
+        await this.postService.dislikePost(this.post.pid);
       }
       this.saveVoteState();
     } catch (e) {
       console.error('Failed to dislike post', e);
+    } finally {
+      this.isVotingPost = false;
     }
   }
 
   async likeComment(comment: Comment) {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn() || this.isVotingComment[comment.cid]) return;
+    this.isVotingComment[comment.cid] = true;
     const currentState = this.commentVoteStates[comment.cid];
     try {
       if (currentState === 'like') {
-        await this.commentService.unlikeComment(comment.cid);
         comment.likes--;
         this.commentVoteStates[comment.cid] = null;
+        await this.commentService.unlikeComment(comment.cid);
       } else {
         if (currentState === 'dislike') {
-          await this.commentService.undislikeComment(comment.cid);
           comment.dislikes--;
+          await this.commentService.undislikeComment(comment.cid);
         }
-        await this.commentService.likeComment(comment.cid);
         comment.likes++;
         this.commentVoteStates[comment.cid] = 'like';
+        await this.commentService.likeComment(comment.cid);
       }
       this.saveCommentVoteState(comment.cid);
     } catch (e) {
       console.error('Failed to like comment', e);
+    } finally {
+      this.isVotingComment[comment.cid] = false;
     }
   }
 
   async dislikeComment(comment: Comment) {
-    if (!this.userService.isLoggedIn()) return;
+    if (!this.userService.isLoggedIn() || this.isVotingComment[comment.cid]) return;
+    this.isVotingComment[comment.cid] = true;
     const currentState = this.commentVoteStates[comment.cid];
     try {
       if (currentState === 'dislike') {
-        await this.commentService.undislikeComment(comment.cid);
         comment.dislikes--;
         this.commentVoteStates[comment.cid] = null;
+        await this.commentService.undislikeComment(comment.cid);
       } else {
         if (currentState === 'like') {
-          await this.commentService.unlikeComment(comment.cid);
           comment.likes--;
+          await this.commentService.unlikeComment(comment.cid);
         }
-        await this.commentService.dislikeComment(comment.cid);
         comment.dislikes++;
         this.commentVoteStates[comment.cid] = 'dislike';
+        await this.commentService.dislikeComment(comment.cid);
       }
       this.saveCommentVoteState(comment.cid);
     } catch (e) {
       console.error('Failed to dislike comment', e);
+    } finally {
+      this.isVotingComment[comment.cid] = false;
     }
   }
 }

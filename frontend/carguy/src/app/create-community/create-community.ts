@@ -42,7 +42,11 @@ export class CreateCommunityComponent {
         this.router.navigate(['/communities']);
       }
     } catch (error: any) {
-      this.errorMessage = error.message || 'Failed to create community. Please try again.';
+      if (error.error && typeof error.error === 'string') {
+        this.errorMessage = error.error;
+      } else {
+        this.errorMessage = error.message || 'Failed to create community. Please try again.';
+      }
       console.error('Failed to create community', error);
     } finally {
       this.isLoading = false;

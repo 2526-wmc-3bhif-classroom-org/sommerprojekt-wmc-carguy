@@ -1,7 +1,10 @@
 <div class="mx-auto max-w-[1400px] px-6 py-8 min-h-screen pt-20">
-  <header class="mb-6 mt-4">
-    <h1 class="text-4xl font-bold text-primary mb-4 tracking-tight">Trending Hub</h1>
-    <p class="text-base-content/70 text-lg max-w-3xl">See what's hot and trending in the automotive world. Discover top discussions and active communities sorted by your interests.</p>
+  <header class="premium-header mb-8 mt-4">
+    <div class="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent"></div>
+    <div class="relative z-10">
+      <h1 class="text-4xl font-extrabold text-primary mb-2 tracking-tight">Trending Hub</h1>
+      <p class="text-base-content/70 text-lg max-w-3xl">See what's hot and trending in the automotive world. Discover top discussions and active communities sorted by your interests.</p>
+    </div>
   </header>
 
   <!-- Category Filter Pills -->
@@ -48,7 +51,7 @@
         <!-- Scrollable Wrapper -->
         <div #postsCarousel class="flex overflow-x-auto gap-6 pb-4 scroll-smooth scrollbar-none snap-x snap-mandatory">
           @for (post of filteredTrendingPosts; track post.pid) {
-          <div [routerLink]="['/post', post.pid]" class="premium-card rounded-3xl group/card cursor-pointer flex flex-col justify-between min-w-[320px] md:min-w-[400px] max-w-[450px] snap-start shrink-0 overflow-hidden shadow-lg border border-base-200/60 hover:border-primary/30 transition-all duration-300">
+          <div [routerLink]="['/post', post.pid]" class="premium-card rounded-3xl group/card cursor-pointer flex flex-col justify-between min-w-[320px] md:min-w-[400px] max-w-[450px] snap-start shrink-0 overflow-hidden shadow-lg border border-base-200/60 hover:border-primary/30 transition-[transform,opacity,box-shadow] duration-300">
             
             @if (post.imageUrls && post.imageUrls.length > 0) {
               <!-- Post Image Header (Full width) -->
@@ -79,6 +82,13 @@
             <!-- Text Content -->
             <div class="p-6 flex flex-col justify-between flex-grow">
               <div class="mb-4">
+                @if (post.forum?.name) {
+                  <div class="mb-2">
+                    <a [routerLink]="['/community', post.forum.forumId]" (click)="$event.stopPropagation()" class="text-xs font-bold text-accent hover:underline">
+                      c/{{ post.forum.name }}
+                    </a>
+                  </div>
+                }
                 <h3 class="text-xl font-extrabold mb-3 group-hover/card:text-primary transition-colors line-clamp-2 leading-snug">{{ post.title }}</h3>
                 <p class="text-sm text-base-content/70 line-clamp-3 mb-4 leading-relaxed">{{ post.content }}</p>
               </div>
@@ -127,10 +137,10 @@
     @if (filteredTrendingForums.length > 0) {
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         @for (forum of filteredTrendingForums; track forum.forumId) {
-        <div [routerLink]="['/community', forum.forumId]" class="premium-card rounded-2xl group cursor-pointer p-5">
+        <div [routerLink]="['/community', forum.forumId]" class="premium-card rounded-3xl group cursor-pointer p-5">
           <h3 class="text-xl font-bold mb-2 group-hover:text-accent transition-colors">{{ forum.name }}</h3>
           <p class="text-sm text-base-content/70 line-clamp-2 mb-4">{{ forum.description }}</p>
-          <a class="text-accent font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+          <a class="text-accent font-semibold flex items-center gap-1 group-hover:gap-2 transition-[transform,opacity,box-shadow]">
             Explore <span class="text-lg">›</span>
           </a>
         </div>

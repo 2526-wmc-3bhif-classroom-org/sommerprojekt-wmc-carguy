@@ -5,7 +5,8 @@
   transform: translate(-50%, -50%);
   width: 150vw;
   height: 150vw;
-  background: radial-gradient(circle, rgba(var(--p), 0.1) 0%, transparent 60%);
+  background: radial-gradient(circle, var(--color-primary) 0%, transparent 60%);
+  opacity: 0.1;
   z-index: 0;
   pointer-events: none;
 }
