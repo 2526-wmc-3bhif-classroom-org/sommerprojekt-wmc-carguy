@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { GuideService } from '../services/guide-service';
 import { UserService } from '../services/user-service';
-import { Guide } from '../../model';
+import { Guide, User } from '../../model';
 
 @Component({
   selector: 'app-guides',
@@ -19,15 +19,29 @@ export class GuidesComponent implements OnInit, OnDestroy {
   isLoading = true;
 
   // Refreshed user state (fetched from server on init)
-  private refreshedUser: import('../../model').User | null = null;
+  refreshedUser: User | null = null;
 
-  // Form State
+  // Create Form State
   showCreateForm = false;
   newGuideTitle = '';
   newGuideDescription = '';
   newGuideSteps: string[] = [''];
   isSubmitting = false;
   errorMessage = '';
+
+  // Edit Form State
+  showEditForm = false;
+  editingGuide: Guide | null = null;
+  editGuideTitle = '';
+  editGuideDescription = '';
+  editGuideSteps: string[] = [''];
+  isEditSubmitting = false;
+  editErrorMessage = '';
+
+  // Delete State
+  showDeleteConfirm = false;
+  deletingGuide: Guide | null = null;
+  isDeleting = false;
 
   private userService = inject(UserService);
   private guideService = inject(GuideService);
@@ -37,10 +51,15 @@ export class GuidesComponent implements OnInit, OnDestroy {
   }
 
   get canPostGuides(): boolean {
-    // Use the freshly fetched user if available, fall back to stored user
     const user = this.refreshedUser ?? this.userService.getCurrentUser();
     if (!user) return false;
     return user.role === 'admin' || (user.totalAura || 0) >= 100;
+  }
+
+  isAuthorOf(guide: Guide): boolean {
+    const user = this.refreshedUser ?? this.userService.getCurrentUser();
+    if (!user || !guide.author) return false;
+    return guide.author.uid === user.uid;
   }
 
   async ngOnInit() {
@@ -53,15 +72,13 @@ export class GuidesComponent implements OnInit, OnDestroy {
   async refreshUserAura() {
     const loggedInUser = this.userService.getCurrentUser();
     if (loggedInUser) {
-      // Set immediately from localStorage as fallback
       this.refreshedUser = loggedInUser;
       try {
         const updatedUser = await this.userService.getUserById(loggedInUser.uid);
-        localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-        // Store in component so canPostGuides uses fresh data immediately
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
         this.refreshedUser = updatedUser;
       } catch (err) {
-        console.error("Failed to refresh user aura:", err);
+        console.error('Failed to refresh user aura:', err);
       }
     }
   }
@@ -70,22 +87,22 @@ export class GuidesComponent implements OnInit, OnDestroy {
     try {
       this.guides = await this.guideService.getGuides();
     } catch (err) {
-      console.error("Failed to load guides:", err);
+      console.error('Failed to load guides:', err);
     }
   }
 
+  // --- Read Modal ---
   openGuide(guide: Guide): void {
     this.selectedGuide = guide;
-    // Prevent scrolling on the background when modal is open
     document.body.style.overflow = 'hidden';
   }
 
   closeGuide(): void {
     this.selectedGuide = null;
-    // Restore scrolling
     document.body.style.overflow = 'auto';
   }
 
+  // --- Create Modal ---
   openCreateForm() {
     this.showCreateForm = true;
     this.newGuideTitle = '';
@@ -129,18 +146,95 @@ export class GuidesComponent implements OnInit, OnDestroy {
       await this.guideService.createGuide(title, description, steps);
       this.closeCreateForm();
       await this.loadGuides();
-    } catch (err) {
-      if (err instanceof Error) {
-        this.errorMessage = err.message;
-      } else {
-        this.errorMessage = 'An unexpected error occurred.';
-      }
+    } catch (err: any) {
+      this.errorMessage = err?.error?.message || err?.message || 'An unexpected error occurred.';
     } finally {
       this.isSubmitting = false;
     }
   }
 
-  // Ensure we restore scrolling if the user navigates away while the modal is open
+  // --- Edit Modal ---
+  openEditForm(guide: Guide) {
+    this.editingGuide = guide;
+    this.editGuideTitle = guide.title;
+    this.editGuideDescription = guide.description;
+    this.editGuideSteps = [...guide.content];
+    this.editErrorMessage = '';
+    this.showEditForm = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeEditForm() {
+    this.showEditForm = false;
+    this.editingGuide = null;
+    document.body.style.overflow = 'auto';
+  }
+
+  addEditStep() {
+    this.editGuideSteps.push('');
+  }
+
+  removeEditStep(index: number) {
+    if (this.editGuideSteps.length > 1) {
+      this.editGuideSteps.splice(index, 1);
+    } else {
+      this.editGuideSteps[0] = '';
+    }
+  }
+
+  async submitEdit() {
+    if (!this.editingGuide) return;
+
+    const title = this.editGuideTitle.trim();
+    const description = this.editGuideDescription.trim();
+    const steps = this.editGuideSteps.map(s => s.trim()).filter(s => s !== '');
+
+    if (!title || !description || steps.length === 0) {
+      this.editErrorMessage = 'Please fill out all fields and add at least one step.';
+      return;
+    }
+
+    this.isEditSubmitting = true;
+    this.editErrorMessage = '';
+
+    try {
+      await this.guideService.updateGuide(this.editingGuide.id, title, description, steps);
+      this.closeEditForm();
+      await this.loadGuides();
+    } catch (err: any) {
+      this.editErrorMessage = err?.error?.message || err?.message || 'An unexpected error occurred.';
+    } finally {
+      this.isEditSubmitting = false;
+    }
+  }
+
+  // --- Delete Confirm Modal ---
+  openDeleteConfirm(guide: Guide) {
+    this.deletingGuide = guide;
+    this.showDeleteConfirm = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeDeleteConfirm() {
+    this.showDeleteConfirm = false;
+    this.deletingGuide = null;
+    document.body.style.overflow = 'auto';
+  }
+
+  async confirmDelete() {
+    if (!this.deletingGuide) return;
+    this.isDeleting = true;
+    try {
+      await this.guideService.deleteGuide(this.deletingGuide.id);
+      this.closeDeleteConfirm();
+      await this.loadGuides();
+    } catch (err: any) {
+      console.error('Failed to delete guide:', err);
+    } finally {
+      this.isDeleting = false;
+    }
+  }
+
   ngOnDestroy(): void {
     document.body.style.overflow = 'auto';
   }
