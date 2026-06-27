@@ -84,4 +84,22 @@ export class GuideRepository {
             0
         );
     }
+
+    public findGuideAuthorUid(id: number): number | undefined {
+        const db = DB.getInstance();
+        const row = db.prepare("SELECT UID FROM Guide WHERE GuideID = ?").get(id) as { UID: number } | undefined;
+        return row?.UID;
+    }
+
+    public updateGuide(id: number, title: string, description: string, content: string[]): void {
+        const db = DB.getInstance();
+        db.prepare(`
+            UPDATE Guide SET Title = ?, Description = ?, Content = ? WHERE GuideID = ?
+        `).run(title, description, JSON.stringify(content), id);
+    }
+
+    public deleteGuide(id: number): void {
+        const db = DB.getInstance();
+        db.prepare("DELETE FROM Guide WHERE GuideID = ?").run(id);
+    }
 }
