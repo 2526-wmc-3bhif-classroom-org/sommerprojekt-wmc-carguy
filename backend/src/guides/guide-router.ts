@@ -55,3 +55,48 @@ guideRouter.post("/guide", requireAuth, (req, res) => {
         }
     }
 });
+
+guideRouter.put("/guide/:id", requireAuth, (req, res) => {
+    const userClaims = req.user;
+    if (!userClaims) return res.status(StatusCodes.UNAUTHORIZED).json({ message: "Unauthorized" });
+
+    const id = Number(req.params.id);
+    if (isNaN(id)) return res.status(StatusCodes.BAD_REQUEST).json({ message: "Invalid id" });
+
+    const { title, description, content } = req.body;
+    if (!title || !description || !Array.isArray(content) || content.length === 0) {
+        return res.status(StatusCodes.BAD_REQUEST).json({ message: "Invalid guide data." });
+    }
+
+    try {
+        guideService.updateGuide(id, title, description, content, userClaims.username);
+        res.status(StatusCodes.OK).json({ message: "Guide updated successfully" });
+    } catch (error) {
+        if (error instanceof Error) {
+            const status = error.message.includes("only edit") ? StatusCodes.FORBIDDEN : StatusCodes.NOT_FOUND;
+            res.status(status).json({ message: error.message });
+        } else {
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "An unexpected error occurred" });
+        }
+    }
+});
+
+guideRouter.delete("/guide/:id", requireAuth, (req, res) => {
+    const userClaims = req.user;
+    if (!userClaims) return res.status(StatusCodes.UNAUTHORIZED).json({ message: "Unauthorized" });
+
+    const id = Number(req.params.id);
+    if (isNaN(id)) return res.status(StatusCodes.BAD_REQUEST).json({ message: "Invalid id" });
+
+    try {
+        guideService.deleteGuide(id, userClaims.username);
+        res.status(StatusCodes.OK).json({ message: "Guide deleted successfully" });
+    } catch (error) {
+        if (error instanceof Error) {
+            const status = error.message.includes("only delete") ? StatusCodes.FORBIDDEN : StatusCodes.NOT_FOUND;
+            res.status(status).json({ message: error.message });
+        } else {
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "An unexpected error occurred" });
+        }
+    }
+});
