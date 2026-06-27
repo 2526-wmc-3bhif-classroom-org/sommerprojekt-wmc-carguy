@@ -7,7 +7,9 @@
       <p class="text-lg opacity-80">Explore our comprehensive guides and tutorials to get the most out of CarGuy.</p>
     </div>
     <div class="relative z-10 flex items-center">
-      @if (isLoggedIn) {
+      @if (isLoading) {
+        <div class="skeleton h-10 w-32 rounded-xl"></div>
+      } @else if (isLoggedIn) {
         @if (canPostGuides) {
           <button (click)="openCreateForm()" class="btn btn-primary">Create Guide</button>
         } @else {
@@ -53,7 +55,7 @@
   <!-- Modal / Overlay for the selected guide -->
   @if (selectedGuide) {
     <div class="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in p-4 sm:p-8">
-      <div class="modal-box bg-base-100/80 backdrop-blur-md border border-accent/30 shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto relative animate-slide-up rounded-3xl p-8">
+      <div class="bg-base-100/80 backdrop-blur-md border border-accent/30 shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto relative animate-slide-up rounded-3xl p-8">
 
         <!-- Close button (top right) -->
         <button
@@ -110,7 +112,7 @@
   <!-- Modal for Creating a Guide -->
   @if (showCreateForm) {
     <div class="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-8">
-      <div class="modal-box bg-base-100/80 backdrop-blur-md border border-primary/30 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative rounded-3xl p-8">
+      <div class="bg-base-100/80 backdrop-blur-md border border-primary/30 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative rounded-3xl p-8">
 
         <button
           (click)="closeCreateForm()"
