@@ -16,6 +16,10 @@ import { Guide } from '../../model';
 export class GuidesComponent implements OnInit, OnDestroy {
   selectedGuide: Guide | null = null;
   guides: Guide[] = [];
+  isLoading = true;
+
+  // Refreshed user state (fetched from server on init)
+  private refreshedUser: import('../../model').User | null = null;
 
   // Form State
   showCreateForm = false;
@@ -33,21 +37,29 @@ export class GuidesComponent implements OnInit, OnDestroy {
   }
 
   get canPostGuides(): boolean {
-    const user = this.userService.getCurrentUser();
-    return user !== null && ((user.totalAura || 0) >= 100 || user.role === 'admin');
+    // Use the freshly fetched user if available, fall back to stored user
+    const user = this.refreshedUser ?? this.userService.getCurrentUser();
+    if (!user) return false;
+    return user.role === 'admin' || (user.totalAura || 0) >= 100;
   }
 
   async ngOnInit() {
+    this.isLoading = true;
     await this.refreshUserAura();
     await this.loadGuides();
+    this.isLoading = false;
   }
 
   async refreshUserAura() {
     const loggedInUser = this.userService.getCurrentUser();
     if (loggedInUser) {
+      // Set immediately from localStorage as fallback
+      this.refreshedUser = loggedInUser;
       try {
         const updatedUser = await this.userService.getUserById(loggedInUser.uid);
         localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+        // Store in component so canPostGuides uses fresh data immediately
+        this.refreshedUser = updatedUser;
       } catch (err) {
         console.error("Failed to refresh user aura:", err);
       }
