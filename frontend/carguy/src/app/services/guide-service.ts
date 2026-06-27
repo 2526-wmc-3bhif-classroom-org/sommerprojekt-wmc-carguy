@@ -18,11 +18,19 @@ export class GuideService {
 
   async createGuide(title: string, description: string, content: string[]): Promise<void> {
     return firstValueFrom(
-      this.http.post<void>(`${environment.apiBaseUrl}/guide`, {
-        title,
-        description,
-        content
-      })
+      this.http.post<void>(`${environment.apiBaseUrl}/guide`, { title, description, content })
+    );
+  }
+
+  async updateGuide(id: number, title: string, description: string, content: string[]): Promise<void> {
+    return firstValueFrom(
+      this.http.put<void>(`${environment.apiBaseUrl}/guide/${id}`, { title, description, content })
+    );
+  }
+
+  async deleteGuide(id: number): Promise<void> {
+    return firstValueFrom(
+      this.http.delete<void>(`${environment.apiBaseUrl}/guide/${id}`)
     );
   }
 }
