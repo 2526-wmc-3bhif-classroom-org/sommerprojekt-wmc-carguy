@@ -46,34 +46,52 @@
               class="btn btn-outline border-accent text-accent hover:bg-accent hover:border-accent hover:text-base-content btn-sm rounded-xl">
               Read Guide
             </button>
+
+            <!-- Edit / Delete only for the guide's author -->
+            @if (isAuthorOf(guide)) {
+              <div class="flex gap-2">
+                <button
+                  (click)="openEditForm(guide)"
+                  class="btn btn-sm btn-outline border-primary/50 text-primary hover:bg-primary hover:text-primary-content rounded-xl"
+                  title="Edit Guide">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                  Edit
+                </button>
+                <button
+                  (click)="openDeleteConfirm(guide)"
+                  class="btn btn-sm btn-outline border-error/50 text-error hover:bg-error hover:text-error-content rounded-xl"
+                  title="Delete Guide">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                    <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                  </svg>
+                  Delete
+                </button>
+              </div>
+            }
           </div>
         </div>
       </div>
     }
   </div>
 
-  <!-- Modal / Overlay for the selected guide -->
+  <!-- ─── Modal: Read Guide ─── -->
   @if (selectedGuide) {
-    <div class="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in p-4 sm:p-8">
-      <div class="bg-base-100/80 backdrop-blur-md border border-accent/30 shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto relative animate-slide-up rounded-3xl p-8">
+    <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in p-4 sm:p-8">
+      <div class="bg-base-100/90 backdrop-blur-md border border-accent/30 shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto relative animate-slide-up rounded-3xl p-8">
 
-        <!-- Close button (top right) -->
-        <button
-          (click)="closeGuide()"
-          class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 hover:bg-white/10 hover:text-accent">
-          ✕
-        </button>
+        <button (click)="closeGuide()" class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 hover:bg-white/10 hover:text-accent">✕</button>
 
         <div class="mt-2 mb-6">
           <h2 class="text-3xl font-bold text-accent mb-2">{{ selectedGuide.title }}</h2>
           <div class="flex items-center gap-2 text-sm opacity-70 mb-6 pb-4 border-b border-white/10">
             @if (selectedGuide.author) {
               <span>Written by</span>
-              <a [routerLink]="['/profile', selectedGuide.author.uid]" (click)="closeGuide()" class="font-medium text-accent hover:underline flex items-center gap-1">
+              <a [routerLink]="['/profile', selectedGuide.author.uid]" (click)="closeGuide()" class="font-medium text-accent hover:underline">
                 u/{{ selectedGuide.author.username }}
-                <span *ngIf="(selectedGuide.author.totalAura || 0) >= 100">
-                  <svg class="text-success inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0 1 12 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 0 1 3.498 1.307 4.491 4.491 0 0 1 1.307 3.497A4.49 4.49 0 0 1 21.75 12a4.49 4.49 0 0 1-1.549 3.397 4.491 4.491 0 0 1-1.307 3.498 4.491 4.491 0 0 1-3.497 1.307A4.49 4.49 0 0 1 12 21.75a4.49 4.49 0 0 1-3.397-1.549 4.49 4.49 0 0 1-3.498-1.306 4.491 4.491 0 0 1-1.307-3.498A4.49 4.49 0 0 1 2.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 0 1 1.307-3.497 4.49 4.49 0 0 1 3.497-1.307Zm7.007 6.387a.75.75 0 0 0-1.06-1.061l-3.879 3.879-1.97-1.97a.75.75 0 1 0-1.06 1.06l2.5 2.5a.75.75 0 0 0 1.06 0l4.41-4.41Z" clip-rule="evenodd"/></svg>
-                </span>
               </a>
             } @else {
               <span>Written by system</span>
@@ -84,9 +102,7 @@
             }
           </div>
 
-          <p class="text-lg opacity-90 mb-8 italic border-l-4 border-accent pl-4">
-            {{ selectedGuide.description }}
-          </p>
+          <p class="text-lg opacity-90 mb-8 italic border-l-4 border-accent pl-4">{{ selectedGuide.description }}</p>
 
           <div class="space-y-6">
             @for (step of selectedGuide.content; track $index) {
@@ -94,53 +110,39 @@
                 <div class="shrink-0 w-8 h-8 rounded-full bg-accent/20 border border-accent/40 text-accent flex items-center justify-center font-bold">
                   {{ $index + 1 }}
                 </div>
-                <p class="text-lg leading-relaxed pt-1">
-                  {{ step }}
-                </p>
+                <p class="text-lg leading-relaxed pt-1">{{ step }}</p>
               </div>
             }
           </div>
         </div>
 
-        <div class="modal-action mt-8 pt-4 border-t border-white/10">
+        <div class="mt-8 pt-4 border-t border-white/10">
           <button (click)="closeGuide()" class="btn bg-accent text-base-content hover:bg-opacity-90 border-none rounded-xl">Got it, thanks!</button>
         </div>
       </div>
     </div>
   }
 
-  <!-- Modal for Creating a Guide -->
+  <!-- ─── Modal: Create Guide ─── -->
   @if (showCreateForm) {
-    <div class="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-8">
-      <div class="bg-base-100/80 backdrop-blur-md border border-primary/30 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative rounded-3xl p-8">
+    <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-8">
+      <div class="bg-base-100/90 backdrop-blur-md border border-primary/30 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative rounded-3xl p-8">
 
-        <button
-          (click)="closeCreateForm()"
-          class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 hover:bg-white/10 hover:text-primary">
-          ✕
-        </button>
+        <button (click)="closeCreateForm()" class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 hover:bg-white/10 hover:text-primary">✕</button>
 
         <h2 class="text-3xl font-bold text-primary mb-6">Create a Guide</h2>
 
         <div class="space-y-4">
           <div class="form-control">
             <label class="label"><span class="label-text font-semibold text-base-content/80">Guide Title</span></label>
-            <input
-              [(ngModel)]="newGuideTitle"
-              type="text"
-              placeholder="e.g. How to replace spark plugs"
-              class="input input-bordered w-full bg-white/5 text-base-content focus:border-primary rounded-xl"
-            />
+            <input [(ngModel)]="newGuideTitle" type="text" placeholder="e.g. How to replace spark plugs"
+              class="input input-bordered w-full bg-white/5 text-base-content focus:border-primary rounded-xl"/>
           </div>
 
           <div class="form-control">
             <label class="label"><span class="label-text font-semibold text-base-content/80">Short Description</span></label>
-            <textarea
-              [(ngModel)]="newGuideDescription"
-              placeholder="Provide a brief summary of what this guide covers..."
-              class="textarea textarea-bordered w-full bg-white/5 text-base-content focus:border-primary rounded-xl"
-              rows="3"
-            ></textarea>
+            <textarea [(ngModel)]="newGuideDescription" placeholder="Provide a brief summary of what this guide covers..."
+              class="textarea textarea-bordered w-full bg-white/5 text-base-content focus:border-primary rounded-xl" rows="3"></textarea>
           </div>
 
           <div class="form-control">
@@ -151,49 +153,120 @@
                   <div class="shrink-0 w-8 h-8 rounded-full bg-primary/20 border border-primary/40 text-primary flex items-center justify-center font-bold text-sm mt-1">
                     {{ $index + 1 }}
                   </div>
-                  <input
-                    [(ngModel)]="newGuideSteps[$index]"
-                    type="text"
-                    placeholder="Describe this step..."
-                    class="input input-bordered flex-1 bg-white/5 text-base-content focus:border-primary rounded-xl"
-                  />
-                  <button
-                    (click)="removeStep($index)"
-                    [disabled]="newGuideSteps.length <= 1"
-                    class="btn btn-error btn-square btn-sm mt-1 rounded-lg"
-                  >
-                    ✕
-                  </button>
+                  <input [(ngModel)]="newGuideSteps[$index]" type="text" placeholder="Describe this step..."
+                    class="input input-bordered flex-1 bg-white/5 text-base-content focus:border-primary rounded-xl"/>
+                  <button (click)="removeStep($index)" [disabled]="newGuideSteps.length <= 1"
+                    class="btn btn-error btn-square btn-sm mt-1 rounded-lg">✕</button>
                 </div>
               }
             </div>
-            <button (click)="addStep()" class="btn btn-outline btn-sm btn-primary w-fit mt-4 rounded-xl">
-              + Add Step
-            </button>
+            <button (click)="addStep()" class="btn btn-outline btn-sm btn-primary w-fit mt-4 rounded-xl">+ Add Step</button>
           </div>
 
           @if (errorMessage) {
-            <div class="alert alert-error text-sm py-2 px-4 mt-4 rounded-xl">
-              <span>{{ errorMessage }}</span>
-            </div>
+            <div class="alert alert-error text-sm py-2 px-4 mt-4 rounded-xl"><span>{{ errorMessage }}</span></div>
           }
 
-          <div class="modal-action mt-8 pt-4 border-t border-base-content/10 flex justify-end gap-3">
+          <div class="mt-8 pt-4 border-t border-base-content/10 flex justify-end gap-3">
             <button (click)="closeCreateForm()" class="btn btn-ghost rounded-xl">Cancel</button>
-            <button
-              (click)="submitGuide()"
-              [disabled]="isSubmitting || !newGuideTitle.trim() || !newGuideDescription.trim()"
-              class="btn btn-primary rounded-xl"
-            >
-              @if (isSubmitting) {
-                <span class="loading loading-spinner loading-sm"></span>
-              } @else {
-                Publish Guide
-              }
+            <button (click)="submitGuide()" [disabled]="isSubmitting || !newGuideTitle.trim() || !newGuideDescription.trim()"
+              class="btn btn-primary rounded-xl">
+              @if (isSubmitting) { <span class="loading loading-spinner loading-sm"></span> }
+              @else { Publish Guide }
             </button>
           </div>
         </div>
       </div>
     </div>
   }
+
+  <!-- ─── Modal: Edit Guide ─── -->
+  @if (showEditForm) {
+    <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-8">
+      <div class="bg-base-100/90 backdrop-blur-md border border-primary/30 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative rounded-3xl p-8">
+
+        <button (click)="closeEditForm()" class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 hover:bg-white/10 hover:text-primary">✕</button>
+
+        <h2 class="text-3xl font-bold text-primary mb-6">Edit Guide</h2>
+
+        <div class="space-y-4">
+          <div class="form-control">
+            <label class="label"><span class="label-text font-semibold text-base-content/80">Guide Title</span></label>
+            <input [(ngModel)]="editGuideTitle" type="text" placeholder="e.g. How to replace spark plugs"
+              class="input input-bordered w-full bg-white/5 text-base-content focus:border-primary rounded-xl"/>
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text font-semibold text-base-content/80">Short Description</span></label>
+            <textarea [(ngModel)]="editGuideDescription" placeholder="Provide a brief summary..."
+              class="textarea textarea-bordered w-full bg-white/5 text-base-content focus:border-primary rounded-xl" rows="3"></textarea>
+          </div>
+
+          <div class="form-control">
+            <label class="label"><span class="label-text font-semibold text-base-content/80">Steps</span></label>
+            <div class="space-y-3">
+              @for (step of editGuideSteps; track $index) {
+                <div class="flex gap-2 items-start">
+                  <div class="shrink-0 w-8 h-8 rounded-full bg-primary/20 border border-primary/40 text-primary flex items-center justify-center font-bold text-sm mt-1">
+                    {{ $index + 1 }}
+                  </div>
+                  <input [(ngModel)]="editGuideSteps[$index]" type="text" placeholder="Describe this step..."
+                    class="input input-bordered flex-1 bg-white/5 text-base-content focus:border-primary rounded-xl"/>
+                  <button (click)="removeEditStep($index)" [disabled]="editGuideSteps.length <= 1"
+                    class="btn btn-error btn-square btn-sm mt-1 rounded-lg">✕</button>
+                </div>
+              }
+            </div>
+            <button (click)="addEditStep()" class="btn btn-outline btn-sm btn-primary w-fit mt-4 rounded-xl">+ Add Step</button>
+          </div>
+
+          @if (editErrorMessage) {
+            <div class="alert alert-error text-sm py-2 px-4 mt-4 rounded-xl"><span>{{ editErrorMessage }}</span></div>
+          }
+
+          <div class="mt-8 pt-4 border-t border-base-content/10 flex justify-end gap-3">
+            <button (click)="closeEditForm()" class="btn btn-ghost rounded-xl">Cancel</button>
+            <button (click)="submitEdit()" [disabled]="isEditSubmitting || !editGuideTitle.trim() || !editGuideDescription.trim()"
+              class="btn btn-primary rounded-xl">
+              @if (isEditSubmitting) { <span class="loading loading-spinner loading-sm"></span> }
+              @else { Save Changes }
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ─── Modal: Delete Confirm ─── -->
+  @if (showDeleteConfirm) {
+    <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div class="bg-base-100/90 backdrop-blur-md border border-error/30 shadow-2xl max-w-md w-full rounded-3xl p-8">
+
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-12 h-12 rounded-full bg-error/20 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-error" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold">Delete Guide</h3>
+            <p class="text-sm opacity-70 mt-0.5">This action cannot be undone.</p>
+          </div>
+        </div>
+
+        <p class="text-base-content/80 mb-6">
+          Are you sure you want to delete <span class="font-semibold text-base-content">"{{ deletingGuide?.title }}"</span>?
+        </p>
+
+        <div class="flex justify-end gap-3">
+          <button (click)="closeDeleteConfirm()" class="btn btn-ghost rounded-xl" [disabled]="isDeleting">Cancel</button>
+          <button (click)="confirmDelete()" class="btn btn-error rounded-xl" [disabled]="isDeleting">
+            @if (isDeleting) { <span class="loading loading-spinner loading-sm"></span> }
+            @else { Delete Guide }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
 </div>
