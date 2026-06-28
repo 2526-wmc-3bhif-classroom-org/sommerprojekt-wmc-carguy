@@ -19,12 +19,12 @@
         <div class="flex gap-6">
           <!-- Votes -->
           <div class="flex flex-col items-center gap-3 text-base-content/70 min-w-[48px]">
-            <button (click)="likePost()" class="flex flex-col items-center gap-1 transition-colors"
+            <button (click)="likePost($event)" class="flex flex-col items-center gap-1 transition-colors"
               [class.text-green-400]="voteState === 'like'">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></svg>
               <span class="font-semibold text-sm">{{ post.likes }}</span>
             </button>
-            <button (click)="dislikePost()" class="flex flex-col items-center gap-1 transition-colors"
+            <button (click)="dislikePost($event)" class="flex flex-col items-center gap-1 transition-colors"
               [class.text-red-400]="voteState === 'dislike'">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/></svg>
               <span class="font-semibold text-sm">{{ post.dislikes }}</span>
@@ -47,10 +47,12 @@
                   } @else {
                     <div class="w-5 h-5 rounded-full bg-base-300 flex items-center justify-center font-bold text-[10px]">{{ post.author.username.charAt(0).toUpperCase() }}</div>
                   }
-                  u/{{ post.author.username }}
-                  <span *ngIf="(post.author.totalAura || 0) >= 100" class="tooltip tooltip-top" data-tip="Verified User (100+ Aura)">
-                    <svg class="text-success inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0 1 12 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 0 1 3.498 1.307 4.491 4.491 0 0 1 1.307 3.497A4.49 4.49 0 0 1 21.75 12a4.49 4.49 0 0 1-1.549 3.397 4.491 4.491 0 0 1-1.307 3.498 4.491 4.491 0 0 1-3.497 1.307A4.49 4.49 0 0 1 12 21.75a4.49 4.49 0 0 1-3.397-1.549 4.49 4.49 0 0 1-3.498-1.306 4.491 4.491 0 0 1-1.307-3.498A4.49 4.49 0 0 1 2.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 0 1 1.307-3.497 4.49 4.49 0 0 1 3.497-1.307Zm7.007 6.387a.75.75 0 0 0-1.06-1.061l-3.879 3.879-1.97-1.97a.75.75 0 1 0-1.06 1.06l2.5 2.5a.75.75 0 0 0 1.06 0l4.41-4.41Z" clip-rule="evenodd"/></svg>
-                  </span>
+                   u/{{ post.author.username }}
+                  @for (badge of getUserBadges(post.author); track badge.name) {
+                    <span class="badge badge-xs font-semibold ml-1 cursor-default tooltip" [attr.data-tip]="badge.tooltip" [ngClass]="badge.class">
+                      {{ badge.icon }} {{ badge.name }}
+                    </span>
+                  }
                 </a>
               } @else {
                 <span class="font-medium text-base-content/80">u/unknown</span>
@@ -58,15 +60,87 @@
               <span>•</span>
               <span>{{ post.publishedAt | date:'medium' }}</span>
             </div>
-            <h1 class="text-3xl font-semibold text-accent mb-4">{{ post.title }}</h1>
+            <div class="flex items-start justify-between gap-4 mb-4">
+              <h1 class="text-3xl font-semibold text-accent leading-snug">{{ post.title }}</h1>
+              @if (isLoggedIn) {
+                <button (click)="toggleBookmark()" class="btn btn-ghost btn-circle text-base-content/70 hover:text-accent transition-all shrink-0"
+                  [title]="isBookmarkedState ? 'Remove Bookmark' : 'Bookmark Post'">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" [attr.fill]="isBookmarkedState ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
+                  </svg>
+                </button>
+              }
+            </div>
             <p class="text-base-content/80 leading-relaxed whitespace-pre-wrap mb-4">{{ post.content }}</p>
+
+            <!-- Poll Section -->
+            @if (post.poll) {
+              <div class="bg-base-200/50 border border-base-content/10 rounded-2xl p-6 mb-6">
+                <h3 class="font-bold text-lg mb-4 text-primary flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M3 20v-8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v8"/><path d="M11 20v-4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v8"/><path d="M15 20v-4"/><path d="M7 20v-8"/></svg>
+                  {{ post.poll.question }}
+                </h3>
+                
+                <div class="space-y-3">
+                  @for (opt of post.poll.options; track $index) {
+                    <div class="relative w-full">
+                      <!-- Voted / Results View -->
+                      @if (post.poll.userVotedOptionIndex !== undefined) {
+                        <div class="flex items-center justify-between p-4 rounded-xl border border-base-content/10 bg-base-300/30 overflow-hidden relative">
+                          <!-- Visual Percentage Bar -->
+                          <div class="absolute inset-y-0 left-0 bg-primary/10 transition-all duration-500" [style.width.%]="getPollOptionPercentage(opt)"></div>
+                          
+                          <div class="z-10 flex items-center gap-2 font-semibold">
+                            <span>{{ opt.text }}</span>
+                            @if (post.poll.userVotedOptionIndex === $index) {
+                              <span class="text-success text-xs flex items-center gap-0.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-success inline-block"><polyline points="20 6 9 17 4 12"/></svg>
+                                Voted
+                              </span>
+                            }
+                          </div>
+                          <span class="z-10 font-bold text-sm text-base-content/80">{{ getPollOptionPercentage(opt) }}% ({{ opt.votes || 0 }})</span>
+                        </div>
+                      } @else {
+                        <!-- Interactive Voting View -->
+                        <button
+                          (click)="votePoll($index)"
+                          [disabled]="!isLoggedIn || isVotingPoll"
+                          class="w-full flex items-center justify-between p-4 rounded-xl border border-base-content/10 hover:border-primary/40 bg-base-300/20 hover:bg-base-300/40 text-left font-semibold transition-all"
+                        >
+                          <span>{{ opt.text }}</span>
+                          <span class="text-xs text-base-content/40 hover:text-accent">Vote</span>
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+
+                @if (!isLoggedIn) {
+                  <p class="text-xs text-base-content/50 mt-4 italic text-center">
+                    Please <a [routerLink]="['/login']" class="text-accent underline font-semibold">log in</a> to cast your vote.
+                  </p>
+                }
+              </div>
+            }
             
             @if (post.imageUrls && post.imageUrls.length > 0) {
               <div class="mb-4">
                 <div class="carousel rounded-box w-full max-h-96 border border-base-content/10 bg-base-300">
                   @for (url of post.imageUrls; track $index) {
                     <div class="carousel-item w-full relative group/carousel" id="slide-post-{{post.pid}}-{{$index}}">
-                      <img [src]="url" class="w-full h-full object-contain cursor-pointer" (click)="openImageModal(url, $event)" />
+                      @if (isImageFlagged(url) && !revealedImages[url]) {
+                        <div class="relative w-full h-full min-h-[300px] flex items-center justify-center bg-base-300 w-full">
+                          <img [src]="getImageUrl(url)" class="absolute inset-0 w-full h-full object-cover blur-lg scale-105" />
+                          <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 text-white p-4 text-center">
+                            <svg class="h-8 w-8 text-warning mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            <span class="text-xs font-bold uppercase tracking-wider mb-2">Flagged by AI</span>
+                            <button (click)="revealImage(url, $event)" class="btn btn-xs btn-primary rounded-lg pointer-events-auto">Reveal Content</button>
+                          </div>
+                        </div>
+                      } @else {
+                        <img [src]="getImageUrl(url)" class="w-full h-full object-contain cursor-pointer" (click)="openImageModal(getImageUrl(url), $event)" />
+                      }
                       @if (post.imageUrls.length > 1) {
                         <div class="absolute left-2 right-2 top-1/2 flex -translate-y-1/2 transform justify-between pointer-events-none opacity-0 group-hover/carousel:opacity-100 transition-opacity">
                           <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-post-' + post.pid + '-' + ($index === 0 ? post.imageUrls.length - 1 : $index - 1))" class="btn btn-circle btn-sm bg-black/30 hover:bg-black/60 text-white border-none pointer-events-auto">❮</button>
@@ -177,22 +251,34 @@
             
             <div class="premium-card p-6 rounded-2xl flex gap-4">
               <!-- Comment Votes -->
-              <div class="flex flex-col items-center gap-2 text-base-content/70 min-w-[32px] pt-1">
-                <button (click)="likeComment(comment)" class="flex flex-col items-center transition-colors hover:text-green-400"
-                  [class.text-green-400]="commentVoteStates[comment.cid] === 'like'">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></svg>
-                  <span class="font-semibold text-xs mt-1">{{ comment.likes }}</span>
-                </button>
-                <button (click)="dislikeComment(comment)" class="flex flex-col items-center transition-colors hover:text-red-400"
-                  [class.text-red-400]="commentVoteStates[comment.cid] === 'dislike'">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/></svg>
-                  <span class="font-semibold text-xs mt-1">{{ comment.dislikes }}</span>
-                </button>
-              </div>
+              @if (!collapsedComments[comment.cid]) {
+                <div class="flex flex-col items-center gap-2 text-base-content/70 min-w-[32px] pt-1">
+                  <button (click)="likeComment(comment, $event)" class="flex flex-col items-center transition-colors hover:text-green-400"
+                    [class.text-green-400]="commentVoteStates[comment.cid] === 'like'">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></svg>
+                    <span class="font-semibold text-xs mt-1">{{ comment.likes }}</span>
+                  </button>
+                  <button (click)="dislikeComment(comment, $event)" class="flex flex-col items-center transition-colors hover:text-red-400"
+                    [class.text-red-400]="commentVoteStates[comment.cid] === 'dislike'">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/></svg>
+                    <span class="font-semibold text-xs mt-1">{{ comment.dislikes }}</span>
+                  </button>
+                </div>
+              }
 
               <!-- Comment Content & Metadata -->
               <div class="flex-1">
                 <div class="text-xs text-base-content/60 mb-2 flex items-center gap-2 flex-wrap">
+                  <button (click)="toggleCollapseComment(comment.cid)" class="btn btn-ghost btn-xs btn-circle text-base-content/60 hover:text-accent p-0 inline-flex items-center justify-center mr-1" [title]="collapsedComments[comment.cid] ? 'Expand' : 'Collapse'">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      @if (collapsedComments[comment.cid]) {
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="12" y1="9" x2="12" y2="15"/>
+                      } @else {
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="12" x2="15" y2="12"/>
+                      }
+                    </svg>
+                  </button>
+
                   @if (comment.author) {
                     <a [routerLink]="['/profile', comment.author.uid]" class="font-medium text-base-content/80 hover:text-accent transition-colors cursor-pointer flex items-center gap-1.5">
                       @if (comment.author.image) {
@@ -201,9 +287,11 @@
                         <div class="w-5 h-5 rounded-full bg-base-300 flex items-center justify-center font-bold text-[10px]">{{ comment.author.username.charAt(0).toUpperCase() }}</div>
                       }
                       u/{{ comment.author.username }}
-                      <span *ngIf="(comment.author.totalAura || 0) >= 100" class="tooltip tooltip-top" data-tip="Verified User (100+ Aura)">
-                        <svg class="text-success inline-block w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0 1 12 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 0 1 3.498 1.307 4.491 4.491 0 0 1 1.307 3.497A4.49 4.49 0 0 1 21.75 12a4.49 4.49 0 0 1-1.549 3.397 4.491 4.491 0 0 1-1.307 3.498 4.491 4.491 0 0 1-3.497 1.307A4.49 4.49 0 0 1 12 21.75a4.49 4.49 0 0 1-3.397-1.549 4.49 4.49 0 0 1-3.498-1.306 4.491 4.491 0 0 1-1.307-3.498A4.49 4.49 0 0 1 2.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 0 1 1.307-3.497 4.49 4.49 0 0 1 3.497-1.307Zm7.007 6.387a.75.75 0 0 0-1.06-1.061l-3.879 3.879-1.97-1.97a.75.75 0 1 0-1.06 1.06l2.5 2.5a.75.75 0 0 0 1.06 0l4.41-4.41Z" clip-rule="evenodd"/></svg>
-                      </span>
+                      @for (badge of getUserBadges(comment.author); track badge.name) {
+                        <span class="badge badge-xs font-semibold ml-1 cursor-default tooltip" [attr.data-tip]="badge.tooltip" [ngClass]="badge.class">
+                          {{ badge.icon }} {{ badge.name }}
+                        </span>
+                      }
                     </a>
                   } @else {
                     <span class="font-medium text-base-content/80">u/unknown</span>
@@ -218,38 +306,53 @@
                   }
                 </div>
                 
-                <p class="text-base-content/90 leading-relaxed mb-3 whitespace-pre-wrap">{{ comment.content }}</p>
+                @if (collapsedComments[comment.cid]) {
+                  <p class="text-xs text-base-content/40 italic cursor-pointer mt-1" (click)="toggleCollapseComment(comment.cid)">[comment collapsed - click to expand]</p>
+                } @else {
+                  <div class="text-base-content/90 leading-relaxed mb-3 whitespace-pre-wrap" [innerHTML]="getSafeMarkdown(comment.content)"></div>
 
-                <!-- Comment Images -->
-                @if (comment.imageUrls && comment.imageUrls.length > 0) {
-                  <div class="mb-3">
-                    <div class="carousel rounded-box w-full max-h-64 border border-base-content/10 bg-base-300">
-                      @for (url of comment.imageUrls; track $index) {
-                        <div class="carousel-item w-full relative group/carousel" id="slide-comment-{{comment.cid}}-{{$index}}">
-                          <img [src]="url" class="w-full h-full object-contain cursor-pointer" (click)="openImageModal(url, $event)" />
-                          @if (comment.imageUrls.length > 1) {
-                            <div class="absolute left-2 right-2 top-1/2 flex -translate-y-1/2 transform justify-between pointer-events-none opacity-0 group-hover/carousel:opacity-100 transition-opacity">
-                              <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-comment-' + comment.cid + '-' + ($index === 0 ? comment.imageUrls.length - 1 : $index - 1))" class="btn btn-circle btn-sm bg-black/30 hover:bg-black/60 text-white border-none pointer-events-auto">❮</button>
-                              <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-comment-' + comment.cid + '-' + ($index === comment.imageUrls.length - 1 ? 0 : $index + 1))" class="btn btn-circle btn-sm bg-black/30 hover:bg-black/60 text-white border-none pointer-events-auto">❯</button>
-                            </div>
-                          }
-                        </div>
+                  <!-- Comment Images -->
+                  @if (comment.imageUrls && comment.imageUrls.length > 0) {
+                    <div class="mb-3">
+                      <div class="carousel rounded-box w-full max-h-64 border border-base-content/10 bg-base-300">
+                        @for (url of comment.imageUrls; track $index) {
+                          <div class="carousel-item w-full relative group/carousel" id="slide-comment-{{comment.cid}}-{{$index}}">
+                            @if (isImageFlagged(url) && !revealedImages[url]) {
+                              <div class="relative w-full h-full min-h-[200px] flex items-center justify-center bg-base-300 w-full">
+                                <img [src]="getImageUrl(url)" class="absolute inset-0 w-full h-full object-cover blur-lg scale-105" />
+                                <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 text-white p-4 text-center">
+                                  <svg class="h-6 w-6 text-warning mb-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                  <span class="text-[10px] font-bold uppercase tracking-wider mb-1">Flagged by AI</span>
+                                  <button (click)="revealImage(url, $event)" class="btn btn-xs btn-primary rounded-lg pointer-events-auto">Reveal</button>
+                                </div>
+                              </div>
+                            } @else {
+                              <img [src]="getImageUrl(url)" class="w-full h-full object-contain cursor-pointer" (click)="openImageModal(getImageUrl(url), $event)" />
+                            }
+                            @if (comment.imageUrls.length > 1) {
+                              <div class="absolute left-2 right-2 top-1/2 flex -translate-y-1/2 transform justify-between pointer-events-none opacity-0 group-hover/carousel:opacity-100 transition-opacity">
+                                <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-comment-' + comment.cid + '-' + ($index === 0 ? comment.imageUrls.length - 1 : $index - 1))" class="btn btn-circle btn-sm bg-black/30 hover:bg-black/60 text-white border-none pointer-events-auto">❮</button>
+                                <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-comment-' + comment.cid + '-' + ($index === comment.imageUrls.length - 1 ? 0 : $index + 1))" class="btn btn-circle btn-sm bg-black/30 hover:bg-black/60 text-white border-none pointer-events-auto">❯</button>
+                              </div>
+                            }
+                          </div>
+                        }
+                      </div>
+                      @if (comment.imageUrls.length > 1) {
+                        <p class="text-xs text-base-content/50 mt-1 text-right">{{ comment.imageUrls.length }} images. Scroll to view more.</p>
                       }
                     </div>
-                    @if (comment.imageUrls.length > 1) {
-                      <p class="text-xs text-base-content/50 mt-1 text-right">{{ comment.imageUrls.length }} images. Scroll to view more.</p>
-                    }
-                  </div>
-                }
+                  }
 
-                <!-- Inline Action -->
-                @if (isLoggedIn) {
-                  <div class="flex items-center gap-4 mt-2">
-                    <button (click)="toggleReplyForm(comment.cid)" class="text-xs text-base-content/60 hover:text-accent flex items-center gap-1 transition-colors font-medium">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                      Reply
-                    </button>
-                  </div>
+                  <!-- Inline Action -->
+                  @if (isLoggedIn) {
+                    <div class="flex items-center gap-4 mt-2">
+                      <button (click)="toggleReplyForm(comment.cid)" class="text-xs text-base-content/60 hover:text-accent flex items-center gap-1 transition-colors font-medium">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        Reply
+                      </button>
+                    </div>
+                  }
                 }
               </div>
             </div>
@@ -285,7 +388,7 @@
             }
 
             <!-- Recursive replies -->
-            @if (comment.replies && comment.replies.length > 0) {
+            @if (!collapsedComments[comment.cid] && comment.replies && comment.replies.length > 0) {
               @for (reply of comment.replies; track reply.cid) {
                 <ng-container *ngTemplateOutlet="commentTemplate; context: { comment: reply, depth: depth + 1 }"></ng-container>
               }

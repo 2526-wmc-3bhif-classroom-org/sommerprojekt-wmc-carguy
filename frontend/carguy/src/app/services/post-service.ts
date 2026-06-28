@@ -34,7 +34,7 @@ export class PostService {
     );
   }
 
-  async createPost(title: string, content: string, author: User, forum: Forum, imageUrls?: string[]): Promise<void> {
+  async createPost(title: string, content: string, author: User, forum: Forum, imageUrls?: string[], poll?: { question: string, options: string[] }): Promise<void> {
     return firstValueFrom(
       this.http.post<void>(`${environment.apiBaseUrl}/post`, {
         title,
@@ -42,6 +42,7 @@ export class PostService {
         author,
         forum,
         imageUrls,
+        poll,
         publishedAt: new Date().toISOString(),
         likes: 0,
         dislikes: 0,
@@ -70,6 +71,37 @@ export class PostService {
   async undislikePost(id: number): Promise<void> {
     return firstValueFrom(
       this.http.patch<void>(`${environment.apiBaseUrl}/posts/${id}/undislike`, {})
+    );
+  }
+
+  async bookmarkPost(id: number): Promise<void> {
+    return firstValueFrom(
+      this.http.post<void>(`${environment.apiBaseUrl}/posts/${id}/bookmark`, {})
+    );
+  }
+
+  async unbookmarkPost(id: number): Promise<void> {
+    return firstValueFrom(
+      this.http.delete<void>(`${environment.apiBaseUrl}/posts/${id}/bookmark`)
+    );
+  }
+
+  async isBookmarked(id: number): Promise<boolean> {
+    const res = await firstValueFrom(
+      this.http.get<{ bookmarked: boolean }>(`${environment.apiBaseUrl}/posts/${id}/bookmarked`)
+    );
+    return res.bookmarked;
+  }
+
+  async getBookmarkedPosts(): Promise<Post[]> {
+    return firstValueFrom(
+      this.http.get<Post[]>(`${environment.apiBaseUrl}/users/bookmarks`)
+    );
+  }
+
+  async voteInPoll(postId: number, optionIndex: number): Promise<void> {
+    await firstValueFrom(
+      this.http.post<void>(`${environment.apiBaseUrl}/posts/${postId}/poll/vote`, { optionIndex })
     );
   }
 }

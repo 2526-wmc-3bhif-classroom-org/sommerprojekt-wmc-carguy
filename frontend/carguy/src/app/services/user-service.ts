@@ -129,4 +129,10 @@ export class UserService {
     this.curUser = response.user;
     return response.user;
   }
+
+  async getAllUsers(): Promise<User[]> {
+    return firstValueFrom(
+      this.http.get<User[]>(`${environment.apiBaseUrl}/users`)
+    );
+  }
 }

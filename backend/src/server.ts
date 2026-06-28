@@ -6,6 +6,10 @@ import { postRouter } from "./post/post-router";
 import { commentRouter } from "./comments/comment-router";
 import { guideRouter } from "./guides/guide-router";
 import { searchRouter } from "./search/search-router";
+import { shoutRouter } from "./shout/shout-router";
+import { garageRouter } from "./garage/garage-router";
+import { moderationRouter } from "./moderation/moderation-router";
+import { eventRouter } from "./event/event-router";
 import { DB } from "./database";
 
 const app = express();
@@ -18,6 +22,10 @@ app.use("/api", postRouter);
 app.use("/api", commentRouter);
 app.use("/api", guideRouter);
 app.use("/api", searchRouter);
+app.use("/api", shoutRouter);
+app.use("/api", garageRouter);
+app.use("/api", moderationRouter);
+app.use("/api", eventRouter);
 
 const startServer = async () => {
     try {

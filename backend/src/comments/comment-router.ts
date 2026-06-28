@@ -5,8 +5,13 @@ import { Comment } from "../../data/model";
 import { requireAuth } from "../auth-middleware";
 import { UserRepository } from "../user/user-repository";
 
+import { ModerationService } from "../moderation/moderation-service";
+import { ModerationRepository } from "../moderation/moderation-repository";
+
 const commentService = new CommentService(new CommentRepository());
 const userRepository = new UserRepository();
+const moderationService = new ModerationService();
+const moderationRepository = new ModerationRepository();
 export const commentRouter = express.Router();
 
 commentRouter.get("/comments", (req, res) => {
@@ -48,45 +53,95 @@ commentRouter.get("/comment/:id", (req, res) => {
     res.json(result);
 });
 
-commentRouter.post("/comment", requireAuth, (req, res) => {
+commentRouter.post("/comment", requireAuth, async (req, res) => {
     if (!req.user) return res.status(401).send("Unauthorized");
     const user = userRepository.findUserByUsername(req.user.username);
     if (!user) return res.status(401).send("User not found");
 
-    const { content, post, imageUrls } = req.body;
-    const comment: Comment = {
-        cid: 0,
-        content,
-        author: user,
-        post,
-        imageUrls,
-        publishedAt: new Date().toISOString() as any,
-        likes: 0,
-        dislikes: 0
-    };
-    commentService.createComment(comment);
-    res.status(201).json({ message: "Comment created" });
+    const { content, post } = req.body;
+    let { imageUrls } = req.body;
+
+    try {
+        const moderation = await moderationService.moderateContent(content, imageUrls);
+
+        if (!moderation.safe) {
+            moderationRepository.logModeration("comment", content, "blocked", moderation.reason || "Unsafe comment detected");
+            return res.status(400).send("Content blocked by AI Safety: Inappropriate language or content detected.");
+        }
+
+        if (moderation.flaggedImages && moderation.flaggedImages.length > 0 && imageUrls) {
+            imageUrls = imageUrls.map((img: string) => {
+                if (moderation.flaggedImages?.includes(img)) {
+                    return `flagged:${img}`;
+                }
+                return img;
+            });
+            moderationRepository.logModeration("comment", content, "flagged", `Flagged ${moderation.flaggedImages.length} image(s)`);
+        } else {
+            moderationRepository.logModeration("comment", content, "passed", null);
+        }
+
+        const comment: Comment = {
+            cid: 0,
+            content,
+            author: user,
+            post,
+            imageUrls,
+            publishedAt: new Date().toISOString() as any,
+            likes: 0,
+            dislikes: 0
+        };
+        commentService.createComment(comment);
+        res.status(201).json({ message: "Comment created" });
+    } catch (e: any) {
+        res.status(500).send(e.message);
+    }
 });
 
-commentRouter.post("/posts/comments", requireAuth, (req, res) => {
+commentRouter.post("/posts/comments", requireAuth, async (req, res) => {
     if (!req.user) return res.status(401).send("Unauthorized");
     const user = userRepository.findUserByUsername(req.user.username);
     if (!user) return res.status(401).send("User not found");
 
-    const { content, post, comment: parentComment, imageUrls } = req.body;
-    const reply: Comment = {
-        cid: 0,
-        content,
-        author: user,
-        post,
-        parentComment,
-        imageUrls,
-        publishedAt: new Date().toISOString() as any,
-        likes: 0,
-        dislikes: 0
-    };
-    commentService.createReply(reply);
-    res.status(201).json({ message: "Reply created" });
+    const { content, post, comment: parentComment } = req.body;
+    let { imageUrls } = req.body;
+
+    try {
+        const moderation = await moderationService.moderateContent(content, imageUrls);
+
+        if (!moderation.safe) {
+            moderationRepository.logModeration("comment", content, "blocked", moderation.reason || "Unsafe reply comment detected");
+            return res.status(400).send("Content blocked by AI Safety: Inappropriate language or content detected.");
+        }
+
+        if (moderation.flaggedImages && moderation.flaggedImages.length > 0 && imageUrls) {
+            imageUrls = imageUrls.map((img: string) => {
+                if (moderation.flaggedImages?.includes(img)) {
+                    return `flagged:${img}`;
+                }
+                return img;
+            });
+            moderationRepository.logModeration("comment", content, "flagged", `Flagged ${moderation.flaggedImages.length} image(s)`);
+        } else {
+            moderationRepository.logModeration("comment", content, "passed", null);
+        }
+
+        const reply: Comment = {
+            cid: 0,
+            content,
+            author: user,
+            post,
+            parentComment,
+            imageUrls,
+            publishedAt: new Date().toISOString() as any,
+            likes: 0,
+            dislikes: 0
+        };
+        commentService.createReply(reply);
+        res.status(201).json({ message: "Reply created" });
+    } catch (e: any) {
+        res.status(500).send(e.message);
+    }
 });
 
 commentRouter.patch("/comments/:id/like", requireAuth, (req, res) => {

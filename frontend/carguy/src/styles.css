@@ -150,3 +150,23 @@ html.theme-transitioning *::after {
 [data-theme="light"] .premium-header {
   background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0) 100%);
 }
+
+/* Aura Shift floating text animation */
+@keyframes aura-shift {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.8);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px) scale(0.9);
+  }
+}
+
+.animate-aura-shift {
+  animation: aura-shift 0.8s cubic-bezier(0.25, 1, 0.50, 1) forwards;
+}

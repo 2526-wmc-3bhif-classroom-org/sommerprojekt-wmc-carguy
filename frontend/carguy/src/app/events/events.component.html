@@ -1,0 +1,225 @@
+<div class="max-w-7xl mx-auto px-4 pt-24 pb-8">
+  <!-- Header -->
+  <header class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-extrabold text-accent">Car Meets &amp; Community Events</h1>
+      <p class="text-base-content/60 text-sm mt-1">Discover community track days, highway cruises, and local morning meets</p>
+    </div>
+    <button *ngIf="isLoggedIn" (click)="showCreateModal = true" class="btn btn-primary rounded-xl flex items-center gap-1">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+      Host Event
+    </button>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <div class="flex border-b border-base-content/10 mb-8 gap-6">
+    <button (click)="switchTab('list')"
+            [class.border-primary]="activeTab === 'list'"
+            [class.text-primary]="activeTab === 'list'"
+            [class.border-transparent]="activeTab !== 'list'"
+            [class.text-base-content/50]="activeTab !== 'list'"
+            class="pb-3 border-b-2 font-bold text-sm tracking-wide transition-all">
+      📋 List View
+    </button>
+    <button (click)="switchTab('map')"
+            [class.border-primary]="activeTab === 'map'"
+            [class.text-primary]="activeTab === 'map'"
+            [class.border-transparent]="activeTab !== 'map'"
+            [class.text-base-content/50]="activeTab !== 'map'"
+            class="pb-3 border-b-2 font-bold text-sm tracking-wide transition-all">
+      🗺️ Map View
+    </button>
+  </div>
+
+  <!-- ═══════════════ LIST VIEW ═══════════════ -->
+  <div *ngIf="activeTab === 'list'" class="space-y-6">
+    <div *ngFor="let ev of events" class="premium-card p-6 rounded-3xl border border-base-content/10 flex flex-col justify-between hover:border-primary/20 transition-all duration-300 relative overflow-hidden">
+      <div class="absolute -right-24 -top-24 w-48 h-48 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="flex flex-col lg:flex-row justify-between gap-6">
+        <div class="flex-1">
+          <div class="flex items-center gap-3 mb-2.5">
+            <span class="badge badge-sm font-bold bg-primary/10 text-primary border-none uppercase tracking-wider px-2.5 py-1 text-[10px]">
+              {{ ev.eventDate | date:'mediumDate' }}
+            </span>
+            <span class="text-xs text-base-content/50 font-medium">Hosted by u/{{ ev.hostUsername }}</span>
+          </div>
+          <h2 class="text-2xl font-extrabold text-base-content leading-tight mb-2">{{ ev.title }}</h2>
+          <p class="text-base-content/80 text-sm leading-relaxed mb-4 max-w-2xl">{{ ev.description }}</p>
+          <div class="flex flex-wrap items-center gap-4 text-xs font-semibold text-base-content/60">
+            <span class="flex items-center gap-1.5">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              {{ ev.location }}
+            </span>
+            <span class="flex items-center gap-1.5">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              {{ ev.eventDate | date:'shortTime' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="lg:w-72 shrink-0 flex flex-col justify-between gap-4 border-t lg:border-t-0 lg:border-l border-base-content/10 pt-6 lg:pt-0 lg:pl-6">
+          <div class="bg-base-200/50 rounded-2xl p-4 border border-base-content/5 text-center">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-base-content/50">Starts In</span>
+            <div class="text-xl font-black text-accent tracking-tight mt-1">{{ getCountdown(ev.eventDate) }}</div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between text-xs font-bold text-base-content/50 mb-2">
+              <span>Going: {{ ev.yesCount }}</span>
+              <span>Maybe: {{ ev.maybeCount }}</span>
+            </div>
+            <div class="grid grid-cols-3 gap-1.5" *ngIf="isLoggedIn">
+              <button (click)="rsvp(ev.eid, 'yes')" [class.btn-primary]="getCurrentUserRsvp(ev) === 'yes'" [class.btn-ghost]="getCurrentUserRsvp(ev) !== 'yes'" class="btn btn-xs rounded-lg border border-base-content/10 hover:border-primary/40 font-bold">Yes</button>
+              <button (click)="rsvp(ev.eid, 'maybe')" [class.btn-primary]="getCurrentUserRsvp(ev) === 'maybe'" [class.btn-ghost]="getCurrentUserRsvp(ev) !== 'maybe'" class="btn btn-xs rounded-lg border border-base-content/10 hover:border-primary/40 font-bold">Maybe</button>
+              <button (click)="rsvp(ev.eid, 'no')" [class.btn-primary]="getCurrentUserRsvp(ev) === 'no'" [class.btn-ghost]="getCurrentUserRsvp(ev) !== 'no'" class="btn btn-xs rounded-lg border border-base-content/10 hover:border-primary/40 font-bold">No</button>
+            </div>
+            <p *ngIf="!isLoggedIn" class="text-[10px] text-center text-base-content/40 italic">Log in to RSVP</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-base-content/10 mt-5 pt-4">
+        <button (click)="toggleExpand(ev.eid)" class="text-xs font-semibold text-accent flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200" [class.rotate-90]="expandedEvents[ev.eid]"><polyline points="9 18 15 12 9 6"/></svg>
+          Attending List ({{ ev.attendees.length }})
+        </button>
+        <div *ngIf="expandedEvents[ev.eid]" class="mt-3 flex flex-wrap gap-2">
+          <div *ngFor="let at of ev.attendees" class="badge badge-sm font-semibold rounded-lg border border-base-content/10 px-2 py-2 flex gap-1.5 items-center bg-base-300/30">
+            <span class="text-base-content">{{ at.username }}</span>
+            <span class="w-1.5 h-1.5 rounded-full" [ngClass]="{'bg-success': at.status === 'yes','bg-warning': at.status === 'maybe','bg-error': at.status === 'no'}"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comment Section -->
+      <div class="border-t border-base-content/10 mt-4 pt-4">
+        <button (click)="toggleComments(ev.eid)" class="text-xs font-semibold text-accent flex items-center gap-1.5 hover:text-primary transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200" [class.rotate-90]="showComments[ev.eid]"><polyline points="9 18 15 12 9 6"/></svg>
+          Comments
+        </button>
+        <div *ngIf="showComments[ev.eid]" class="mt-4 space-y-3">
+          <div *ngIf="loadingComments[ev.eid]" class="text-xs text-base-content/50 animate-pulse">Loading...</div>
+          <div *ngFor="let c of (eventComments[ev.eid] || [])" class="flex gap-3 items-start">
+            <div class="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-extrabold text-primary shrink-0">{{ c.username[0]?.toUpperCase() }}</div>
+            <div class="flex-1 bg-base-200/60 rounded-xl px-3 py-2">
+              <div class="flex items-center gap-2 mb-0.5">
+                <span class="text-xs font-bold text-base-content">{{ c.username }}</span>
+                <span class="text-[10px] text-base-content/40">{{ c.publishedAt | date:'MMM d, HH:mm' }}</span>
+              </div>
+              <p class="text-xs text-base-content/80">{{ c.content }}</p>
+            </div>
+          </div>
+          <p *ngIf="(eventComments[ev.eid] || []).length === 0 && !loadingComments[ev.eid]" class="text-xs text-base-content/40 italic">No comments yet.</p>
+          <div *ngIf="isLoggedIn" class="flex gap-2 mt-3">
+            <input [(ngModel)]="newCommentText[ev.eid]" (keyup.enter)="postComment(ev.eid)" placeholder="Write a comment..." class="input input-sm flex-1 bg-base-200/60 border-base-content/10 focus:border-primary text-xs rounded-xl" />
+            <button (click)="postComment(ev.eid)" [disabled]="!newCommentText[ev.eid]?.trim()" class="btn btn-primary btn-sm rounded-xl px-3 text-xs font-bold">Post</button>
+          </div>
+          <p *ngIf="!isLoggedIn" class="text-[10px] text-base-content/40 italic">Log in to comment.</p>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="events.length === 0" class="premium-card bg-base-200 border border-base-content/10 p-12 rounded-3xl text-center">
+      <p class="text-base-content/60 font-semibold">No upcoming events listed.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════ MAP VIEW ═══════════════ -->
+  <div *ngIf="activeTab === 'map'" class="flex gap-6" style="height: calc(100vh - 280px); min-height: 520px;">
+
+    <!-- Scrollable sidebar -->
+    <div class="w-80 shrink-0 flex flex-col gap-3 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-base-300">
+      <div
+        *ngFor="let ev of events"
+        [id]="'map-event-' + ev.eid"
+        (click)="selectEventOnMap(ev)"
+        class="premium-card p-4 rounded-2xl border cursor-pointer transition-all duration-200 select-none"
+        [class.border-primary]="selectedMapEvent?.eid === ev.eid"
+        [class.bg-primary/5]="selectedMapEvent?.eid === ev.eid"
+        [class.border-base-content/10]="selectedMapEvent?.eid !== ev.eid"
+        [class.hover:border-primary/30]="selectedMapEvent?.eid !== ev.eid"
+      >
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
+            <p class="font-extrabold text-sm text-base-content truncate">{{ ev.title }}</p>
+            <p class="text-xs text-base-content/60 mt-0.5 truncate flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              {{ ev.location }}
+            </p>
+          </div>
+          <div class="text-right shrink-0">
+            <p class="text-[10px] font-bold text-accent">{{ getCountdown(ev.eventDate) }}</p>
+            <p class="text-[10px] text-base-content/50">{{ ev.eventDate | date:'MMM d' }}</p>
+          </div>
+        </div>
+
+        <!-- RSVP quick bar -->
+        <div class="mt-3 flex items-center justify-between">
+          <div class="flex items-center gap-2 text-[10px] font-bold text-base-content/50">
+            <span class="text-success">✓ {{ ev.yesCount }}</span>
+            <span class="text-warning">? {{ ev.maybeCount }}</span>
+          </div>
+          <div class="flex gap-1" *ngIf="isLoggedIn">
+            <button (click)="$event.stopPropagation(); rsvp(ev.eid, 'yes')" [class.btn-primary]="getCurrentUserRsvp(ev) === 'yes'" [class.btn-ghost]="getCurrentUserRsvp(ev) !== 'yes'" class="btn btn-xs rounded-lg border border-base-content/10 font-bold text-[9px] px-2 h-6 min-h-0">Go</button>
+            <button (click)="$event.stopPropagation(); rsvp(ev.eid, 'maybe')" [class.btn-primary]="getCurrentUserRsvp(ev) === 'maybe'" [class.btn-ghost]="getCurrentUserRsvp(ev) !== 'maybe'" class="btn btn-xs rounded-lg border border-base-content/10 font-bold text-[9px] px-2 h-6 min-h-0">?</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leaflet map -->
+    <div class="flex-1 rounded-3xl overflow-hidden border border-base-content/10 relative">
+      <div id="leaflet-map" class="w-full h-full"></div>
+
+      <!-- Selected event detail overlay -->
+      <div *ngIf="selectedMapEvent"
+           class="absolute bottom-4 left-4 right-4 premium-card p-4 rounded-2xl border border-primary/30 bg-base-100/90 backdrop-blur-md shadow-2xl z-[1000] flex flex-col sm:flex-row sm:items-center gap-4">
+        <div class="flex-1 min-w-0">
+          <p class="font-extrabold text-base text-base-content truncate">{{ selectedMapEvent.title }}</p>
+          <p class="text-xs text-base-content/60 mt-0.5">📍 {{ selectedMapEvent.location }} · ⏱️ {{ getCountdown(selectedMapEvent.eventDate) }}</p>
+        </div>
+        <div class="flex gap-2 shrink-0" *ngIf="isLoggedIn">
+          <button (click)="rsvp(selectedMapEvent.eid, 'yes')" [class.btn-primary]="getCurrentUserRsvp(selectedMapEvent) === 'yes'" [class.btn-ghost]="getCurrentUserRsvp(selectedMapEvent) !== 'yes'" class="btn btn-sm rounded-xl border border-base-content/10 font-bold">Yes</button>
+          <button (click)="rsvp(selectedMapEvent.eid, 'maybe')" [class.btn-primary]="getCurrentUserRsvp(selectedMapEvent) === 'maybe'" [class.btn-ghost]="getCurrentUserRsvp(selectedMapEvent) !== 'maybe'" class="btn btn-sm rounded-xl border border-base-content/10 font-bold">Maybe</button>
+          <button (click)="rsvp(selectedMapEvent.eid, 'no')" [class.btn-primary]="getCurrentUserRsvp(selectedMapEvent) === 'no'" [class.btn-ghost]="getCurrentUserRsvp(selectedMapEvent) !== 'no'" class="btn btn-sm rounded-xl border border-base-content/10 font-bold">No</button>
+        </div>
+        <button (click)="selectedMapEvent = null" class="btn btn-xs btn-circle btn-ghost shrink-0">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ HOST MODAL ═══════════════ -->
+  <div *ngIf="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="premium-card p-8 rounded-3xl max-w-md w-full border border-base-content/10 bg-base-100 shadow-2xl relative">
+      <button (click)="showCreateModal = false" class="btn btn-sm btn-circle btn-ghost absolute top-4 right-4">✕</button>
+      <h3 class="font-extrabold text-2xl text-primary mb-6">Host Car Event</h3>
+      <div class="space-y-4">
+        <div>
+          <label class="label text-xs font-semibold uppercase tracking-wider text-base-content/60 p-0 mb-1">Event Title</label>
+          <input [(ngModel)]="newTitle" placeholder="e.g. Shibuya JDM Cruise Night" class="input input-bordered w-full bg-white/5 border-base-content/10 focus:border-primary text-sm h-11" />
+        </div>
+        <div>
+          <label class="label text-xs font-semibold uppercase tracking-wider text-base-content/60 p-0 mb-1">Description</label>
+          <textarea [(ngModel)]="newDescription" placeholder="Details about the meet..." class="textarea textarea-bordered w-full bg-white/5 border-base-content/10 focus:border-primary text-sm resize-none" rows="3"></textarea>
+        </div>
+        <div>
+          <label class="label text-xs font-semibold uppercase tracking-wider text-base-content/60 p-0 mb-1">Location</label>
+          <input [(ngModel)]="newLocation" placeholder="e.g. Nürburgring Nordschleife Entry" class="input input-bordered w-full bg-white/5 border-base-content/10 focus:border-primary text-sm h-11" />
+        </div>
+        <div>
+          <label class="label text-xs font-semibold uppercase tracking-wider text-base-content/60 p-0 mb-1">Date &amp; Time</label>
+          <input type="datetime-local" [(ngModel)]="newDate" class="input input-bordered w-full bg-white/5 border-base-content/10 focus:border-primary text-sm h-11" />
+        </div>
+        <p *ngIf="createError" class="text-red-400 text-xs mt-2">{{ createError }}</p>
+        <div class="flex justify-end gap-3 mt-8">
+          <button (click)="showCreateModal = false" class="btn btn-ghost">Cancel</button>
+          <button (click)="createEvent()" [disabled]="!newTitle.trim() || !newDescription.trim() || !newLocation.trim() || !newDate || isSubmitting" class="btn btn-primary">
+            <span *ngIf="isSubmitting" class="loading loading-spinner loading-xs"></span>
+            <span *ngIf="!isSubmitting">Publish Event</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

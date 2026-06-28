@@ -1,20 +1,24 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { ForumService } from '../services/forum-service';
 import { PostService } from '../services/post-service';
-import { Forum, ForumCategory, Post } from '../../model';
+import { ShoutService } from '../services/shout-service';
+import { UserService } from '../services/user-service';
+import { Forum, ForumCategory, Post, Shout } from '../../model';
 import { getBrandColor } from '../brand-colors';
 import { openImageModal, scrollToSlide } from '../image-modal';
+import { getUserBadges, Badge } from '../utils/badge';
 
 @Component({
   selector: 'app-brand-directory',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './brand-directory.component.html',
   styleUrls: ['./brand-directory.component.css']
 })
-export class BrandDirectoryComponent implements OnInit {
+export class BrandDirectoryComponent implements OnInit, OnDestroy {
 
   forums: Forum[] = [];
   categories: ForumCategory[] = [];
@@ -23,8 +27,18 @@ export class BrandDirectoryComponent implements OnInit {
   trendingPosts: Post[] = [];
   selectedImage: string | null = null;
 
+  shouts: Shout[] = [];
+  newShoutContent = '';
+  isPostingShout = false;
+  shoutError = '';
+  isLoggedIn = false;
+  currentUser: any = null;
+  private shoutInterval: any;
+
   private forumService = inject(ForumService);
   private postService = inject(PostService);
+  private shoutService = inject(ShoutService);
+  private userService = inject(UserService);
 
   constructor() {}
 
@@ -32,8 +46,27 @@ export class BrandDirectoryComponent implements OnInit {
     return getBrandColor(name);
   }
 
+  revealedImages: Record<string, boolean> = {};
+
+  isImageFlagged(url?: string): boolean {
+    return !!url && url.startsWith('flagged:');
+  }
+
+  getImageUrl(url?: string): string {
+    if (!url) return '';
+    if (url.startsWith('flagged:')) {
+      return url.substring(8);
+    }
+    return url;
+  }
+
+  revealImage(url: string, event: Event) {
+    event.stopPropagation();
+    this.revealedImages[url] = true;
+  }
+
   openImageModal(url: string, event: Event) {
-    this.selectedImage = openImageModal(url, event);
+    this.selectedImage = openImageModal(this.getImageUrl(url), event);
   }
 
   scrollToSlide(id: string) {
@@ -97,6 +130,11 @@ export class BrandDirectoryComponent implements OnInit {
 
   async ngOnInit() {
     try {
+      this.isLoggedIn = this.userService.isLoggedIn();
+      this.currentUser = this.userService.getCurrentUser();
+      await this.loadShouts();
+      this.shoutInterval = setInterval(() => this.loadShouts(), 5000);
+
       this.forums = await this.forumService.getAllForums();
       this.categories = await this.forumService.getAllCategories();
       this.trendingForums = await this.forumService.getTrendingForums(12);
@@ -118,6 +156,49 @@ export class BrandDirectoryComponent implements OnInit {
       });
     } catch (error) {
       console.error('Failed to load dashboard data', error);
+    }
+  }
+
+  async loadShouts() {
+    try {
+      this.shouts = await this.shoutService.getRecentShouts();
+    } catch (e) {
+      console.error('Failed to load shouts', e);
+    }
+  }
+
+  async sendShout() {
+    if (!this.newShoutContent.trim() || this.isPostingShout) return;
+    this.isPostingShout = true;
+    this.shoutError = '';
+    try {
+      await this.shoutService.postShout(this.newShoutContent.trim());
+      this.newShoutContent = '';
+      await this.loadShouts();
+    } catch (e: any) {
+      this.shoutError = e.error || e.message || 'Failed to post shout';
+    } finally {
+      this.isPostingShout = false;
+    }
+  }
+
+  async deleteShout(sid: number) {
+    if (!confirm('Are you sure you want to delete this shout?')) return;
+    try {
+      await this.shoutService.deleteShout(sid);
+      await this.loadShouts();
+    } catch (e) {
+      console.error('Failed to delete shout', e);
+    }
+  }
+
+  getUserBadges(user?: any | null): Badge[] {
+    return getUserBadges(user);
+  }
+
+  ngOnDestroy() {
+    if (this.shoutInterval) {
+      clearInterval(this.shoutInterval);
     }
   }
 }

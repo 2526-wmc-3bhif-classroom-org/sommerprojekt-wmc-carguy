@@ -1,0 +1,164 @@
+<div class="mx-auto max-w-[1200px] px-6 py-12 bg-base-100 min-h-screen pt-20">
+
+  <!-- Header -->
+  <div class="premium-header mb-12 text-center relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-r from-primary/15 to-transparent"></div>
+    <div class="relative z-10">
+      <h1 class="text-4xl font-extrabold text-primary mb-3">Community Aura Leaderboard</h1>
+      <p class="text-base-content/70 max-w-xl mx-auto">
+        The highest-reputation drivers and tuners in the community, ranked by their total Aura (Likes received on posts & comments).
+      </p>
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div class="flex justify-center py-20">
+      <span class="loading loading-spinner loading-lg text-primary"></span>
+    </div>
+  } @else {
+    <!-- Podium for Top 3 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-end max-w-4xl mx-auto mb-16">
+      
+      <!-- 2nd Place (Left) -->
+      @if (users.length > 1) {
+        <div class="order-2 md:order-1 flex flex-col items-center">
+          <div class="premium-card p-6 rounded-3xl w-full text-center border-base-content/10 shadow-md relative hover:scale-[1.02] hover:border-slate-400/40 transition-all duration-300">
+            <span class="absolute -top-4 left-1/2 -translate-x-1/2 badge bg-slate-400 text-slate-900 border-none font-bold px-3 py-1.5 shadow-md">#2 Silver</span>
+            <div class="w-20 h-20 rounded-full overflow-hidden mx-auto mb-4 border-2 border-slate-400/50">
+              @if (users[1].image) {
+                <img [src]="users[1].image" class="w-full h-full object-cover">
+              } @else {
+                <div class="w-full h-full bg-base-300 flex items-center justify-center font-bold text-2xl">{{ users[1].username.charAt(0).toUpperCase() }}</div>
+              }
+            </div>
+            <a [routerLink]="['/profile', users[1].uid]" class="text-lg font-bold hover:text-accent transition-colors block truncate">
+              {{ users[1].publicname }}
+            </a>
+            <p class="text-xs text-base-content/60 mb-3 truncate">u/{{ users[1].username }}</p>
+            <div class="flex flex-wrap gap-1 justify-center mb-3">
+              @for (badge of getUserBadges(users[1]); track badge.name) {
+                <span class="badge badge-xs font-semibold" [attr.data-tip]="badge.tooltip" [ngClass]="badge.class">{{ badge.icon }}</span>
+              }
+            </div>
+            <div class="text-2xl font-black text-slate-400">{{ users[1].totalAura || 0 }} <span class="text-xs font-medium text-base-content/60">Aura</span></div>
+          </div>
+        </div>
+      }
+
+      <!-- 1st Place (Center - Main Spotlight) -->
+      @if (users.length > 0) {
+        <div class="order-1 md:order-2 flex flex-col items-center">
+          <div class="premium-card p-8 rounded-3xl w-full text-center border-yellow-500/30 shadow-xl relative hover:scale-[1.04] hover:border-yellow-500/50 transition-all duration-300 bg-base-200/60">
+            <span class="absolute -top-5 left-1/2 -translate-x-1/2 badge bg-yellow-500 text-yellow-950 border-none font-black px-4 py-2 shadow-lg text-xs tracking-wider animate-bounce">👑 #1 GOLD</span>
+            <div class="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4 border-4 border-yellow-500">
+              @if (users[0].image) {
+                <img [src]="users[0].image" class="w-full h-full object-cover">
+              } @else {
+                <div class="w-full h-full bg-base-300 flex items-center justify-center font-bold text-3xl">{{ users[0].username.charAt(0).toUpperCase() }}</div>
+              }
+            </div>
+            <a [routerLink]="['/profile', users[0].uid]" class="text-xl font-extrabold hover:text-accent transition-colors block truncate">
+              {{ users[0].publicname }}
+            </a>
+            <p class="text-xs text-base-content/60 mb-4 truncate">u/{{ users[0].username }}</p>
+            <div class="flex flex-wrap gap-1 justify-center mb-4">
+              @for (badge of getUserBadges(users[0]); track badge.name) {
+                <span class="badge badge-sm font-semibold" [attr.data-tip]="badge.tooltip" [ngClass]="badge.class">{{ badge.icon }} {{ badge.name }}</span>
+              }
+            </div>
+            <div class="text-3xl font-black text-yellow-500">{{ users[0].totalAura || 0 }} <span class="text-xs font-medium text-base-content/60">Aura</span></div>
+          </div>
+        </div>
+      }
+
+      <!-- 3rd Place (Right) -->
+      @if (users.length > 2) {
+        <div class="order-3 flex flex-col items-center">
+          <div class="premium-card p-6 rounded-3xl w-full text-center border-base-content/10 shadow-md relative hover:scale-[1.02] hover:border-amber-600/40 transition-all duration-300">
+            <span class="absolute -top-4 left-1/2 -translate-x-1/2 badge bg-amber-600 text-amber-50 border-none font-bold px-3 py-1.5 shadow-md">#3 Bronze</span>
+            <div class="w-20 h-20 rounded-full overflow-hidden mx-auto mb-4 border-2 border-amber-600/50">
+              @if (users[2].image) {
+                <img [src]="users[2].image" class="w-full h-full object-cover">
+              } @else {
+                <div class="w-full h-full bg-base-300 flex items-center justify-center font-bold text-2xl">{{ users[2].username.charAt(0).toUpperCase() }}</div>
+              }
+            </div>
+            <a [routerLink]="['/profile', users[2].uid]" class="text-lg font-bold hover:text-accent transition-colors block truncate">
+              {{ users[2].publicname }}
+            </a>
+            <p class="text-xs text-base-content/60 mb-3 truncate">u/{{ users[2].username }}</p>
+            <div class="flex flex-wrap gap-1 justify-center mb-3">
+              @for (badge of getUserBadges(users[2]); track badge.name) {
+                <span class="badge badge-xs font-semibold" [attr.data-tip]="badge.tooltip" [ngClass]="badge.class">{{ badge.icon }}</span>
+              }
+            </div>
+            <div class="text-2xl font-black text-amber-600">{{ users[2].totalAura || 0 }} <span class="text-xs font-medium text-base-content/60">Aura</span></div>
+          </div>
+        </div>
+      }
+
+    </div>
+
+    <!-- Leaderboard Rankings Table -->
+    <div class="premium-card rounded-3xl overflow-hidden p-6 max-w-5xl mx-auto shadow-lg">
+      <h3 class="text-xl font-bold mb-4 px-2 text-primary">All Standings</h3>
+      <div class="overflow-x-auto">
+        <table class="table table-zebra w-full text-base-content">
+          <thead>
+            <tr class="border-b border-base-content/10 text-base-content/60">
+              <th class="w-16 text-center font-bold">Rank</th>
+              <th>User</th>
+              <th class="text-center">Badges</th>
+              <th class="text-right font-bold">Aura</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of users; track user.uid) {
+              <tr class="hover:bg-base-200/50 border-b border-base-content/5 transition-colors">
+                <td class="text-center font-extrabold text-lg text-primary">
+                  {{ $index + 1 }}
+                </td>
+                <td>
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full overflow-hidden border border-base-content/10 bg-base-300 flex-shrink-0">
+                      @if (user.image) {
+                        <img [src]="user.image" class="w-full h-full object-cover">
+                      } @else {
+                        <div class="w-full h-full flex items-center justify-center font-bold">{{ user.username.charAt(0).toUpperCase() }}</div>
+                      }
+                    </div>
+                    <div>
+                      <a [routerLink]="['/profile', user.uid]" class="font-bold text-accent hover:underline">
+                        {{ user.publicname }}
+                      </a>
+                      <div class="text-xs text-base-content/60">u/{{ user.username }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="flex flex-wrap gap-1.5 justify-center">
+                    @for (badge of getUserBadges(user); track badge.name) {
+                      <span class="badge badge-sm font-semibold tooltip cursor-default" [attr.data-tip]="badge.tooltip" [ngClass]="badge.class">
+                        {{ badge.icon }} {{ badge.name }}
+                      </span>
+                    } @empty {
+                      <span class="text-xs text-base-content/40 italic">No badges yet</span>
+                    }
+                  </div>
+                </td>
+                <td class="text-right font-black text-xl text-primary">
+                  {{ user.totalAura || 0 }}
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="text-center text-base-content/60 py-8 italic">No users found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+</div>

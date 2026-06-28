@@ -2,11 +2,13 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Post, Comment } from '../../model';
 import { PostService } from '../services/post-service';
 import { CommentService } from '../services/comment-service';
 import { UserService } from '../services/user-service';
 import { openImageModal, scrollToSlide } from '../image-modal';
+import { getUserBadges, Badge } from '../utils/badge';
 
 @Component({
   selector: 'app-post-detail',
@@ -15,6 +17,9 @@ import { openImageModal, scrollToSlide } from '../image-modal';
   templateUrl: './post-detail.html',
 })
 export class PostDetailComponent implements OnInit {
+  getUserBadges(user?: any | null): Badge[] {
+    return getUserBadges(user);
+  }
   post: Post | null = null;
   comments: Comment[] = [];
   rootComments: Comment[] = [];
@@ -33,6 +38,90 @@ export class PostDetailComponent implements OnInit {
   isVotingPost = false;
   isVotingComment: Record<number, boolean> = {};
   selectedImage: string | null = null;
+  isBookmarkedState = false;
+  collapsedComments: Record<number, boolean> = {};
+  isVotingPoll = false;
+
+  private sanitizer = inject(DomSanitizer);
+
+  revealedImages: Record<string, boolean> = {};
+
+  isImageFlagged(url?: string): boolean {
+    return !!url && url.startsWith('flagged:');
+  }
+
+  getImageUrl(url?: string): string {
+    if (!url) return '';
+    if (url.startsWith('flagged:')) {
+      return url.substring(8);
+    }
+    return url;
+  }
+
+  revealImage(url: string, event: Event) {
+    event.stopPropagation();
+    this.revealedImages[url] = true;
+  }
+
+  async votePoll(optionIndex: number) {
+    if (!this.post || !this.userService.isLoggedIn() || this.isVotingPoll) return;
+    if (this.post.poll?.userVotedOptionIndex !== undefined) return;
+    this.isVotingPoll = true;
+    try {
+      await this.postService.voteInPoll(this.post.pid, optionIndex);
+      const updated = await this.postService.getPostById(this.post.pid);
+      if (updated) {
+        this.post.poll = updated.poll;
+      }
+    } catch (e) {
+      console.error('Failed to vote in poll', e);
+    } finally {
+      this.isVotingPoll = false;
+    }
+  }
+
+  getPollOptionPercentage(option: any): number {
+    if (!this.post || !this.post.poll || !this.post.poll.options) return 0;
+    const total = this.post.poll.options.reduce((acc: number, opt: any) => acc + (opt.votes || 0), 0);
+    if (total === 0) return 0;
+    return Math.round(((option.votes || 0) / total) * 100);
+  }
+
+  toggleCollapseComment(cid: number) {
+    this.collapsedComments[cid] = !this.collapsedComments[cid];
+  }
+
+  parseMarkdown(text: string): string {
+    if (!text) return '';
+    let html = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    html = html.replace(/`(.*?)`/g, '<code class="bg-base-300 px-1 rounded font-mono text-[10px] text-accent">$1</code>');
+    html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a class="text-accent hover:underline" href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    return html;
+  }
+
+  getSafeMarkdown(text: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(this.parseMarkdown(text));
+  }
+
+  async toggleBookmark() {
+    if (!this.post || !this.userService.isLoggedIn()) return;
+    try {
+      if (this.isBookmarkedState) {
+        this.isBookmarkedState = false;
+        await this.postService.unbookmarkPost(this.post.pid);
+      } else {
+        this.isBookmarkedState = true;
+        await this.postService.bookmarkPost(this.post.pid);
+      }
+    } catch (e) {
+      console.error('Failed to toggle bookmark', e);
+    }
+  }
 
   private userService = inject(UserService);
   private postService = inject(PostService);
@@ -142,6 +231,9 @@ export class PostDetailComponent implements OnInit {
         this.comments = await this.commentService.getCommentsByPostId(id);
         this.rootComments = this.buildCommentTree(this.comments);
         this.loadVoteState();
+        if (this.userService.isLoggedIn()) {
+          this.isBookmarkedState = await this.postService.isBookmarked(id);
+        }
       } catch (error) {
         console.error('Failed to load post', error);
       } finally {
@@ -295,10 +387,29 @@ export class PostDetailComponent implements OnInit {
     }
   }
 
-  async likePost() {
+  triggerAuraShift(event: MouseEvent, auraChange: string) {
+    const el = document.createElement('div');
+    el.innerText = auraChange;
+    el.className = 'absolute font-black pointer-events-none select-none text-xs z-[9999] animate-aura-shift';
+    if (auraChange.startsWith('+')) {
+      el.style.color = '#4ade80'; // text-green-400
+    } else {
+      el.style.color = '#f87171'; // text-red-400
+    }
+    el.style.left = `${event.clientX}px`;
+    el.style.top = `${event.clientY - 20}px`;
+    el.style.position = 'fixed';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 800);
+  }
+
+  async likePost(event?: MouseEvent) {
     if (!this.post || !this.userService.isLoggedIn() || this.isVotingPost) return;
     this.isVotingPost = true;
     try {
+      if (event) {
+        this.triggerAuraShift(event, this.voteState === 'like' ? '-1 Aura' : '+1 Aura');
+      }
       if (this.voteState === 'like') {
         this.post.likes--;
         this.voteState = null;
@@ -315,16 +426,18 @@ export class PostDetailComponent implements OnInit {
       this.saveVoteState();
     } catch (e) {
       console.error('Failed to like post', e);
-      // Revert state if necessary on real apps, ignoring here for simplicity
     } finally {
       this.isVotingPost = false;
     }
   }
 
-  async dislikePost() {
+  async dislikePost(event?: MouseEvent) {
     if (!this.post || !this.userService.isLoggedIn() || this.isVotingPost) return;
     this.isVotingPost = true;
     try {
+      if (event) {
+        this.triggerAuraShift(event, this.voteState === 'dislike' ? '+1 Aura' : '-1 Aura');
+      }
       if (this.voteState === 'dislike') {
         this.post.dislikes--;
         this.voteState = null;
@@ -346,11 +459,14 @@ export class PostDetailComponent implements OnInit {
     }
   }
 
-  async likeComment(comment: Comment) {
+  async likeComment(comment: Comment, event?: MouseEvent) {
     if (!this.userService.isLoggedIn() || this.isVotingComment[comment.cid]) return;
     this.isVotingComment[comment.cid] = true;
     const currentState = this.commentVoteStates[comment.cid];
     try {
+      if (event) {
+        this.triggerAuraShift(event, currentState === 'like' ? '-1 Aura' : '+1 Aura');
+      }
       if (currentState === 'like') {
         comment.likes--;
         this.commentVoteStates[comment.cid] = null;
@@ -372,11 +488,14 @@ export class PostDetailComponent implements OnInit {
     }
   }
 
-  async dislikeComment(comment: Comment) {
+  async dislikeComment(comment: Comment, event?: MouseEvent) {
     if (!this.userService.isLoggedIn() || this.isVotingComment[comment.cid]) return;
     this.isVotingComment[comment.cid] = true;
     const currentState = this.commentVoteStates[comment.cid];
     try {
+      if (event) {
+        this.triggerAuraShift(event, currentState === 'dislike' ? '+1 Aura' : '-1 Aura');
+      }
       if (currentState === 'dislike') {
         comment.dislikes--;
         this.commentVoteStates[comment.cid] = null;

@@ -36,6 +36,27 @@ export class CommunityDetailComponent implements OnInit {
   imageUrlInput = '';
   isDragging = false;
 
+  // Poll creation
+  showPollForm = false;
+  pollQuestion = '';
+  pollOptions: string[] = ['', ''];
+
+  togglePollForm() {
+    this.showPollForm = !this.showPollForm;
+  }
+
+  addPollOption() {
+    if (this.pollOptions.length < 5) {
+      this.pollOptions.push('');
+    }
+  }
+
+  removePollOption(index: number) {
+    if (this.pollOptions.length > 2) {
+      this.pollOptions.splice(index, 1);
+    }
+  }
+
   // View post images / sorting
   selectedImage: string | null = null;
   sortMode: 'newest' | 'oldest' | 'most_liked' = 'newest';
@@ -278,7 +299,30 @@ export class CommunityDetailComponent implements OnInit {
     this.isSubmittingPost = true;
     this.postError = '';
     try {
-      await this.postService.createPost(this.newPostTitle.trim(), this.newPostContent.trim(), user, this.community, this.newPostImageUrls);
+      const poll = this.showPollForm && this.pollQuestion.trim()
+        ? {
+            question: this.pollQuestion.trim(),
+            options: this.pollOptions.filter(o => o.trim() !== '')
+          }
+        : undefined;
+
+      await this.postService.createPost(
+        this.newPostTitle.trim(),
+        this.newPostContent.trim(),
+        user,
+        this.community,
+        this.newPostImageUrls,
+        poll
+      );
+
+      this.newPostTitle = '';
+      this.newPostContent = '';
+      this.newPostImageUrls = [];
+      this.imageUrlInput = '';
+      this.showPollForm = false;
+      this.pollQuestion = '';
+      this.pollOptions = ['', ''];
+
       this.showCreatePost = false;
       const id = this.community.forumId;
       this.community = await this.forumService.getForumById(id);

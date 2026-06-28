@@ -50,6 +50,7 @@ export interface Post {
   likes: number;
   dislikes: number;
   category?: PostCategory;
+  poll?: any;
 }
 
 export interface Forum {
@@ -102,4 +103,21 @@ export interface Guide {
   publishedAt: string;
   likes: number;
   dislikes: number;
+}
+
+export interface Shout {
+  sid: number;
+  content: string;
+  author: User;
+  publishedAt: string;
+}
+
+export interface GarageVehicle {
+  gvid: number;
+  uid: number;
+  make: string;
+  model: string;
+  year: number;
+  mods?: string;
+  imageUrl?: string;
 }

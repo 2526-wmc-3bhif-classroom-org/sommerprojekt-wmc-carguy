@@ -8,6 +8,9 @@ import {LoginPage} from './login-page/login-page';
 import { GuidesComponent } from './Guides/Guides';
 import { CreateCommunityComponent } from './create-community/create-community';
 import { SearchResultsComponent } from './search-results/search-results';
+import { LeaderboardComponent } from './leaderboard/leaderboard';
+import { AdminComponent } from './admin/admin.component';
+import { EventsComponent } from './events/events.component';
 import { authGuard } from './auth.guard';
 
 export const routes: Routes = [
@@ -21,5 +24,8 @@ export const routes: Routes = [
   { path: 'guides', component: GuidesComponent },
   { path: 'create-community', component: CreateCommunityComponent, canActivate: [authGuard] },
   { path: 'search', component: SearchResultsComponent },
+  { path: 'leaderboard', component: LeaderboardComponent },
+  { path: 'admin', component: AdminComponent, canActivate: [authGuard] },
+  { path: 'events', component: EventsComponent },
   { path: '**', redirectTo: '' }
 ];

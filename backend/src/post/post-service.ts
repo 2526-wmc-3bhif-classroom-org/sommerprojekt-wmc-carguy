@@ -12,8 +12,8 @@ export class PostService {
         return this.postRepository.findTrendingPosts(limit);
     }
 
-    public getPostById(id: number): Post | undefined {
-        return this.postRepository.findPostById(id);
+    public getPostById(id: number, currentUserId?: number): Post | undefined {
+        return this.postRepository.findPostById(id, currentUserId);
     }
 
     public getRepliesByParentId(parentId: number): Post[] {
@@ -54,5 +54,25 @@ export class PostService {
 
     public undislikePost(id: number): void {
         this.postRepository.undislikePost(id);
+    }
+
+    public bookmarkPost(uid: number, pid: number): void {
+        this.postRepository.bookmarkPost(uid, pid);
+    }
+
+    public unbookmarkPost(uid: number, pid: number): void {
+        this.postRepository.unbookmarkPost(uid, pid);
+    }
+
+    public isBookmarked(uid: number, pid: number): boolean {
+        return this.postRepository.isBookmarked(uid, pid);
+    }
+
+    public getBookmarkedPosts(uid: number): Post[] {
+        return this.postRepository.findBookmarkedPosts(uid);
+    }
+
+    public recordPollVote(pid: number, uid: number, optionIndex: number): void {
+        this.postRepository.recordPollVote(pid, uid, optionIndex);
     }
 }
