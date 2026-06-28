@@ -1,4 +1,4 @@
-import { AI_PROVIDER, AI_API_KEY, AI_API_URL, AI_MODEL } from "../config";
+import { aiConfig } from "../config";
 
 const LOCAL_BAD_WORDS = [
     "nigger", "faggot", "retard", "cunt", "kys", "kill yourself", "slut", "bitch", "whore", "rape"
@@ -6,10 +6,9 @@ const LOCAL_BAD_WORDS = [
 
 export class ModerationService {
     public async moderateContent(text: string, imageUrls?: string[]): Promise<{ safe: boolean; reason?: string; flaggedImages?: string[] }> {
-        const provider = (AI_PROVIDER || "local").toLowerCase();
+        const provider = (aiConfig.provider || "local").toLowerCase();
 
-        // 1. If provider is local or no configuration, use local fallback
-        if (provider === "local" || (!AI_API_KEY && provider !== "ollama")) {
+        if (provider === "local" || (!aiConfig.apiKey && provider !== "ollama")) {
             return this.localModeration(text, imageUrls);
         }
 
@@ -42,11 +41,11 @@ export class ModerationService {
     }
 
     private async moderateWithGemini(text: string, imageUrls?: string[]): Promise<{ safe: boolean; reason?: string; flaggedImages?: string[] }> {
-        const apiKey = AI_API_KEY;
-        const model = AI_MODEL || "gemini-1.5-flash";
+        const apiKey = aiConfig.apiKey;
+        const model = aiConfig.model || "gemini-1.5-flash";
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-        const prompt = `You are an AI content moderator for a car enthusiast forum. 
+        const prompt = `You are an AI content moderator for a car enthusiast forum.
 Analyze the provided text and images for toxic behavior: hate speech, slurs, harassment, sexual content, or graphic violence.
 Respond ONLY with a JSON object of this structure:
 {
@@ -97,11 +96,11 @@ Text: "${text.replace(/"/g, '\\"')}"`;
     }
 
     private async moderateWithOpenAI(text: string, imageUrls?: string[]): Promise<{ safe: boolean; reason?: string; flaggedImages?: string[] }> {
-        const apiKey = AI_API_KEY;
-        const model = AI_MODEL || "gpt-4o-mini";
-        const url = AI_API_URL || "https://api.openai.com/v1/chat/completions";
+        const apiKey = aiConfig.apiKey;
+        const model = aiConfig.model || "gpt-4o-mini";
+        const url = aiConfig.apiUrl || "https://api.openai.com/v1/chat/completions";
 
-        const systemMessage = `You are an AI content moderator for a car enthusiast forum. 
+        const systemMessage = `You are an AI content moderator for a car enthusiast forum.
 Analyze the provided text and images for toxic behavior: hate speech, slurs, harassment, sexual content, or graphic violence.
 Respond ONLY with a JSON object of this structure:
 {
@@ -152,11 +151,11 @@ Respond ONLY with a JSON object of this structure:
     }
 
     private async moderateWithOllama(text: string, imageUrls?: string[]): Promise<{ safe: boolean; reason?: string; flaggedImages?: string[] }> {
-        const model = AI_MODEL || "llama3";
-        const baseUrl = AI_API_URL || "http://localhost:11434";
+        const model = aiConfig.model || "llama3";
+        const baseUrl = aiConfig.apiUrl || "http://localhost:11434";
         const url = `${baseUrl}/api/chat`;
 
-        const systemMessage = `You are an AI content moderator for a car enthusiast forum. 
+        const systemMessage = `You are an AI content moderator for a car enthusiast forum.
 Analyze the provided text and images for toxic behavior: hate speech, slurs, harassment, sexual content, or graphic violence.
 Respond ONLY with a JSON object of this structure (do not output markdown format, only valid JSON):
 {

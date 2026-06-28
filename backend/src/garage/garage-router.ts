@@ -2,6 +2,7 @@ import express from "express";
 import { requireAuth } from "../auth-middleware";
 import { GarageService } from "./garage-service";
 import { GarageRepository } from "./garage-repository";
+import { UserRepository } from "../user/user-repository";
 import { StatusCodes } from "http-status-codes";
 
 import { ModerationService } from "../moderation/moderation-service";
@@ -9,6 +10,7 @@ import { ModerationRepository } from "../moderation/moderation-repository";
 
 const garageRepository = new GarageRepository();
 const garageService = new GarageService(garageRepository);
+const userRepository = new UserRepository();
 const moderationService = new ModerationService();
 const moderationRepository = new ModerationRepository();
 
@@ -31,7 +33,9 @@ garageRouter.post("/users/garage", requireAuth, async (req: any, res) => {
     try {
         const { make, model, year, mods } = req.body;
         let { imageUrl } = req.body;
-        const uid = req.user.uid;
+        const user = userRepository.findUserByUsername(req.user.username);
+        if (!user) return res.status(StatusCodes.UNAUTHORIZED).send("User not found");
+        const uid = user.uid;
 
         if (!make || !model || !year) {
             return res.status(StatusCodes.BAD_REQUEST).send("Make, model, and year are required");
@@ -67,7 +71,9 @@ garageRouter.post("/users/garage", requireAuth, async (req: any, res) => {
 garageRouter.delete("/users/garage/:id", requireAuth, (req: any, res) => {
     try {
         const gvid = Number(req.params.id);
-        const uid = req.user.uid;
+        const user = userRepository.findUserByUsername(req.user.username);
+        if (!user) return res.status(StatusCodes.UNAUTHORIZED).send("User not found");
+        const uid = user.uid;
 
         if (isNaN(gvid)) {
             return res.status(StatusCodes.BAD_REQUEST).send("Invalid vehicle ID");

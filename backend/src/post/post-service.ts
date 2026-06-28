@@ -32,8 +32,8 @@ export class PostService {
         return this.postRepository.findPostByCategory(categoryId);
     }
 
-    public createPost(post: Post): void {
-        this.postRepository.createPost(post);
+    public createPost(post: Post): number {
+        return this.postRepository.createPost(post);
     }
 
     public createReply(post: Post): void {

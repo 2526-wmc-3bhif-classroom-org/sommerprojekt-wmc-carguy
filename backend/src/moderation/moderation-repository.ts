@@ -1,5 +1,5 @@
 import { DB } from "../database";
-import { AI_PROVIDER, AI_MODEL } from "../config";
+import { aiConfig } from "../config";
 
 export interface ModerationLogEntry {
     mlid: number;
@@ -10,29 +10,32 @@ export interface ModerationLogEntry {
     provider: string;
     model: string | null;
     timestamp: string;
+    referenceId?: number | null;
 }
 
 export class ModerationRepository {
-    public logModeration(type: string, content: string, status: string, reason: string | null): void {
+    public logModeration(type: string, content: string, status: string, reason: string | null, referenceId?: number | null): void {
         const db = DB.getInstance();
         db.prepare(`
-            INSERT INTO ModerationLog (Type, Content, Status, Reason, Provider, Model, Timestamp)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO ModerationLog (Type, Content, Status, Reason, Provider, Model, Timestamp, ReferenceID)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
             type,
             content,
             status,
             reason,
-            AI_PROVIDER || "local",
-            AI_MODEL || null,
-            new Date().toISOString()
+            aiConfig.provider || "local",
+            aiConfig.model || null,
+            new Date().toISOString(),
+            referenceId ?? null
         );
     }
 
     public getLogs(limit: number = 100): ModerationLogEntry[] {
         const db = DB.getInstance();
         const rows = db.prepare(`
-            SELECT MLID as mlid, Type as type, Content as content, Status as status, Reason as reason, Provider as provider, Model as model, Timestamp as timestamp
+            SELECT MLID as mlid, Type as type, Content as content, Status as status, Reason as reason,
+                   Provider as provider, Model as model, Timestamp as timestamp, ReferenceID as referenceId
             FROM ModerationLog
             ORDER BY MLID DESC
             LIMIT ?
@@ -55,7 +58,7 @@ export class ModerationRepository {
         activeModel: string;
     } {
         const db = DB.getInstance();
-        
+
         const total = db.prepare("SELECT COUNT(*) as count FROM ModerationLog").get() as { count: number };
         const passed = db.prepare("SELECT COUNT(*) as count FROM ModerationLog WHERE Status = 'passed'").get() as { count: number };
         const blocked = db.prepare("SELECT COUNT(*) as count FROM ModerationLog WHERE Status = 'blocked'").get() as { count: number };
@@ -66,8 +69,8 @@ export class ModerationRepository {
             passed: passed?.count || 0,
             blocked: blocked?.count || 0,
             flagged: flagged?.count || 0,
-            activeProvider: AI_PROVIDER || "local",
-            activeModel: AI_MODEL || "n/a"
+            activeProvider: aiConfig.provider || "local",
+            activeModel: aiConfig.model || "n/a"
         };
     }
 }

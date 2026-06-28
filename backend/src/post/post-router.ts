@@ -91,19 +91,20 @@ postRouter.post("/post", requireAuth, async (req, res) => {
             return res.status(400).send(`Content blocked by AI Safety: Inappropriate language or content detected.`);
         }
 
+        // Flag sensitive images before saving the post
+        let moderationStatus = "passed";
+        let moderationReason: string | null = null;
         if (moderation.flaggedImages && moderation.flaggedImages.length > 0 && post.imageUrls) {
-            post.imageUrls = post.imageUrls.map(img => {
-                if (moderation.flaggedImages?.includes(img)) {
-                    return `flagged:${img}`;
-                }
-                return img;
-            });
-            moderationRepository.logModeration("post", textContent, "flagged", `Flagged ${moderation.flaggedImages.length} image(s)`);
-        } else {
-            moderationRepository.logModeration("post", textContent, "passed", null);
+            post.imageUrls = post.imageUrls.map(img =>
+                moderation.flaggedImages?.includes(img) ? `flagged:${img}` : img
+            );
+            moderationStatus = "flagged";
+            moderationReason = `Flagged ${moderation.flaggedImages.length} image(s)`;
         }
 
-        postService.createPost(post);
+        const pid = postService.createPost(post);
+        moderationRepository.logModeration("post", textContent, moderationStatus, moderationReason, pid);
+
         res.status(201).json({ message: "Post created" });
     } catch (e: any) {
         res.status(500).send(e.message);

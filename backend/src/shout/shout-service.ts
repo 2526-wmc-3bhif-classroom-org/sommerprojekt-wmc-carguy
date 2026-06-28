@@ -9,15 +9,6 @@ export class ShoutService {
     }
 
     public postShout(content: string, userId: number): void {
-        // Basic offline moderation check (slurs/bad words) - AI moderation will hook in here as well
-        const normalized = content.toLowerCase();
-        const banned = ["slur", "offensive", "abuse"]; // Basic check, will be enhanced in AI moderator task
-        for (const word of banned) {
-            if (normalized.includes(word)) {
-                throw new Error("Message contains flagged terms. Keep the community clean!");
-            }
-        }
-
         this.shoutRepository.createShout(content, userId);
     }
 

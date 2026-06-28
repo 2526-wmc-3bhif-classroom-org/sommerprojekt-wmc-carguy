@@ -276,10 +276,10 @@ export class PostRepository {
         })) as Post[];
     }
 
-    public createPost(post: Post): void {
+    public createPost(post: Post): number {
         const db = DB.getInstance();
 
-        db.prepare(`
+        const result = db.prepare(`
             INSERT INTO Post
             (Title, Content, UID, ForumID, ParentPID, Post_Category_id, PublishedAt, ImageUrls, PollData, Likes, Dislikes)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -296,6 +296,7 @@ export class PostRepository {
             0,
             0
         );
+        return Number(result.lastInsertRowid);
     }
 
     public likePost(id: number): void {

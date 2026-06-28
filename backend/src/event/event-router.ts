@@ -27,10 +27,15 @@ eventRouter.get("/events", (req, res) => {
 eventRouter.post("/events", requireAuth, async (req: any, res) => {
     try {
         const { title, description, location, eventDate } = req.body;
-        const uid = req.user.uid;
 
         if (!title || !description || !location || !eventDate) {
             return res.status(StatusCodes.BAD_REQUEST).send("All event fields are required");
+        }
+
+        // Resolve uid from username in JWT (uid is not embedded in the token)
+        const user = userRepository.findUserByUsername(req.user.username);
+        if (!user) {
+            return res.status(StatusCodes.UNAUTHORIZED).send("User not found");
         }
 
         const textContent = `${title} ${description} ${location}`;
@@ -43,7 +48,7 @@ eventRouter.post("/events", requireAuth, async (req: any, res) => {
 
         moderationRepository.logModeration("event", textContent, "passed", null);
 
-        eventService.createEvent(title.trim(), description.trim(), location.trim(), eventDate, uid);
+        eventService.createEvent(title.trim(), description.trim(), location.trim(), eventDate, user.uid);
         res.status(StatusCodes.CREATED).json({ message: "Event created successfully" });
     } catch (e: any) {
         res.status(StatusCodes.BAD_REQUEST).send(e.message);
@@ -53,7 +58,6 @@ eventRouter.post("/events", requireAuth, async (req: any, res) => {
 eventRouter.post("/events/:id/rsvp", requireAuth, (req: any, res) => {
     try {
         const eid = Number(req.params.id);
-        const uid = req.user.uid;
         const { status } = req.body;
 
         if (isNaN(eid)) {
@@ -63,14 +67,19 @@ eventRouter.post("/events/:id/rsvp", requireAuth, (req: any, res) => {
             return res.status(StatusCodes.BAD_REQUEST).send("Status is required");
         }
 
-        eventService.submitRsvp(eid, uid, status);
+        // Resolve uid from username in JWT
+        const user = userRepository.findUserByUsername(req.user.username);
+        if (!user) {
+            return res.status(StatusCodes.UNAUTHORIZED).send("User not found");
+        }
+
+        eventService.submitRsvp(eid, user.uid, status);
         res.json({ message: "RSVP updated successfully" });
     } catch (e: any) {
         res.status(StatusCodes.BAD_REQUEST).send(e.message);
     }
 });
 
-// GET /events/:id/comments
 eventRouter.get("/events/:id/comments", (req, res) => {
     try {
         const eid = Number(req.params.id);
@@ -90,23 +99,30 @@ eventRouter.get("/events/:id/comments", (req, res) => {
     }
 });
 
-// POST /events/:id/comments
 eventRouter.post("/events/:id/comments", requireAuth, async (req: any, res) => {
     try {
         const eid = Number(req.params.id);
-        const uid = req.user.uid;
         const { content } = req.body;
+
         if (isNaN(eid)) return res.status(400).send("Invalid event ID");
         if (!content || !content.trim()) return res.status(400).send("Content is required");
+
+        // Resolve uid from username in JWT
+        const user = userRepository.findUserByUsername(req.user.username);
+        if (!user) {
+            return res.status(StatusCodes.UNAUTHORIZED).send("User not found");
+        }
+
         const moderation = await moderationService.moderateContent(content);
         if (!moderation.safe) {
             moderationRepository.logModeration("event_comment", content, "blocked", moderation.reason || "Blocked");
             return res.status(400).send("Comment blocked by moderation.");
         }
         moderationRepository.logModeration("event_comment", content, "passed", null);
+
         const db = require('../database').DB.getInstance();
         db.prepare(`INSERT INTO EventComment (EID, UID, Content, PublishedAt) VALUES (?, ?, ?, ?)`)
-          .run(eid, uid, content.trim(), new Date().toISOString());
+          .run(eid, user.uid, content.trim(), new Date().toISOString());
         res.status(201).json({ message: "Comment posted" });
     } catch (e: any) {
         res.status(500).send(e.message);

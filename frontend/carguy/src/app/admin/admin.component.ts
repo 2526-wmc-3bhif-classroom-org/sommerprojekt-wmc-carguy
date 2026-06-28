@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
@@ -15,6 +16,7 @@ interface ModerationLogEntry {
   provider: string;
   model: string | null;
   timestamp: string;
+  referenceId?: number | null;
 }
 
 interface ModerationStats {
@@ -26,10 +28,17 @@ interface ModerationStats {
   activeModel: string;
 }
 
+interface AISettings {
+  provider: string;
+  model: string;
+  apiUrl: string;
+  hasApiKey: boolean;
+}
+
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './admin.component.html'
 })
 export class AdminComponent implements OnInit {
@@ -42,11 +51,20 @@ export class AdminComponent implements OnInit {
   stats: ModerationStats | null = null;
   isLoading = true;
 
+  settings: AISettings | null = null;
+  editProvider = 'local';
+  editModel = '';
+  editApiKey = '';
+  editApiUrl = '';
+  savingSettings = false;
+  settingsError = '';
+  settingsSaved = false;
+
+  readonly providers = ['local', 'gemini', 'openai', 'ollama'];
+
   getHeaders() {
     const token = this.userService.getToken();
-    return new HttpHeaders({
-      'Authorization': `Bearer ${token || ''}`
-    });
+    return new HttpHeaders({ 'Authorization': `Bearer ${token || ''}` });
   }
 
   async ngOnInit() {
@@ -56,7 +74,7 @@ export class AdminComponent implements OnInit {
       return;
     }
     this.isAdmin = true;
-    await this.loadData();
+    await Promise.all([this.loadData(), this.loadSettings()]);
   }
 
   async loadData() {
@@ -75,6 +93,36 @@ export class AdminComponent implements OnInit {
     }
   }
 
+  async loadSettings() {
+    try {
+      this.settings = await firstValueFrom(this.http.get<AISettings>(`${environment.apiBaseUrl}/admin/moderation/settings`, { headers: this.getHeaders() }));
+      this.editProvider = this.settings?.provider || 'local';
+      this.editModel = this.settings?.model || '';
+      this.editApiUrl = this.settings?.apiUrl || '';
+    } catch (e) {
+      console.error('Failed to load AI settings', e);
+    }
+  }
+
+  async saveSettings() {
+    this.savingSettings = true;
+    this.settingsError = '';
+    this.settingsSaved = false;
+    try {
+      const body: any = { provider: this.editProvider, model: this.editModel, apiUrl: this.editApiUrl };
+      if (this.editApiKey) body.apiKey = this.editApiKey;
+      await firstValueFrom(this.http.post<void>(`${environment.apiBaseUrl}/admin/moderation/settings`, body, { headers: this.getHeaders() }));
+      this.editApiKey = '';
+      this.settingsSaved = true;
+      await Promise.all([this.loadSettings(), this.loadData()]);
+      setTimeout(() => this.settingsSaved = false, 3000);
+    } catch (e: any) {
+      this.settingsError = 'Failed to update settings';
+    } finally {
+      this.savingSettings = false;
+    }
+  }
+
   async clearLogs() {
     if (!confirm('Are you sure you want to clear all moderation logs?')) return;
     try {
@@ -83,5 +131,18 @@ export class AdminComponent implements OnInit {
     } catch (e) {
       console.error('Failed to clear logs', e);
     }
+  }
+
+  navigateToContent(log: ModerationLogEntry) {
+    if (!log.referenceId) return;
+    if (log.type === 'post') {
+      this.router.navigate(['/post', log.referenceId]);
+    } else if (log.type === 'event' || log.type === 'event_comment') {
+      this.router.navigate(['/events']);
+    }
+  }
+
+  isNavigable(log: ModerationLogEntry): boolean {
+    return !!log.referenceId && (log.type === 'post' || log.type === 'event' || log.type === 'event_comment');
   }
 }

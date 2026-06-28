@@ -3,14 +3,11 @@
   <header class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
       <h1 class="text-3xl font-extrabold text-accent">Admin Dashboard</h1>
-      <p class="text-base-content/60 text-sm mt-1">CarGuy real-time content safety control and moderation system logs
-      </p>
+      <p class="text-base-content/60 text-sm mt-1">CarGuy real-time content safety control and moderation system logs</p>
     </div>
     <div class="flex gap-3">
-      <button (click)="loadData()" class="btn btn-sm btn-ghost border border-base-content/10 rounded-xl">🔄
-        Refresh</button>
-      <button (click)="clearLogs()" [disabled]="logs.length === 0"
-        class="btn btn-sm btn-error btn-outline rounded-xl">🧹 Clear Logs</button>
+      <button (click)="loadData()" class="btn btn-sm btn-ghost border border-base-content/10 rounded-xl">🔄 Refresh</button>
+      <button (click)="clearLogs()" [disabled]="logs.length === 0" class="btn btn-sm btn-error btn-outline rounded-xl">🧹 Clear Logs</button>
     </div>
   </header>
 
@@ -60,27 +57,34 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let log of logs" class="border-b border-base-content/5 hover:bg-white/5 transition-colors">
+              <tr *ngFor="let log of logs"
+                  class="border-b border-base-content/5 transition-colors"
+                  [class.hover:bg-primary/5]="isNavigable(log)"
+                  [class.cursor-pointer]="isNavigable(log)"
+                  [class.hover:bg-white/5]="!isNavigable(log)"
+                  (click)="navigateToContent(log)">
                 <td class="font-bold">
-                  <span class="badge badge-sm font-semibold uppercase bg-base-300 text-base-content">{{ log.type
-                    }}</span>
+                  <span class="badge badge-sm font-semibold uppercase bg-base-300 text-base-content">{{ log.type }}</span>
                 </td>
-                <td class="max-w-xs truncate" [title]="log.content">
-                  {{ log.content }}
+                <td class="max-w-xs">
+                  <div class="flex items-center gap-1.5">
+                    <span class="truncate" [title]="log.content">{{ log.content }}</span>
+                    <svg *ngIf="isNavigable(log)" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-primary/60 shrink-0"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  </div>
                 </td>
                 <td>
                   <span class="badge badge-sm font-extrabold text-xs" [ngClass]="{
-                          'bg-success/20 text-success border-success/30': log.status === 'passed',
-                          'bg-error/20 text-error border-error/30': log.status === 'blocked',
-                          'bg-warning/20 text-warning border-warning/30': log.status === 'flagged'
-                        }">
+                    'bg-success/20 text-success border-success/30': log.status === 'passed',
+                    'bg-error/20 text-error border-error/30': log.status === 'blocked',
+                    'bg-warning/20 text-warning border-warning/30': log.status === 'flagged'
+                  }">
                     {{ log.status }}
                   </span>
                 </td>
-                <td class="text-xs italic text-base-content/70">
+                <td class="text-xs italic text-base-content/70 max-w-xs truncate" [title]="log.reason || ''">
                   {{ log.reason || '-' }}
                 </td>
-                <td class="text-xs text-base-content/60">
+                <td class="text-xs text-base-content/60 whitespace-nowrap">
                   {{ log.timestamp | date:'short' }}
                 </td>
               </tr>
@@ -90,26 +94,72 @@
       </div>
     </div>
 
-    <!-- Right Sidebar Configuration -->
+    <!-- Right Sidebar -->
     <div class="space-y-6">
+
+      <!-- AI Model Changer -->
+      <div class="premium-card p-6 rounded-3xl border border-base-content/10 bg-base-200/50">
+        <h2 class="text-lg font-bold text-primary mb-4 flex items-center gap-1.5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+          AI Moderation Engine
+        </h2>
+
+        <div class="space-y-4">
+          <div>
+            <label class="label text-xs font-semibold uppercase tracking-wider text-base-content/60 p-0 mb-1.5">Provider</label>
+            <select [(ngModel)]="editProvider" class="select select-bordered select-sm w-full bg-base-100 border-base-content/10 focus:border-primary text-sm">
+              <option *ngFor="let p of providers" [value]="p">{{ p | uppercase }}</option>
+            </select>
+          </div>
+
+          <div *ngIf="editProvider !== 'local'">
+            <label class="label text-xs font-semibold uppercase tracking-wider text-base-content/60 p-0 mb-1.5">Model</label>
+            <input [(ngModel)]="editModel" [placeholder]="editProvider === 'gemini' ? 'gemini-1.5-flash' : editProvider === 'openai' ? 'gpt-4o-mini' : 'llama3'"
+                   class="input input-bordered input-sm w-full bg-base-100 border-base-content/10 focus:border-primary text-sm" />
+          </div>
+
+          <div *ngIf="editProvider !== 'local'">
+            <label class="label text-xs font-semibold uppercase tracking-wider text-base-content/60 p-0 mb-1.5">
+              API Key {{ settings?.hasApiKey ? '(currently set)' : '(not set)' }}
+            </label>
+            <input [(ngModel)]="editApiKey" type="password" placeholder="Leave blank to keep existing"
+                   class="input input-bordered input-sm w-full bg-base-100 border-base-content/10 focus:border-primary text-sm" />
+          </div>
+
+          <div *ngIf="editProvider === 'ollama'">
+            <label class="label text-xs font-semibold uppercase tracking-wider text-base-content/60 p-0 mb-1.5">API URL</label>
+            <input [(ngModel)]="editApiUrl" placeholder="http://localhost:11434"
+                   class="input input-bordered input-sm w-full bg-base-100 border-base-content/10 focus:border-primary text-sm" />
+          </div>
+
+          <div *ngIf="settingsError" class="text-xs text-error">{{ settingsError }}</div>
+          <div *ngIf="settingsSaved" class="text-xs text-success font-semibold">✓ Settings saved successfully</div>
+
+          <button (click)="saveSettings()" [disabled]="savingSettings" class="btn btn-primary btn-sm w-full rounded-xl">
+            <span *ngIf="savingSettings" class="loading loading-spinner loading-xs"></span>
+            <span>{{ savingSettings ? 'Saving...' : 'Apply Settings' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- System Info -->
       <div class="premium-card p-6 rounded-3xl border border-base-content/10 bg-base-200/50">
         <h2 class="text-lg font-bold text-accent mb-4 flex items-center gap-1.5">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
           </svg>
           System Info
         </h2>
 
-        <div class="space-y-4 text-sm" *ngIf="stats">
+        <div class="space-y-3 text-sm" *ngIf="stats">
           <div class="flex justify-between py-2 border-b border-base-content/10">
-            <span class="text-base-content/60">AI Moderation Engine:</span>
+            <span class="text-base-content/60">Active Provider:</span>
             <span class="font-bold uppercase text-primary">{{ stats.activeProvider }}</span>
           </div>
           <div class="flex justify-between py-2 border-b border-base-content/10">
-            <span class="text-base-content/60">Model Configured:</span>
-            <span class="font-mono text-xs text-accent font-semibold">{{ stats.activeModel }}</span>
+            <span class="text-base-content/60">Active Model:</span>
+            <span class="font-mono text-xs text-accent font-semibold">{{ stats.activeModel || 'n/a' }}</span>
           </div>
           <div class="flex justify-between py-2">
             <span class="text-base-content/60">Security Mode:</span>

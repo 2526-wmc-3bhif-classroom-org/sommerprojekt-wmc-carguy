@@ -63,6 +63,13 @@ export class DB {
             // Already migrated or table not created yet
         }
 
+        try {
+            connection.exec("ALTER TABLE ModerationLog ADD COLUMN ReferenceID Integer;");
+            console.log("Migration: Added ReferenceID column to ModerationLog table.");
+        } catch (_) {
+            // Already migrated or table not created yet
+        }
+
         connection.exec(`
             create table if not exists User (
                                                 UID Integer not null,
@@ -894,6 +901,317 @@ export class DB {
             }
         } catch (err) {
             console.error("Error seeding flagged post:", err);
+        }
+
+        // Seed extended events (20+ total) - only runs if extended set not yet present
+        try {
+            const hasExtended = connection.prepare("SELECT COUNT(*) as count FROM Event WHERE Title = 'Goodwood Festival of Speed'").get() as { count: number } | undefined;
+            if (!hasExtended || hasExtended.count === 0) {
+                console.log("Seeding extended events...");
+                const users = connection.prepare("SELECT UID FROM User LIMIT 4").all() as { UID: number }[];
+                if (users.length > 0) {
+                    const u0 = users[0].UID;
+                    const u1 = (users[1] ?? users[0]).UID;
+                    const u2 = (users[2] ?? users[0]).UID;
+                    const u3 = (users[3] ?? users[0]).UID;
+
+                    const insertE = connection.prepare(`INSERT INTO Event (Title, Description, Location, EventDate, UID) VALUES (?, ?, ?, ?, ?)`);
+                    const insertR = connection.prepare(`INSERT INTO EventRSVP (EID, UID, Status) VALUES (?, ?, ?) ON CONFLICT(EID, UID) DO UPDATE SET Status = ?`);
+                    const insertC = connection.prepare(`INSERT INTO EventComment (EID, UID, Content, PublishedAt) VALUES (?, ?, ?, ?)`);
+
+                    const future = (days: number, hour = 10) => {
+                        const d = new Date();
+                        d.setDate(d.getDate() + days);
+                        d.setHours(hour, 0, 0, 0);
+                        return d.toISOString();
+                    };
+                    const past = (days: number, hour = 14) => {
+                        const d = new Date();
+                        d.setDate(d.getDate() - days);
+                        d.setHours(hour, 0, 0, 0);
+                        return d.toISOString();
+                    };
+                    const ago = (mins: number) => new Date(Date.now() - mins * 60000).toISOString();
+
+                    const seed: { title: string; desc: string; loc: string; date: string; uid: number; rsvps: [number, string][]; comments: [number, string][] }[] = [
+                        {
+                            title: "Goodwood Festival of Speed",
+                            desc: "The world's greatest celebration of motorsport on the legendary Goodwood hill. Bring your cameras!",
+                            loc: "Goodwood Estate, Chichester, UK",
+                            date: future(30, 9),
+                            uid: u1,
+                            rsvps: [[u0, "yes"], [u2, "yes"], [u3, "maybe"]],
+                            comments: [
+                                [u0, "This is on my bucket list every year. Finally going!"],
+                                [u2, "Anyone else booking the grandstand tickets? They sell out fast."],
+                                [u3, "Heard a McLaren P1 GTR will be doing the hillclimb run 🔥"],
+                            ]
+                        },
+                        {
+                            title: "Monaco Historic Grand Prix",
+                            desc: "Vintage racing legends return to the streets of Monaco. F1 classics, sports prototypes, and GT heroes.",
+                            loc: "Circuit de Monaco, Monte Carlo",
+                            date: future(45, 14),
+                            uid: u2,
+                            rsvps: [[u0, "maybe"], [u1, "yes"]],
+                            comments: [
+                                [u1, "Monaco is always spectacular. The sounds of those old engines on the streets is unreal."],
+                                [u0, "Anyone know if the '67 Ferrari 312 will be racing this year?"],
+                            ]
+                        },
+                        {
+                            title: "Suzuka Circuit Open Track Day",
+                            desc: "Tackle the legendary figure-of-eight Suzuka layout. All levels welcome, instructor sessions available.",
+                            loc: "Suzuka International Racing Course, Japan",
+                            date: future(18, 8),
+                            uid: u0,
+                            rsvps: [[u1, "yes"], [u2, "yes"], [u3, "yes"]],
+                            comments: [
+                                [u2, "Suzuka is technically demanding. Anyone doing the instructor session?"],
+                                [u1, "The Spoon Curve section always gets me. Need more practice."],
+                                [u3, "R34 GT-R is ready to go! See you on the 130R!"],
+                            ]
+                        },
+                        {
+                            title: "Pebble Beach Concours d'Elegance",
+                            desc: "The world's most prestigious classic car show on the 18th fairway at Pebble Beach Golf Links.",
+                            loc: "Pebble Beach, Monterey, California",
+                            date: future(60, 10),
+                            uid: u3,
+                            rsvps: [[u0, "maybe"], [u2, "yes"]],
+                            comments: [
+                                [u0, "If there's a pre-war Bugatti winning Best of Show again I'll lose my mind (in a good way)."],
+                                [u2, "The cars here make Goodwood look like a grocery run. No offense 😂"],
+                            ]
+                        },
+                        {
+                            title: "Brands Hatch Sprint Day",
+                            desc: "Short-circuit sprint competition in the iconic Indy loop. Perfect for club racers and first-timers.",
+                            loc: "Brands Hatch Circuit, Kent, UK",
+                            date: future(10, 9),
+                            uid: u1,
+                            rsvps: [[u0, "yes"], [u3, "yes"]],
+                            comments: [
+                                [u3, "Brands Hatch Indy is short but savage. Paddock Hill Bend will sort the men from the boys."],
+                                [u0, "Entered in the sub-1400cc class. Hoping my MX-5 can hold its own!"],
+                            ]
+                        },
+                        {
+                            title: "Fuji Speedway Mountain Run",
+                            desc: "Free lap session at Fuji with Mt Fuji as a backdrop. One of the most scenic track days on Earth.",
+                            loc: "Fuji Speedway, Oyama, Japan",
+                            date: future(22, 7),
+                            uid: u2,
+                            rsvps: [[u0, "yes"], [u1, "maybe"], [u3, "yes"]],
+                            comments: [
+                                [u0, "The main straight here is so long you'll run out of gears. What a circuit."],
+                                [u3, "Fuji is only an hour from Tokyo — making a full weekend of it!"],
+                            ]
+                        },
+                        {
+                            title: "Los Angeles Cars & Coffee",
+                            desc: "Sunday morning cruise culture meets premium builds. From barn finds to SEMA-worthy show cars.",
+                            loc: "Rose Bowl Parking Lot, Pasadena, California",
+                            date: future(3, 7),
+                            uid: u0,
+                            rsvps: [[u1, "yes"], [u2, "yes"], [u3, "maybe"]],
+                            comments: [
+                                [u1, "LA's car scene is second to none. The diversity of builds here is insane."],
+                                [u2, "Anyone coming from the valley? Happy to carpool."],
+                                [u3, "Bringing the Supra this time. Get ready for the crowds 😅"],
+                            ]
+                        },
+                        {
+                            title: "Bathurst Night Laps",
+                            desc: "Experience the legendary Mount Panorama under floodlights. A bucket-list track day for any enthusiast.",
+                            loc: "Mount Panorama, Bathurst, Australia",
+                            date: future(35, 19),
+                            uid: u3,
+                            rsvps: [[u1, "yes"], [u2, "yes"]],
+                            comments: [
+                                [u1, "Conrod Straight at night with a V8 soundtrack. This is going to be epic."],
+                                [u2, "Hell Corner and The Cutting at night sound terrifying but I'm in."],
+                            ]
+                        },
+                        {
+                            title: "Mid-Ohio Open Lapping Day",
+                            desc: "One of America's most technical circuits. Carousel, Keyhole, and the Chicane await. All cars welcome.",
+                            loc: "Mid-Ohio Sports Car Course, Ohio, USA",
+                            date: future(14, 8),
+                            uid: u1,
+                            rsvps: [[u0, "yes"], [u3, "maybe"]],
+                            comments: [
+                                [u0, "Mid-Ohio rewards smooth driving more than any other circuit. Perfect for learning trail braking."],
+                            ]
+                        },
+                        {
+                            title: "Atlanta Cars & Culture Expo",
+                            desc: "Southeast's biggest automotive gathering. Modified builds, OEM exotics, and everything in between.",
+                            loc: "Piedmont Park, Atlanta, Georgia",
+                            date: future(7, 10),
+                            uid: u2,
+                            rsvps: [[u0, "yes"], [u1, "yes"], [u3, "yes"]],
+                            comments: [
+                                [u1, "Atlanta always brings out the clean builds. Excited to see who wins Best in Show."],
+                                [u3, "Driving down from Charlotte — see you all there!"],
+                                [u0, "The vendor booths are great too. Always find obscure JDM parts here."],
+                            ]
+                        },
+                        {
+                            title: "Cape Town Classic Car Rally",
+                            desc: "Drive the scenic Cape Winelands in a convoy of pre-1990 classics. Scenic stops and optional time trials.",
+                            loc: "V&A Waterfront, Cape Town, South Africa",
+                            date: future(50, 9),
+                            uid: u0,
+                            rsvps: [[u1, "maybe"], [u2, "yes"]],
+                            comments: [
+                                [u2, "The backdrop of Table Mountain with vintage cars is unbeatable."],
+                                [u1, "Does anyone know if modern classics (post-1980) are accepted?"],
+                            ]
+                        },
+                        {
+                            title: "Dubai Supercar Cruise Night",
+                            desc: "The desert city's iconic midnight cruise. Lamborghinis, Bugattis, and everything in between hitting Sheikh Zayed Road.",
+                            loc: "Dubai Mall Parking, Dubai, UAE",
+                            date: future(25, 22),
+                            uid: u3,
+                            rsvps: [[u0, "maybe"], [u2, "yes"]],
+                            comments: [
+                                [u2, "Sheikh Zayed at midnight with a Huracan. Living the dream."],
+                                [u0, "Is this open to non-supercar cars too or only exotics?"],
+                            ]
+                        },
+                        {
+                            title: "Rio Hillclimb Festival",
+                            desc: "Brazilian hillclimb tradition meets modern performance. Open to all cars, timed runs, great atmosphere.",
+                            loc: "Estrada das Canoas, Rio de Janeiro, Brazil",
+                            date: future(40, 11),
+                            uid: u1,
+                            rsvps: [[u3, "maybe"]],
+                            comments: [
+                                [u3, "The Brazilian hillclimb scenes in old motorsport footage are legendary. Want to experience this."],
+                            ]
+                        },
+                        {
+                            title: "Sydney Drift Day",
+                            desc: "Drift practice and demo sessions at Sydney Motorsport Park. Instructors available for beginners.",
+                            loc: "Sydney Motorsport Park, Eastern Creek, Australia",
+                            date: future(16, 10),
+                            uid: u2,
+                            rsvps: [[u0, "yes"], [u1, "yes"]],
+                            comments: [
+                                [u0, "Finally getting my S15 out for some proper seat time. So pumped!"],
+                                [u1, "Are the passenger ride sessions included in the entry fee?"],
+                                [u2, "Yes! Passenger rides in the instructor car are included. It's wild."],
+                            ]
+                        },
+                        {
+                            title: "JDM Summit: Kyoto Edition",
+                            desc: "The premier JDM gathering returns to Kyoto. NSXs, GT-Rs, RX-7s, and more fill the temple parking.",
+                            loc: "Fushimi Inari, Kyoto, Japan",
+                            date: future(28, 9),
+                            uid: u0,
+                            rsvps: [[u1, "yes"], [u2, "yes"], [u3, "yes"]],
+                            comments: [
+                                [u1, "JDM Summit never disappoints. The community here is the best."],
+                                [u2, "R34 GT-R next to a temple gate. That's art."],
+                                [u3, "Flying in from the UK for this. Worth every penny."],
+                                [u0, "See everyone there! Will be the biggest JDM lineup in Japan this year."],
+                            ]
+                        },
+                        {
+                            title: "Nismo Festival at Fuji",
+                            desc: "Nissan's annual heritage festival featuring GT-Rs, Zs, and the full Nismo racing team history on display.",
+                            loc: "Fuji Speedway, Oyama, Japan",
+                            date: future(55, 9),
+                            uid: u3,
+                            rsvps: [[u0, "yes"], [u2, "maybe"]],
+                            comments: [
+                                [u0, "The Nismo GT-Rs doing demo laps is always a highlight. Can't wait."],
+                                [u2, "Any word on if the R390 GT1 will make an appearance this year?"],
+                            ]
+                        },
+                    ];
+
+                    for (const ev of seed) {
+                        try {
+                            const r = insertE.run(ev.title, ev.desc, ev.loc, ev.date, ev.uid);
+                            const eid = Number(r.lastInsertRowid);
+                            for (const [uid, status] of ev.rsvps) {
+                                insertR.run(eid, uid, status, status);
+                            }
+                            for (const [uid, msg] of ev.comments) {
+                                insertC.run(eid, uid, msg, ago(Math.floor(Math.random() * 1440 + 30)));
+                            }
+                        } catch (innerErr) {
+                            console.error("Error seeding extended event:", ev.title, innerErr);
+                        }
+                    }
+                }
+            }
+        } catch (err) {
+            console.error("Error seeding extended events:", err);
+        }
+
+        // --- Garage seed data (sentinel: admin's R34) ---
+        try {
+            const garageExists = connection.prepare(
+                "SELECT COUNT(*) as cnt FROM GarageVehicle WHERE Make = 'Nissan' AND Model = 'Skyline GT-R R34' AND UID = 1"
+            ).get() as any;
+
+            if (!garageExists || garageExists.cnt === 0) {
+                const insertV = connection.prepare(
+                    "INSERT INTO GarageVehicle (UID, Make, Model, Year, Mods, ImageUrl) VALUES (?, ?, ?, ?, ?, ?)"
+                );
+
+                // admin (UID=1)
+                insertV.run(1, "Nissan", "Skyline GT-R R34", 1999,
+                    "Nismo N1 turbos, HKS intercooler, Tomei exhaust, Bride bucket seats, RAYS Volk TE37 17\"",
+                    "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800");
+                insertV.run(1, "Porsche", "911 GT3 RS", 2023,
+                    "Akrapovic titanium exhaust, Clubsport package, carbon fibre bonnet, Michelin Pilot Sport Cup 2",
+                    "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=800");
+                insertV.run(1, "Toyota", "GR Yaris", 2021,
+                    "TRD aero kit, Forge Motorsport induction kit, Whiteline sway bars, Enkei RPF1 wheels",
+                    "https://images.unsplash.com/photo-1623005329973-d44e4f6e8219?w=800");
+
+                // driftkingFD (UID=2)
+                insertV.run(2, "Mazda", "RX-7 FD3S", 1997,
+                    "Twin turbo rebuild, RE Amemiya body kit, HKS full exhaust, Bride Zeta III seats, Enkei RP-F1",
+                    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800");
+                insertV.run(2, "Nissan", "Silvia S15 Spec-R", 2000,
+                    "SR20DET T28 single turbo, HPI wastegate, Cusco coilovers, Nismo LSD, Works Bell boss kit",
+                    "https://images.unsplash.com/photo-1610714218830-a5ec8f93d61b?w=800");
+                insertV.run(2, "Toyota", "Supra A80", 1994,
+                    "2JZ-GTE single turbo 600whp, Garrett GTX3582, AEM standalone ECU, Recaro SPG seats, BBS RS wheels",
+                    "https://images.unsplash.com/photo-1614026480249-f26ad896d4f7?w=800");
+
+                // gt3_pilot (UID=3)
+                insertV.run(3, "Porsche", "911 GT3 Cup (991)", 2018,
+                    "Full race spec, Bilstein DampTronic, roll cage, Sabelt harness, fire suppression system",
+                    "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800");
+                insertV.run(3, "BMW", "M4 Competition", 2021,
+                    "Eventuri carbon intake, Akrapovic slip-on exhaust, KW V3 coilovers, carbon fibre roof, M Performance brakes",
+                    "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800");
+                insertV.run(3, "Ferrari", "488 Pista", 2018,
+                    "Completely stock — perfection needs no changes",
+                    "https://images.unsplash.com/photo-1592198084033-aade902d1aae?w=800");
+
+                // muscle_legends (UID=4)
+                insertV.run(4, "Ford", "Mustang Shelby GT500", 1969,
+                    "Restored 428 Cobra Jet, Holley carb rebuild, Tremec T-5 manual swap, Magnaflow exhaust, Shelby 10-spoke wheels",
+                    "https://images.unsplash.com/photo-1547744152-14d985cb937f?w=800");
+                insertV.run(4, "Chevrolet", "Camaro Z/28", 1970,
+                    "Numbers-matching 350 V8, Edelbrock intake, Muncie 4-speed, Custom vinyl roof delete, Centerline wheels",
+                    "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800");
+                insertV.run(4, "Dodge", "Challenger Hellcat", 2020,
+                    "Borla ATAK exhaust, cold air intake, Mopar widebody kit, Brembo brake upgrade, SRT performance pages tune",
+                    "https://images.unsplash.com/photo-1611859266238-4b98091d9d9b?w=800");
+
+                console.log("Seeded garage vehicles for all users.");
+            }
+        } catch (err) {
+            console.error("Error seeding garage vehicles:", err);
         }
     }
 }

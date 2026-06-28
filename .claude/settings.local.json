@@ -47,7 +47,18 @@
       "WebFetch(domain:images.unsplash.com)",
       "PowerShell(Start-Sleep 3; Invoke-WebRequest -Uri \"http://localhost:3000/api/posts/trending\" -UseBasicParsing | Select-Object -ExpandProperty StatusCode)",
       "PowerShell($r = Invoke-WebRequest -Uri \"http://localhost:3000/api/posts/trending\" -UseBasicParsing | ConvertFrom-Json; $r | Where-Object { $_.forumId -eq 1 } | Select-Object -First 3 | ForEach-Object { Write-Host \"Post $\\($_.pid\\): $\\($_.title\\)\"; Write-Host \"  Images: $\\($_.imageUrls -join ', '\\)\"; Write-Host \"\" })",
-      "PowerShell($response = Invoke-WebRequest -Uri \"http://localhost:3000/api/posts/trending\" -UseBasicParsing; $json = $response.Content | ConvertFrom-Json; Write-Host \"Total posts: $\\($json.Count\\)\"; $json | Select-Object -First 5 | ForEach-Object { Write-Host \"ForumID=$\\($_.forumId\\) Title=$\\($_.title\\) Images=$\\($_.imageUrls\\)\" })"
+      "PowerShell($response = Invoke-WebRequest -Uri \"http://localhost:3000/api/posts/trending\" -UseBasicParsing; $json = $response.Content | ConvertFrom-Json; Write-Host \"Total posts: $\\($json.Count\\)\"; $json | Select-Object -First 5 | ForEach-Object { Write-Host \"ForumID=$\\($_.forumId\\) Title=$\\($_.title\\) Images=$\\($_.imageUrls\\)\" })",
+      "Bash(Get-ChildItem -Path \"C:\\\\3WMC\\\\CarGuy\" -Force)",
+      "Bash(Select-Object Name, FullName, PSIsContainer)",
+      "Bash(Format-Table)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\3WMC\\\\CarGuy\\\\backend\" | Where-Object { $_.Name -match '\\(package\\\\.json|tsconfig|\\\\.env\\)' } | Select-Object Name)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\3WMC\\\\CarGuy\\\\backend\\\\src\" -Recurse | Where-Object { $_.PSIsContainer } | Select-Object FullName | Sort-Object)",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "PowerShell(Get-Content *)",
+      "PowerShell(Stop-Job *)",
+      "PowerShell(Wait-Job *)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(node_modules/.bin/ng build *)"
     ]
   }
 }
