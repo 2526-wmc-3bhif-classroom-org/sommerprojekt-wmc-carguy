@@ -7,8 +7,8 @@ export class EventService {
         return this.eventRepository.findAllEvents();
     }
 
-    public createEvent(title: string, description: string, location: string, eventDate: string, uid: number): void {
-        this.eventRepository.createEvent(title, description, location, eventDate, uid);
+    public createEvent(title: string, description: string, location: string, eventDate: string, uid: number, lat?: number | null, lng?: number | null): void {
+        this.eventRepository.createEvent(title, description, location, eventDate, uid, lat, lng);
     }
 
     public submitRsvp(eid: number, uid: number, status: string): void {

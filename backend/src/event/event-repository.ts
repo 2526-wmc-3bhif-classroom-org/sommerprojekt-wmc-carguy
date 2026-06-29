@@ -14,6 +14,8 @@ export interface EventModel {
     eventDate: string;
     hostUid: number;
     hostUsername: string;
+    lat: number | null;
+    lng: number | null;
     yesCount: number;
     noCount: number;
     maybeCount: number;
@@ -24,7 +26,7 @@ export class EventRepository {
     public findAllEvents(): EventModel[] {
         const db = DB.getInstance();
         const events = db.prepare(`
-            SELECT e.EID as eid, e.Title as title, e.Description as description, e.Location as location, e.EventDate as eventDate, e.UID as hostUid, u.Username as hostUsername
+            SELECT e.EID as eid, e.Title as title, e.Description as description, e.Location as location, e.EventDate as eventDate, e.UID as hostUid, u.Username as hostUsername, e.Lat as lat, e.Lng as lng
             FROM Event e
             JOIN User u ON e.UID = u.UID
             ORDER BY e.EventDate ASC
@@ -65,6 +67,8 @@ export class EventRepository {
                 eventDate: e.eventDate,
                 hostUid: e.hostUid,
                 hostUsername: e.hostUsername,
+                lat: e.lat ?? null,
+                lng: e.lng ?? null,
                 yesCount,
                 noCount,
                 maybeCount,
@@ -75,12 +79,12 @@ export class EventRepository {
         return results;
     }
 
-    public createEvent(title: string, description: string, location: string, eventDate: string, uid: number): void {
+    public createEvent(title: string, description: string, location: string, eventDate: string, uid: number, lat?: number | null, lng?: number | null): void {
         const db = DB.getInstance();
         db.prepare(`
-            INSERT INTO Event (Title, Description, Location, EventDate, UID)
-            VALUES (?, ?, ?, ?, ?)
-        `).run(title, description, location, eventDate, uid);
+            INSERT INTO Event (Title, Description, Location, EventDate, UID, Lat, Lng)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `).run(title, description, location, eventDate, uid, lat ?? null, lng ?? null);
     }
 
     public rsvpEvent(eid: number, uid: number, status: string): void {

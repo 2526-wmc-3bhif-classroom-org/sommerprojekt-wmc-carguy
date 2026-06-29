@@ -27,6 +27,8 @@ export interface EventModel {
   eventDate: string;
   hostUid: number;
   hostUsername: string;
+  lat: number | null;
+  lng: number | null;
   yesCount: number;
   noCount: number;
   maybeCount: number;
@@ -53,11 +55,11 @@ export class EventService {
     );
   }
 
-  async createEvent(title: string, description: string, location: string, eventDate: string): Promise<void> {
+  async createEvent(title: string, description: string, location: string, eventDate: string, lat?: number | null, lng?: number | null): Promise<void> {
     await firstValueFrom(
       this.http.post<void>(
         `${environment.apiBaseUrl}/events`,
-        { title, description, location, eventDate },
+        { title, description, location, eventDate, lat, lng },
         { headers: this.getHeaders() }
       )
     );

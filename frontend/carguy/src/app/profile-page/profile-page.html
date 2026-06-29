@@ -127,10 +127,46 @@
       </div>
     } @else {
       @if (activeTab === 'posts') {
-        <div class="space-y-4">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           @for (post of recentPosts; track post.pid) {
-            <a [routerLink]="['/post', post.pid]" class="premium-card p-6 rounded-3xl cursor-pointer block">
-              <div class="flex gap-4">
+            <a [routerLink]="['/post', post.pid]" class="premium-card rounded-3xl cursor-pointer block overflow-hidden border border-base-200/60 hover:border-primary/30 transition-all duration-300">
+              @if (post.imageUrls && post.imageUrls.length > 0) {
+                <!-- Post Image Header (Full width) -->
+                <div class="relative w-full h-60 bg-base-200" (click)="$event.stopPropagation()">
+                  <div class="carousel w-full h-full">
+                    @for (url of post.imageUrls; track $index) {
+                    <div class="carousel-item w-full h-full relative group/carousel" id="slide-recent-{{post.pid}}-{{$index}}">
+                      @if (isImageFlagged(url) && !revealedImages[url]) {
+                        <div class="relative w-full h-full min-h-[240px] flex items-center justify-center bg-base-300 w-full">
+                          <img [src]="getImageUrl(url)" class="absolute inset-0 w-full h-full object-cover blur-lg scale-105" />
+                          <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 text-white p-4 text-center">
+                            <svg class="h-6 w-6 text-warning mb-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            <span class="text-[10px] font-bold uppercase tracking-wider mb-2">Flagged by AI</span>
+                            <button (click)="revealImage(url, $event)" class="btn btn-xs btn-primary rounded-lg text-[9px] px-2 py-0.5 h-auto min-h-0 pointer-events-auto">Reveal</button>
+                          </div>
+                        </div>
+                      } @else {
+                        <img [src]="getImageUrl(url)" class="w-full h-full object-cover cursor-pointer" alt="Post Image" (click)="openImageModal(url, $event)">
+                      }
+                      @if (post.imageUrls.length > 1) {
+                        <div class="absolute left-2 right-2 top-1/2 flex -translate-y-1/2 transform justify-between pointer-events-none opacity-0 group-hover/carousel:opacity-100 transition-opacity">
+                          <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-recent-' + post.pid + '-' + ($index === 0 ? post.imageUrls.length - 1 : $index - 1))" class="btn btn-circle btn-xs bg-black/50 hover:bg-black/80 text-white border-none pointer-events-auto">❮</button>
+                          <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-recent-' + post.pid + '-' + ($index === post.imageUrls.length - 1 ? 0 : $index + 1))" class="btn btn-circle btn-xs bg-black/50 hover:bg-black/80 text-white border-none pointer-events-auto">❯</button>
+                        </div>
+                      }
+                    </div>
+                    }
+                  </div>
+                  @if (post.imageUrls.length > 1) {
+                    <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+                      @for (url of post.imageUrls; track $index) {
+                        <a href="#slide-recent-{{post.pid}}-{{$index}}" class="w-2 h-2 rounded-full bg-white/50 hover:bg-white transition-colors"></a>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+              <div class="p-6 flex gap-4">
                 <div class="flex flex-col items-center gap-3 text-base-content/70 min-w-[48px]">
                   <div class="flex flex-col items-center gap-1">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></svg>
@@ -175,7 +211,7 @@
               </div>
             </a>
           } @empty {
-            <div class="card bg-base-200 border border-base-content/10 p-6 rounded-xl min-h-[200px] flex items-center justify-center shadow-sm">
+            <div class="col-span-full card bg-base-200 border border-base-content/10 p-6 rounded-xl min-h-[200px] flex items-center justify-center shadow-sm">
               <p class="text-base-content/60 text-center">No recent posts found.</p>
             </div>
           }
@@ -222,10 +258,46 @@
           }
         </div>
       } @else if (activeTab === 'bookmarks') {
-        <div class="space-y-4">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           @for (post of bookmarkedPosts; track post.pid) {
-            <a [routerLink]="['/post', post.pid]" class="premium-card p-6 rounded-3xl cursor-pointer block">
-              <div class="flex gap-4">
+            <a [routerLink]="['/post', post.pid]" class="premium-card rounded-3xl cursor-pointer block overflow-hidden border border-base-200/60 hover:border-primary/30 transition-all duration-300">
+              @if (post.imageUrls && post.imageUrls.length > 0) {
+                <!-- Post Image Header (Full width) -->
+                <div class="relative w-full h-60 bg-base-200" (click)="$event.stopPropagation()">
+                  <div class="carousel w-full h-full">
+                    @for (url of post.imageUrls; track $index) {
+                    <div class="carousel-item w-full h-full relative group/carousel" id="slide-bookmarked-{{post.pid}}-{{$index}}">
+                      @if (isImageFlagged(url) && !revealedImages[url]) {
+                        <div class="relative w-full h-full min-h-[240px] flex items-center justify-center bg-base-300 w-full">
+                          <img [src]="getImageUrl(url)" class="absolute inset-0 w-full h-full object-cover blur-lg scale-105" />
+                          <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 text-white p-4 text-center">
+                            <svg class="h-6 w-6 text-warning mb-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            <span class="text-[10px] font-bold uppercase tracking-wider mb-2">Flagged by AI</span>
+                            <button (click)="revealImage(url, $event)" class="btn btn-xs btn-primary rounded-lg text-[9px] px-2 py-0.5 h-auto min-h-0 pointer-events-auto">Reveal</button>
+                          </div>
+                        </div>
+                      } @else {
+                        <img [src]="getImageUrl(url)" class="w-full h-full object-cover cursor-pointer" alt="Post Image" (click)="openImageModal(url, $event)">
+                      }
+                      @if (post.imageUrls.length > 1) {
+                        <div class="absolute left-2 right-2 top-1/2 flex -translate-y-1/2 transform justify-between pointer-events-none opacity-0 group-hover/carousel:opacity-100 transition-opacity">
+                          <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-bookmarked-' + post.pid + '-' + ($index === 0 ? post.imageUrls.length - 1 : $index - 1))" class="btn btn-circle btn-xs bg-black/50 hover:bg-black/80 text-white border-none pointer-events-auto">❮</button>
+                          <button (click)="$event.stopPropagation(); $event.preventDefault(); scrollToSlide('slide-bookmarked-' + post.pid + '-' + ($index === post.imageUrls.length - 1 ? 0 : $index + 1))" class="btn btn-circle btn-xs bg-black/50 hover:bg-black/80 text-white border-none pointer-events-auto">❯</button>
+                        </div>
+                      }
+                    </div>
+                    }
+                  </div>
+                  @if (post.imageUrls.length > 1) {
+                    <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+                      @for (url of post.imageUrls; track $index) {
+                        <a href="#slide-bookmarked-{{post.pid}}-{{$index}}" class="w-2 h-2 rounded-full bg-white/50 hover:bg-white transition-colors"></a>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+              <div class="p-6 flex gap-4">
                 <div class="flex flex-col items-center gap-3 text-base-content/70 min-w-[48px]">
                   <div class="flex flex-col items-center gap-1">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></svg>
@@ -270,7 +342,7 @@
               </div>
             </a>
           } @empty {
-            <div class="card bg-base-200 border border-base-content/10 p-6 rounded-xl min-h-[200px] flex items-center justify-center shadow-sm">
+            <div class="col-span-full card bg-base-200 border border-base-content/10 p-6 rounded-xl min-h-[200px] flex items-center justify-center shadow-sm">
               <p class="text-base-content/60 text-center">No bookmarked posts found.</p>
             </div>
           }
@@ -425,5 +497,20 @@
     </div>
   }
 
+  <!-- Image Modal -->
+  <dialog id="image_modal" class="modal">
+    <div class="modal-box w-11/12 max-w-5xl p-0 overflow-hidden bg-transparent shadow-none relative flex justify-center items-center">
+      @if (selectedImage) {
+        <img [src]="selectedImage" class="w-full h-auto object-contain max-h-[90vh]">
+      }
+      <form method="dialog" class="absolute top-2 right-2">
+        <button class="btn btn-sm btn-circle btn-ghost text-white bg-black/50 hover:bg-black/80">✕</button>
+      </form>
+    </div>
+    <form method="dialog" class="modal-backdrop bg-black/80">
+      <button>close</button>
+    </form>
+  </dialog>
 </div>
 }
+

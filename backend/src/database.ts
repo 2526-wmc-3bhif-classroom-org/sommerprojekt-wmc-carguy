@@ -70,6 +70,14 @@ export class DB {
             // Already migrated or table not created yet
         }
 
+        try {
+            connection.exec("ALTER TABLE Event ADD COLUMN Lat Real;");
+            connection.exec("ALTER TABLE Event ADD COLUMN Lng Real;");
+            console.log("Migration: Added Lat/Lng columns to Event table.");
+        } catch (_) {
+            // Already migrated or table not created yet
+        }
+
         connection.exec(`
             create table if not exists User (
                                                 UID Integer not null,
@@ -282,6 +290,8 @@ export class DB {
                 Location Text not null,
                 EventDate Text not null,
                 UID Integer not null,
+                Lat Real,
+                Lng Real,
                 constraint FK_Event_User foreign key (UID)
                 references User (UID)
                 on delete cascade
@@ -1207,6 +1217,36 @@ export class DB {
                 insertV.run(4, "Dodge", "Challenger Hellcat", 2020,
                     "Borla ATAK exhaust, cold air intake, Mopar widebody kit, Brembo brake upgrade, SRT performance pages tune",
                     "https://images.unsplash.com/photo-1611859266238-4b98091d9d9b?w=800");
+
+                // porsche_pete (UID=11)
+                insertV.run(11, "Porsche", "911 GT3 RS (992)", 2023,
+                    "Manthey Racing kit, Magnesium wheels, Shark Blue paint, Akrapovic exhaust",
+                    "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=800");
+                insertV.run(11, "Porsche", "Carrera GT", 2005,
+                    "Fabspeed straight pipes, custom cognac leather luggage set, completely stock engine",
+                    "https://images.unsplash.com/photo-1611245037920-5690b2c1598f?w=800");
+                insertV.run(11, "Porsche", "911 Turbo S (993)", 1997,
+                    "Arena Red Metallic over Cashmere, hollow-spoke technology wheels, 450hp factory option kit",
+                    "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800");
+
+                // jdm_yuki (UID=12)
+                insertV.run(12, "Nissan", "Skyline GT-R R34", 2002,
+                    "Midnight Purple III, Nismo Z-Tune body parts, RB26 stage 1 turbos, Volk TE37 Saga",
+                    "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800");
+                insertV.run(12, "Toyota", "Supra MK4", 1998,
+                    "Quicksilver FX, stock twin-turbos, active front spoiler, HKS hypermax coilovers",
+                    "https://images.unsplash.com/photo-1614026480249-f26ad896d4f7?w=800");
+                insertV.run(12, "Mazda", "RX-7 FD", 1999,
+                    "Spirit R Type A, Innocent Blue Mica, 13B-REW twins, BBS wheels, Recaro carbon seats",
+                    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800");
+
+                // turbo_tommy (UID=7)
+                insertV.run(7, "Subaru", "WRX STI", 2017,
+                    "Hyper Blue paint, Blouch 2.5XTR turbo, ETS front mount intercooler, Tomei exhaust, 450whp",
+                    "https://images.unsplash.com/photo-1626847037657-fd3622613ce3?w=800");
+                insertV.run(7, "Mitsubishi", "Lancer Evolution IX", 2006,
+                    "Apex Silver, FP Green turbo, GSC S2 cams, Ohlins Road & Track coilovers, Volk CE28N",
+                    "https://images.unsplash.com/photo-1603386329225-868f9b1ee6c9?w=800");
 
                 console.log("Seeded garage vehicles for all users.");
             }

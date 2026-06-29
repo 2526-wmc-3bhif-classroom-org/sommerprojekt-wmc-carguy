@@ -1,7 +1,7 @@
 import { aiConfig } from "../config";
 
 const LOCAL_BAD_WORDS = [
-    "nigger", "faggot", "retard", "cunt", "kys", "kill yourself", "slut", "bitch", "whore", "rape"
+    "nigger", "faggot", "retard", "cunt", "kys", "kill yourself", "slut", "bitch", "whore", "rape", "bad word"
 ];
 
 export class ModerationService {

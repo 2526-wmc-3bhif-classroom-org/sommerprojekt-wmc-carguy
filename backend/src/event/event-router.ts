@@ -26,7 +26,7 @@ eventRouter.get("/events", (req, res) => {
 
 eventRouter.post("/events", requireAuth, async (req: any, res) => {
     try {
-        const { title, description, location, eventDate } = req.body;
+        const { title, description, location, eventDate, lat, lng } = req.body;
 
         if (!title || !description || !location || !eventDate) {
             return res.status(StatusCodes.BAD_REQUEST).send("All event fields are required");
@@ -48,7 +48,10 @@ eventRouter.post("/events", requireAuth, async (req: any, res) => {
 
         moderationRepository.logModeration("event", textContent, "passed", null);
 
-        eventService.createEvent(title.trim(), description.trim(), location.trim(), eventDate, user.uid);
+        const parsedLat = typeof lat === 'number' ? lat : null;
+        const parsedLng = typeof lng === 'number' ? lng : null;
+
+        eventService.createEvent(title.trim(), description.trim(), location.trim(), eventDate, user.uid, parsedLat, parsedLng);
         res.status(StatusCodes.CREATED).json({ message: "Event created successfully" });
     } catch (e: any) {
         res.status(StatusCodes.BAD_REQUEST).send(e.message);

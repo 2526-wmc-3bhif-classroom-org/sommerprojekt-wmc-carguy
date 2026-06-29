@@ -9,6 +9,7 @@ import { GarageService } from '../services/garage-service';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { getUserBadges, Badge } from '../utils/badge';
+import { openImageModal, scrollToSlide } from '../image-modal';
 
 @Component({
   selector: 'app-profile-page',
@@ -28,6 +29,16 @@ export class ProfilePage implements OnInit {
     return getUserBadges(user);
   }
   public isEditing = false;
+  selectedImage: string | null = null;
+
+  openImageModal(url: string, event: Event) {
+    this.selectedImage = openImageModal(this.getImageUrl(url), event);
+  }
+
+  scrollToSlide(id: string) {
+    scrollToSlide(id);
+  }
+
 
   public editPublicName: string = '';
   public editUsername: string = '';

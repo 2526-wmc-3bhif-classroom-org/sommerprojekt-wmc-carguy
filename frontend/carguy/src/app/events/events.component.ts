@@ -63,6 +63,9 @@ const GEO_LOOKUP: { keyword: string; lat: number; lng: number }[] = [
 ];
 
 function getCoords(ev: EventModel): [number, number] {
+  // Use stored coordinates if available
+  if (ev.lat != null && ev.lng != null) return [ev.lat, ev.lng];
+  // Fall back to keyword geo-lookup
   const combined = `${ev.title} ${ev.location}`;
   for (const g of GEO_LOOKUP) {
     if (combined.toLowerCase().includes(g.keyword.toLowerCase())) {
@@ -100,8 +103,14 @@ export class EventsComponent implements OnInit, OnDestroy {
   newDescription = '';
   newLocation = '';
   newDate = '';
+  newLat: number | null = null;
+  newLng: number | null = null;
   createError = '';
   isSubmitting = false;
+  isGeocodingLocation = false;
+
+  private pickerMap: L.Map | null = null;
+  private pickerMarker: L.Marker | null = null;
 
   now = Date.now();
   private timerInterval?: any;
@@ -119,7 +128,53 @@ export class EventsComponent implements OnInit, OnDestroy {
       this.router.navigate(['/login']);
       return;
     }
+    this.newTitle = ''; this.newDescription = ''; this.newLocation = ''; this.newDate = '';
+    this.newLat = null; this.newLng = null; this.createError = '';
     this.showCreateModal = true;
+    setTimeout(() => this.initPickerMap(), 200);
+  }
+
+  private initPickerMap() {
+    const container = document.getElementById('picker-map');
+    if (!container || this.pickerMap) return;
+
+    const theme = document.documentElement.getAttribute('data-theme');
+    const isDark = theme && theme !== 'light';
+    const tileUrl = isDark
+      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+    this.pickerMap = L.map('picker-map', { center: [30, 10], zoom: 2, zoomControl: true });
+    L.tileLayer(tileUrl, { attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(this.pickerMap);
+
+    this.pickerMap.on('click', (e: L.LeafletMouseEvent) => {
+      const { lat, lng } = e.latlng;
+      this.newLat = lat;
+      this.newLng = lng;
+      const pinIcon = L.divIcon({
+        html: `<div style="width:26px;height:34px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.45))">
+          <svg width="26" height="34" viewBox="0 0 26 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13 1C7.477 1 3 5.477 3 11c0 8.5 10 22 10 22s10-13.5 10-22C23 5.477 18.523 1 13 1z"
+                  fill="#f59e0b" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+            <circle cx="13" cy="11" r="4" fill="white" opacity="0.9"/>
+          </svg></div>`,
+        className: '', iconSize: [26, 34], iconAnchor: [13, 34]
+      });
+      if (this.pickerMarker) { this.pickerMarker.setLatLng([lat, lng]); }
+      else { this.pickerMarker = L.marker([lat, lng], { icon: pinIcon }).addTo(this.pickerMap!); }
+      // Reverse geocode with Nominatim
+      this.isGeocodingLocation = true;
+      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`)
+        .then(r => r.json())
+        .then(d => { this.newLocation = d.display_name?.split(',').slice(0, 3).join(',').trim() || `${lat.toFixed(4)}, ${lng.toFixed(4)}`; })
+        .catch(() => { this.newLocation = `${lat.toFixed(4)}, ${lng.toFixed(4)}`; })
+        .finally(() => { this.isGeocodingLocation = false; });
+    });
+  }
+
+  closeHostModal() {
+    this.showCreateModal = false;
+    if (this.pickerMap) { this.pickerMap.remove(); this.pickerMap = null; this.pickerMarker = null; }
   }
 
   eventPinColor(ev: EventModel): string {
@@ -298,9 +353,10 @@ export class EventsComponent implements OnInit, OnDestroy {
     this.isSubmitting = true;
     this.createError = '';
     try {
-      await this.eventService.createEvent(this.newTitle.trim(), this.newDescription.trim(), this.newLocation.trim(), this.newDate);
+      await this.eventService.createEvent(this.newTitle.trim(), this.newDescription.trim(), this.newLocation.trim(), this.newDate, this.newLat, this.newLng);
       this.newTitle = ''; this.newDescription = ''; this.newLocation = ''; this.newDate = '';
-      this.showCreateModal = false;
+      this.newLat = null; this.newLng = null;
+      this.closeHostModal();
       await this.loadEvents();
     } catch (e: any) {
       this.createError = e.error || e.message || 'Failed to create event.';

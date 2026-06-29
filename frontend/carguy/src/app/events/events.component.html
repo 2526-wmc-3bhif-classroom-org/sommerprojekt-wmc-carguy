@@ -202,8 +202,8 @@
 
   <!-- ═══════════════ HOST MODAL ═══════════════ -->
   <div *ngIf="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-    <div class="premium-card p-8 rounded-3xl max-w-md w-full border border-base-content/10 bg-base-100 shadow-2xl relative">
-      <button (click)="showCreateModal = false" class="btn btn-sm btn-circle btn-ghost absolute top-4 right-4">✕</button>
+    <div class="premium-card p-8 rounded-3xl w-full max-w-2xl border border-base-content/10 bg-base-100 shadow-2xl relative overflow-y-auto max-h-[90vh]">
+      <button (click)="closeHostModal()" class="btn btn-sm btn-circle btn-ghost absolute top-4 right-4">✕</button>
       <h3 class="font-extrabold text-2xl text-primary mb-6">Host Car Event</h3>
       <div class="space-y-4">
         <div>
@@ -214,17 +214,34 @@
           <label class="label text-xs font-semibold uppercase tracking-wider text-base-content/60 p-0 mb-1">Description</label>
           <textarea [(ngModel)]="newDescription" placeholder="Details about the meet..." class="textarea textarea-bordered w-full bg-white/5 border-base-content/10 focus:border-primary text-sm resize-none" rows="3"></textarea>
         </div>
+
+        <!-- Location picker -->
         <div>
-          <label class="label text-xs font-semibold uppercase tracking-wider text-base-content/60 p-0 mb-1">Location</label>
-          <input [(ngModel)]="newLocation" placeholder="e.g. Nürburgring Nordschleife Entry" class="input input-bordered w-full bg-white/5 border-base-content/10 focus:border-primary text-sm h-11" />
+          <label class="label text-xs font-semibold uppercase tracking-wider text-base-content/60 p-0 mb-1">
+            Pick Location on Map
+            <span class="ml-2 text-base-content/40 font-normal normal-case">(click map to pin)</span>
+          </label>
+          <!-- Leaflet picker map -->
+          <div id="picker-map" style="height:240px;border-radius:12px;overflow:hidden;z-index:0;position:relative;" class="border border-base-content/15 mb-3"></div>
+          <!-- Auto-filled location text, still editable -->
+          <div class="relative">
+            <input [(ngModel)]="newLocation"
+                   placeholder="Click the map or type manually…"
+                   class="input input-bordered w-full bg-white/5 border-base-content/10 focus:border-primary text-sm h-11 pr-10" />
+            <span *ngIf="isGeocodingLocation" class="absolute right-3 top-3 loading loading-spinner loading-xs text-primary"></span>
+          </div>
+          <p *ngIf="newLat !== null" class="text-[10px] text-base-content/40 mt-1">
+            📍 {{ newLat | number:'1.4-4' }}, {{ newLng | number:'1.4-4' }}
+          </p>
         </div>
+
         <div>
           <label class="label text-xs font-semibold uppercase tracking-wider text-base-content/60 p-0 mb-1">Date &amp; Time</label>
           <input type="datetime-local" [(ngModel)]="newDate" class="input input-bordered w-full bg-white/5 border-base-content/10 focus:border-primary text-sm h-11" />
         </div>
         <p *ngIf="createError" class="text-red-400 text-xs mt-2">{{ createError }}</p>
         <div class="flex justify-end gap-3 mt-8">
-          <button (click)="showCreateModal = false" class="btn btn-ghost">Cancel</button>
+          <button (click)="closeHostModal()" class="btn btn-ghost">Cancel</button>
           <button (click)="createEvent()" [disabled]="!newTitle.trim() || !newDescription.trim() || !newLocation.trim() || !newDate || isSubmitting" class="btn btn-primary">
             <span *ngIf="isSubmitting" class="loading loading-spinner loading-xs"></span>
             <span *ngIf="!isSubmitting">Publish Event</span>
@@ -233,4 +250,5 @@
       </div>
     </div>
   </div>
+
 </div>
